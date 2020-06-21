@@ -1,0 +1,1 @@
+library armv4t;
