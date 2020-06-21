@@ -1,0 +1,19 @@
+name: armv4t
+
+description: >
+  An emulator for the ARMv4T instruction set, written in Dart.
+version: 1.1.0
+
+homepage: https://github.com/matanlurey/armv4t.dart
+
+environment:
+  sdk: ">=2.8.0 <3.0.0"
+
+dependencies:
+  binary: ^1.1.0
+  meta: ^1.1.8
+
+dev_dependencies:
+  pedantic: ^1.9.0
+  test: ^1.15.0
+  test_coverage: ^0.4.1
