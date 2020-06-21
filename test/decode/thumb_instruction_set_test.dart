@@ -14,6 +14,7 @@ void main() {
       'S': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 02:ADD_AND_SUBTRACT', () {
@@ -27,6 +28,7 @@ void main() {
       'S': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 03:MOVE_COMPARE_ADD_AND_SUBTRACT_IMMEDIATE', () {
@@ -39,6 +41,7 @@ void main() {
       'D': '101'.parseBits(),
       'O': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 04:ALU_OPERATION', () {
@@ -51,6 +54,7 @@ void main() {
       'S': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 05:HIGH_REGISTER_OPERATIONS_AND_BRANCH_EXCHANGE', () {
@@ -65,6 +69,7 @@ void main() {
       'S': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 06:PC_RELATIVE_LOAD', () {
@@ -76,6 +81,7 @@ void main() {
       'D': '101'.parseBits(),
       'W': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 07:LOAD_AND_STORE_WITH_RELATIVE_OFFSET', () {
@@ -90,6 +96,7 @@ void main() {
       'N': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test(
@@ -106,6 +113,7 @@ void main() {
         'B': '101'.parseBits(),
         'D': '010'.parseBits(),
       });
+      expect(ThumbInstructionSet.allFormats.match(input), format);
     },
   );
 
@@ -121,6 +129,7 @@ void main() {
       'N': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 10:LOAD_AND_STORE_HALFWORD', () {
@@ -134,6 +143,7 @@ void main() {
       'B': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 11:SP_RELATIVE_LOAD_AND_STORE', () {
@@ -146,6 +156,7 @@ void main() {
       'D': '101'.parseBits(),
       'W': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 12:LOAD_ADDRESS', () {
@@ -158,18 +169,19 @@ void main() {
       'D': '101'.parseBits(),
       'W': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 13:ADD_OFFSET_TO_STACK_POINTER', () {
-    //              1010   SDDD   WWWW   WWWW
-    final input = ('1010' '1101' '0110' '1010').parseBits();
+    //              1011   0000   SWWW   WWWW
+    final input = ('1011' '0000' '0110' '1010').parseBits();
     final format = ThumbInstructionSet.$13$addOffsetToStackPointer;
     final coded = Map.fromIterables(format.names, format.capture(input));
     expect(coded, {
-      'S': 1,
-      'D': '101'.parseBits(),
-      'W': '01101010'.parseBits(),
+      'S': 0,
+      'W': '1101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 14:PUSH_AND_POP_REGISTERS', () {
@@ -182,6 +194,7 @@ void main() {
       'R': 1,
       'T': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 15:MULTIPLE_LOAD_AND_STORE', () {
@@ -194,6 +207,7 @@ void main() {
       'B': '101'.parseBits(),
       'T': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 16:CONDITIONAL_BRANCH', () {
@@ -205,6 +219,7 @@ void main() {
       'C': '1101'.parseBits(),
       'S': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 17:SOFTWARE_INTERRUPT', () {
@@ -215,6 +230,7 @@ void main() {
     expect(coded, {
       'V': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 18:UNCONDITIONAL_BRANCH', () {
@@ -225,6 +241,7 @@ void main() {
     expect(coded, {
       'O': '10101101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 
   test('should decode 19:LONG_BRANCH_WITH_LINK', () {
@@ -236,5 +253,6 @@ void main() {
       'H': 1,
       'O': '10101101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
   });
 }

@@ -68,7 +68,7 @@ class ThumbInstructionSet {
 
   /// Add offset to stack pointer.
   static final $13$addOffsetToStackPointer = BitPatternBuilder.parse(
-    '1010_SDDD_WWWW_WWWW',
+    '1011_0000_SWWW_WWWW',
   ).build('13:ADD_OFFSET_TO_STACK_POINTER');
 
   /// Push and pop registers.
