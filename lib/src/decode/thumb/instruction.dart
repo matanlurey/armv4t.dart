@@ -1,32 +1,44 @@
+part 'instruction/branch/b.dart';
+part 'instruction/branch/bl.dart';
+part 'instruction/branch/bx.dart';
+part 'instruction/coproccess/cdp.dart';
+part 'instruction/coproccess/ldc.dart';
+part 'instruction/coproccess/mcr.dart';
+part 'instruction/coproccess/mrc.dart';
+part 'instruction/coproccess/stc.dart';
+part 'instruction/data/ldm.dart';
+part 'instruction/data/ldr.dart';
+part 'instruction/data/ldrb.dart';
+part 'instruction/data/ldrh.dart';
+part 'instruction/data/ldrsb.dart';
+part 'instruction/data/mov.dart';
+part 'instruction/data/mvn.dart';
+part 'instruction/data/stm.dart';
+part 'instruction/data/str.dart';
+part 'instruction/data/strb.dart';
+part 'instruction/data/strh.dart';
+part 'instruction/logic/and.dart';
+part 'instruction/logic/bic.dart';
+part 'instruction/logic/cmn.dart';
+part 'instruction/logic/cmp.dart';
+part 'instruction/logic/eor.dart';
+part 'instruction/logic/neg.dart';
+part 'instruction/logic/orr.dart';
+part 'instruction/logic/tst.dart';
+part 'instruction/math/adc.dart';
+part 'instruction/math/add.dart';
+part 'instruction/math/mul.dart';
+part 'instruction/math/rsb.dart';
+part 'instruction/math/rsc.dart';
+part 'instruction/math/sbc.dart';
+part 'instruction/math/sub.dart';
+part 'instruction/misc/pop.dart';
+part 'instruction/misc/push.dart';
+part 'instruction/misc/swi.dart';
+part 'instruction/shift/asr.dart';
+part 'instruction/shift/lsl.dart';
+part 'instruction/shift/lsr.dart';
+part 'instruction/shift/ror.dart';
+
 /// An **internal** representation of a decoded `THUMB` instruction.
 abstract class ThumbInstruction {}
-
-abstract class DataProcessingThumbInstruction extends ThumbInstruction {}
-
-class Move extends DataProcessingThumbInstruction {}
-
-class MoveNot extends DataProcessingThumbInstruction {}
-
-class LoadWord extends DataProcessingThumbInstruction {}
-
-class LoadByte extends DataProcessingThumbInstruction {}
-
-class LoadHalfWord extends DataProcessingThumbInstruction {}
-
-class LoadSignedBytes extends DataProcessingThumbInstruction {}
-
-class LoadMultiple extends DataProcessingThumbInstruction {}
-
-class StoreWord extends DataProcessingThumbInstruction {}
-
-class StoreByte extends DataProcessingThumbInstruction {}
-
-class StoreHalfWord extends DataProcessingThumbInstruction {}
-
-class StoreMultiple extends DataProcessingThumbInstruction {}
-
-abstract class ArithmeticThumbInstruction extends ThumbInstruction {}
-
-class Add extends ArithmeticThumbInstruction {}
-
-class AddWithCarry extends ArithmeticThumbInstruction {}
