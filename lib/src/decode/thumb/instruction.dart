@@ -60,7 +60,9 @@ part 'instruction/shift/lsr.dart';
 part 'instruction/shift/ror.dart';
 
 /// An **internal** representation of a decoded `THUMB` instruction.
-abstract class ThumbInstruction {}
+abstract class ThumbInstruction {
+  const ThumbInstruction._();
+}
 
 /// Further decodes a [ThumbInstructionSet] into a [ThumbInstruction].
 class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
@@ -109,7 +111,7 @@ class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
       case 0xF:
         return MVN();
       default:
-        throw _unrecognizedOpcode(set.opcode);
+        return _unrecognizedOpcode(set.opcode);
     }
   }
 
@@ -128,7 +130,7 @@ class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
       case 0x3:
         return SUB();
       default:
-        throw _unrecognizedOpcode(set.opcode);
+        return _unrecognizedOpcode(set.opcode);
     }
   }
 
@@ -215,7 +217,7 @@ class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
       case 0xA:
         return BX();
       default:
-        throw _unrecognizedOpcode(set.opcode);
+        return _unrecognizedOpcode(set.opcode);
     }
   }
 
@@ -349,7 +351,7 @@ class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
       case 0x3:
         return SUB();
       default:
-        throw _unrecognizedOpcode(set.opcode);
+        return _unrecognizedOpcode(set.opcode);
     }
   }
 
@@ -366,7 +368,7 @@ class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
       case 0x2:
         return ASR();
       default:
-        throw _unrecognizedOpcode(set.opcode);
+        return _unrecognizedOpcode(set.opcode);
     }
   }
 
