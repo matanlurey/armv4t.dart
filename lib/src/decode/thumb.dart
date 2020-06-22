@@ -1108,37 +1108,3 @@ class LongBranchWithLink extends ThumbInstructionSet {
     };
   }
 }
-
-/*
-/// Decoded object from [ThumbInstructionSet.X].
-class NAME extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.X;
-
-  /// Creates a [NAME] by decoding [bits].
-  factory NAME.decodeBits(int bits) {
-    return NAME.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [NAME] converting a previously [decoded] list.
-  factory NAME.fromList(List<int> decoded) {
-    return NAME(
-      opcode: decoded[0],
-    );
-  }
-
-  /// Creates a [NAME] from the provided variables.
-  ///
-  /// > **NOTE**: Bits are **not** checked for correctness or size!
-  NAME({
-    @required this.opcode,
-  })  : assert(opcode != null),
-        super._(_F);
-
-  @override
-  Map<String, Object> toJson() {
-    return {
-      'Op': opcode,
-    };
-  }
-}
-*/

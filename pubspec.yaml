@@ -2,7 +2,7 @@ name: armv4t
 
 description: >
   An emulator for the ARMv4T instruction set, written in Dart.
-version: 1.1.0
+version: 0.1.0
 
 homepage: https://github.com/matanlurey/armv4t.dart
 
