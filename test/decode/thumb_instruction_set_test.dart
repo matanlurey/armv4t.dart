@@ -1,4 +1,4 @@
-import 'package:armv4t/src/decode/thumb.dart';
+import 'package:armv4t/src/decode/thumb/format.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
