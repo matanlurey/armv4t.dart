@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:binary/binary.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
@@ -103,39 +105,53 @@ abstract class ThumbInstructionSet {
     '1111_HOOO_OOOO_OOOO',
   ).build('19:LONG_BRANCH_WITH_LINK');
 
+  /// A known list of all the different [ThumbInstructionSetDecoder] instances.
+  static final _decoders = [
+    MoveShiftedRegister.decoder,
+    AddAndSubtract.decoder,
+    MoveCompareAddAndSubtractImmediate.decoder,
+    ALUOperation.decoder,
+    HighRegisterOperationsAndBranchExchange.decoder,
+    PCRelativeLoad.decoder,
+    LoadAndStoreWithRelativeOffset.decoder,
+    LoadAndStoreSignExtendedByteAndHalfWord.decoder,
+    LoadAndStoreWithImmediateOffset.decoder,
+    LoadAndStoreHalfWord.decoder,
+    SPRelativeLoadAndStore.decoder,
+    LoadAddress.decoder,
+    AddOffsetToStackPointer.decoder,
+    PushAndPopRegisters.decoder,
+    MultipleLoadAndStore.decoder,
+    ConditionalBranch.decoder,
+    SoftwareInterrupt.decoder,
+    UnconditionalBranch.decoder,
+    LongBranchWithLink.decoder,
+  ];
+
   /// A collection of all the known formats in [ThumbInstructionSet], sorted.
-  static final BitPatternGroup<List<int>, BitPattern<List<int>>> allFormats = [
-    $01$moveShiftedRegister,
-    $02$addAndSubtract,
-    $03$moveCompareAddAndSubtractImmediate,
-    $04$aluOperation,
-    $05$highRegisterOperationsAndBranch,
-    $06$pcRelativeLoad,
-    $07$loadAndStoreWithRelativeOffset,
-    $08$loadAndStoreSignExtended,
-    $09$loadAndStoreWithImmediateOffset,
-    $10$loadAndStoreHalfword,
-    $11$spRelativeLoadAndStore,
-    $12$loadAddress,
-    $13$addOffsetToStackPointer,
-    $14$pushAndPopRegisters,
-    $15$multipleLoadAndStore,
-    $16$conditionalBranch,
-    $17$softwareInterrupt,
-    $18$unconditionalBranch,
-    $19$longBranchWithLink,
-  ].toGroup();
+  static final allFormats = _decoders.map((d) => d._format).toList().toGroup();
+
+  static Map<BitPattern<void>, ThumbInstructionSetDecoder> _mapDecoders() {
+    final m = {for (final decoder in _decoders) decoder._format: decoder};
+    return HashMap.identity()..addAll(m);
+  }
+
+  /// Create a Map of [BitPattern] -> [ThumbInstructionSetDecoder].
+  static final mapDecoders = _mapDecoders();
 
   /// Format used to match and decode this instruction.
-  final BitPattern<List<int>> format;
+  final BitPattern<List<int>> _format;
 
-  const ThumbInstructionSet._(this.format) : assert(format != null);
+  const ThumbInstructionSet._(this._format) : assert(_format != null);
+
+  /// Delegates to the appropriate method of [visitor], optionally [context].
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]);
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) {
       return true;
-    } else if (o is ThumbInstructionSet && identical(format, o.format)) {
+    } else if (o is ThumbInstructionSet && identical(_format, o._format)) {
       return const MapEquality<Object, Object>().equals(toJson(), o.toJson());
     } else {
       return false;
@@ -152,10 +168,134 @@ abstract class ThumbInstructionSet {
   String toString() => '$runtimeType $toJson()';
 }
 
-/// Decoded object from [ThumbInstructionSet.$01$moveShiftedRegister].
+/// Implements decoding a `List<int>` or `int` into a [T] [ThumbInstructionSet].
+@sealed
+class ThumbInstructionSetDecoder<T extends ThumbInstructionSet> {
+  final BitPattern<List<int>> _format;
+  final T Function(List<int>) _decoder;
 
+  /// Create a new [ThumbInstructionSetDecoder] for type [T].
+  @literal
+  const ThumbInstructionSetDecoder._(this._format, this._decoder);
+
+  /// Creates a [ThumbInstructionSet] by decoding [bits].
+  @nonVirtual
+  T decodeBits(int bits) => decodeList(_format.capture(bits));
+
+  /// Creates a [ThumbInstructionSet] converting a previously [decoded] list.
+  @nonVirtual
+  T decodeList(List<int> decoded) => _decoder(decoded);
+}
+
+/// Implement to in order to visit known sub-types of [ThumbInstructionSet].
+abstract class ThumbInstructionSetVisitor<R, C> {
+  R visitMoveShiftedRegister(
+    MoveShiftedRegister set, [
+    C context,
+  ]);
+
+  R visitAddAndSubtract(
+    AddAndSubtract set, [
+    C context,
+  ]);
+
+  R visitMoveCompareAddAndSubtractImmediate(
+    MoveCompareAddAndSubtractImmediate set, [
+    C context,
+  ]);
+
+  R visitALUOperation(
+    ALUOperation set, [
+    C context,
+  ]);
+
+  R visitHighRegisterOperationsAndBranchExchange(
+    HighRegisterOperationsAndBranchExchange set, [
+    C context,
+  ]);
+
+  R visitPCRelativeLoad(
+    PCRelativeLoad set, [
+    C context,
+  ]);
+
+  R visitLoadAndStoreWithRelativeOffset(
+    LoadAndStoreWithRelativeOffset set, [
+    C context,
+  ]);
+
+  R visitLoadAndStoreSignExtendedByteAndHalfWord(
+    LoadAndStoreSignExtendedByteAndHalfWord set, [
+    C context,
+  ]);
+
+  R visitLoadAndStoreWithImmediateOffset(
+    LoadAndStoreWithImmediateOffset set, [
+    C context,
+  ]);
+
+  R visitLoadAndStoreHalfWord(
+    LoadAndStoreHalfWord set, [
+    C context,
+  ]);
+
+  R visitSPRelativeLoadAndStore(
+    SPRelativeLoadAndStore set, [
+    C context,
+  ]);
+
+  R visitLoadAddress(
+    LoadAddress set, [
+    C context,
+  ]);
+
+  R visitAddOffsetToStackPointer(
+    AddOffsetToStackPointer set, [
+    C context,
+  ]);
+
+  R visitPushAndPopRegisters(
+    PushAndPopRegisters set, [
+    C context,
+  ]);
+
+  R visitMultipleLoadAndStore(
+    MultipleLoadAndStore set, [
+    C context,
+  ]);
+
+  R visitConditionalBranch(
+    ConditionalBranch set, [
+    C context,
+  ]);
+
+  R visitSoftwareInterrupt(
+    SoftwareInterrupt set, [
+    C context,
+  ]);
+
+  R visitUnconditionalBranch(
+    UnconditionalBranch set, [
+    C context,
+  ]);
+
+  R visitLongBranchWithLink(
+    LongBranchWithLink set, [
+    C context,
+  ]);
+}
+
+/// Decoded object from [ThumbInstructionSet.$01$moveShiftedRegister].
 class MoveShiftedRegister extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$01$moveShiftedRegister;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$01$moveShiftedRegister,
+    (decoded) => MoveShiftedRegister(
+      opcode: decoded[0],
+      offset: decoded[1],
+      registerS: decoded[2],
+      registerD: decoded[3],
+    ),
+  );
 
   /// OpCode (2-bits).
   final int opcode;
@@ -169,21 +309,6 @@ class MoveShiftedRegister extends ThumbInstructionSet {
   /// Register `D` (3-bits).
   final int registerD;
 
-  /// Creates a [MoveShiftedRegister] by decoding [bits].
-  factory MoveShiftedRegister.decodeBits(int bits) {
-    return MoveShiftedRegister.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [MoveShiftedRegister] converting a previously [decoded] list.
-  factory MoveShiftedRegister.fromList(List<int> decoded) {
-    return MoveShiftedRegister(
-      opcode: decoded[0],
-      offset: decoded[1],
-      registerS: decoded[2],
-      registerD: decoded[3],
-    );
-  }
-
   /// Creates a [MoveShiftedRegister] from the provided variables.
   ///
   /// > **NOTE**: Bits are **not** checked for correctness or size!
@@ -196,7 +321,12 @@ class MoveShiftedRegister extends ThumbInstructionSet {
         assert(offset != null),
         assert(registerS != null),
         assert(registerD != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitMoveShiftedRegister(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -210,9 +340,16 @@ class MoveShiftedRegister extends ThumbInstructionSet {
 }
 
 /// Decoded object from [ThumbInstructionSet.$02$addAndSubtract].
-
 class AddAndSubtract extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$02$addAndSubtract;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$02$addAndSubtract,
+    (decoded) => AddAndSubtract(
+      opcode: decoded[0],
+      registerNOrOffset3: decoded[1],
+      registerS: decoded[2],
+      registerD: decoded[3],
+    ),
+  );
 
   /// OpCode (2-bits).
   final int opcode;
@@ -226,21 +363,6 @@ class AddAndSubtract extends ThumbInstructionSet {
   /// Register `D`.
   final int registerD;
 
-  /// Creates a [AddAndSubtract] by decoding [bits].
-  factory AddAndSubtract.decodeBits(int bits) {
-    return AddAndSubtract.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [AddAndSubtract] converting a previously [decoded] list.
-  factory AddAndSubtract.fromList(List<int> decoded) {
-    return AddAndSubtract(
-      opcode: decoded[0],
-      registerNOrOffset3: decoded[1],
-      registerS: decoded[2],
-      registerD: decoded[3],
-    );
-  }
-
   /// Creates a [AddAndSubtract] from the provided variables.
   ///
   /// > **NOTE**: Bits are **not** checked for correctness or size!
@@ -253,7 +375,12 @@ class AddAndSubtract extends ThumbInstructionSet {
         assert(registerNOrOffset3 != null),
         assert(registerS != null),
         assert(registerD != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitAddAndSubtract(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -267,9 +394,15 @@ class AddAndSubtract extends ThumbInstructionSet {
 }
 
 /// Decoded object from [ThumbInstructionSet.$03$moveCompareAddAndSubtractImmediate].
-
 class MoveCompareAddAndSubtractImmediate extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$03$moveCompareAddAndSubtractImmediate;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$03$moveCompareAddAndSubtractImmediate,
+    (decoded) => MoveCompareAddAndSubtractImmediate(
+      opcode: decoded[0],
+      registerD: decoded[1],
+      offset: decoded[2],
+    ),
+  );
 
   /// OpCode (2-bits).
   final int opcode;
@@ -279,20 +412,6 @@ class MoveCompareAddAndSubtractImmediate extends ThumbInstructionSet {
 
   /// Offset (8-bits).
   final int offset;
-
-  /// Creates a [MoveCompareAddAndSubtractImmediate] by decoding [bits].
-  factory MoveCompareAddAndSubtractImmediate.decodeBits(int bits) {
-    return MoveCompareAddAndSubtractImmediate.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [MoveCompareAddAndSubtractImmediate] converting a previously [decoded] list.
-  factory MoveCompareAddAndSubtractImmediate.fromList(List<int> decoded) {
-    return MoveCompareAddAndSubtractImmediate(
-      opcode: decoded[0],
-      registerD: decoded[1],
-      offset: decoded[2],
-    );
-  }
 
   /// Creates a [MoveCompareAddAndSubtractImmediate] from the provided variables.
   ///
@@ -304,7 +423,12 @@ class MoveCompareAddAndSubtractImmediate extends ThumbInstructionSet {
   })  : assert(opcode != null),
         assert(offset != null),
         assert(registerD != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitMoveCompareAddAndSubtractImmediate(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -317,9 +441,15 @@ class MoveCompareAddAndSubtractImmediate extends ThumbInstructionSet {
 }
 
 /// Decoded object from [ThumbInstructionSet.$04$aluOperation].
-
 class ALUOperation extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$04$aluOperation;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$04$aluOperation,
+    (decoded) => ALUOperation(
+      opcode: decoded[0],
+      registerS: decoded[1],
+      registerD: decoded[2],
+    ),
+  );
 
   /// OpCode (4-bits).
   final int opcode;
@@ -329,20 +459,6 @@ class ALUOperation extends ThumbInstructionSet {
 
   /// Register `D` (3-bits).
   final int registerD;
-
-  /// Creates a [ALUOperation] by decoding [bits].
-  factory ALUOperation.decodeBits(int bits) {
-    return ALUOperation.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [ALUOperation] converting a previously [decoded] list.
-  factory ALUOperation.fromList(List<int> decoded) {
-    return ALUOperation(
-      opcode: decoded[0],
-      registerS: decoded[1],
-      registerD: decoded[2],
-    );
-  }
 
   /// Creates a [ALUOperation] from the provided variables.
   ///
@@ -354,7 +470,12 @@ class ALUOperation extends ThumbInstructionSet {
   })  : assert(opcode != null),
         assert(registerS != null),
         assert(registerD != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitALUOperation(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -367,9 +488,17 @@ class ALUOperation extends ThumbInstructionSet {
 }
 
 /// Decoded object from [ThumbInstructionSet.$05$highRegisterOperationsAndBranch].
-
 class HighRegisterOperationsAndBranchExchange extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$05$highRegisterOperationsAndBranch;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$05$highRegisterOperationsAndBranch,
+    (decoded) => HighRegisterOperationsAndBranchExchange(
+      opcode: decoded[0],
+      h1: decoded[1],
+      h2: decoded[2],
+      registerSOrHS: decoded[3],
+      registerDOrHD: decoded[4],
+    ),
+  );
 
   /// Opcode (2-bits).
   final int opcode;
@@ -386,22 +515,6 @@ class HighRegisterOperationsAndBranchExchange extends ThumbInstructionSet {
   /// Register `D` or `"Hd"` (3-bits).
   final int registerDOrHD;
 
-  /// Creates a [HighRegisterOperationsAndBranchExchange] by decoding [bits].
-  factory HighRegisterOperationsAndBranchExchange.decodeBits(int bits) {
-    return HighRegisterOperationsAndBranchExchange.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [HighRegisterOperationsAndBranchExchange] converting a previously [decoded] list.
-  factory HighRegisterOperationsAndBranchExchange.fromList(List<int> decoded) {
-    return HighRegisterOperationsAndBranchExchange(
-      opcode: decoded[0],
-      h1: decoded[1],
-      h2: decoded[2],
-      registerSOrHS: decoded[3],
-      registerDOrHD: decoded[4],
-    );
-  }
-
   /// Creates a [HighRegisterOperationsAndBranchExchange] from the provided variables.
   ///
   /// > **NOTE**: Bits are **not** checked for correctness or size!
@@ -416,7 +529,12 @@ class HighRegisterOperationsAndBranchExchange extends ThumbInstructionSet {
         assert(h2 != null),
         assert(registerSOrHS != null),
         assert(registerDOrHD != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitHighRegisterOperationsAndBranchExchange(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -432,26 +550,19 @@ class HighRegisterOperationsAndBranchExchange extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$06$pcRelativeLoad].
 class PCRelativeLoad extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$06$pcRelativeLoad;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$06$pcRelativeLoad,
+    (decoded) => PCRelativeLoad(
+      registerD: decoded[0],
+      word8: decoded[1],
+    ),
+  );
 
   /// Register `D` (3-bits).
   final int registerD;
 
   /// Word (8-bits).
   final int word8;
-
-  /// Creates a [PCRelativeLoad] by decoding [bits].
-  factory PCRelativeLoad.decodeBits(int bits) {
-    return PCRelativeLoad.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [PCRelativeLoad] converting a previously [decoded] list.
-  factory PCRelativeLoad.fromList(List<int> decoded) {
-    return PCRelativeLoad(
-      registerD: decoded[0],
-      word8: decoded[1],
-    );
-  }
 
   /// Creates a [PCRelativeLoad] from the provided variables.
   ///
@@ -461,7 +572,12 @@ class PCRelativeLoad extends ThumbInstructionSet {
     @required this.word8,
   })  : assert(registerD != null),
         assert(word8 != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitPCRelativeLoad(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -474,7 +590,16 @@ class PCRelativeLoad extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$07$loadAndStoreWithRelativeOffset].
 class LoadAndStoreWithRelativeOffset extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$07$loadAndStoreWithRelativeOffset;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$07$loadAndStoreWithRelativeOffset,
+    (decoded) => LoadAndStoreWithRelativeOffset(
+      l: decoded[0],
+      b: decoded[1],
+      registerO: decoded[2],
+      registerB: decoded[3],
+      registerD: decoded[4],
+    ),
+  );
 
   /// `L` (1-bit).
   final int l;
@@ -490,22 +615,6 @@ class LoadAndStoreWithRelativeOffset extends ThumbInstructionSet {
 
   /// Register `D` (3-bits).
   final int registerD;
-
-  /// Creates a [LoadAndStoreWithRelativeOffset] by decoding [bits].
-  factory LoadAndStoreWithRelativeOffset.decodeBits(int bits) {
-    return LoadAndStoreWithRelativeOffset.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [LoadAndStoreWithRelativeOffset] converting a previously [decoded] list.
-  factory LoadAndStoreWithRelativeOffset.fromList(List<int> decoded) {
-    return LoadAndStoreWithRelativeOffset(
-      l: decoded[0],
-      b: decoded[1],
-      registerO: decoded[2],
-      registerB: decoded[3],
-      registerD: decoded[4],
-    );
-  }
 
   /// Creates a [LoadAndStoreWithRelativeOffset] from the provided variables.
   ///
@@ -521,7 +630,12 @@ class LoadAndStoreWithRelativeOffset extends ThumbInstructionSet {
         assert(registerO != null),
         assert(registerB != null),
         assert(registerD != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitLoadAndStoreWithRelativeOffset(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -537,7 +651,16 @@ class LoadAndStoreWithRelativeOffset extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$08$loadAndStoreSignExtended].
 class LoadAndStoreSignExtendedByteAndHalfWord extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$08$loadAndStoreSignExtended;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$08$loadAndStoreSignExtended,
+    (decoded) => LoadAndStoreSignExtendedByteAndHalfWord(
+      h: decoded[0],
+      s: decoded[1],
+      registerO: decoded[2],
+      registerB: decoded[3],
+      registerD: decoded[4],
+    ),
+  );
 
   /// `H` (1-bit).
   final int h;
@@ -554,22 +677,6 @@ class LoadAndStoreSignExtendedByteAndHalfWord extends ThumbInstructionSet {
   /// Register `D` (3-bits).
   final int registerD;
 
-  /// Creates a [LoadAndStoreSignExtendedByteAndHalfWord] by decoding [bits].
-  factory LoadAndStoreSignExtendedByteAndHalfWord.decodeBits(int bits) {
-    return LoadAndStoreSignExtendedByteAndHalfWord.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [LoadAndStoreSignExtendedByteAndHalfWord] converting a previously [decoded] list.
-  factory LoadAndStoreSignExtendedByteAndHalfWord.fromList(List<int> decoded) {
-    return LoadAndStoreSignExtendedByteAndHalfWord(
-      h: decoded[0],
-      s: decoded[1],
-      registerO: decoded[2],
-      registerB: decoded[3],
-      registerD: decoded[4],
-    );
-  }
-
   /// Creates a [LoadAndStoreSignExtendedByteAndHalfWord] from the provided variables.
   ///
   /// > **NOTE**: Bits are **not** checked for correctness or size!
@@ -584,7 +691,12 @@ class LoadAndStoreSignExtendedByteAndHalfWord extends ThumbInstructionSet {
         assert(registerO != null),
         assert(registerB != null),
         assert(registerD != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitLoadAndStoreSignExtendedByteAndHalfWord(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -600,7 +712,16 @@ class LoadAndStoreSignExtendedByteAndHalfWord extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$09$loadAndStoreWithImmediateOffset].
 class LoadAndStoreWithImmediateOffset extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$09$loadAndStoreWithImmediateOffset;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$09$loadAndStoreWithImmediateOffset,
+    (decoded) => LoadAndStoreWithImmediateOffset(
+      b: decoded[0],
+      l: decoded[1],
+      offset5: decoded[2],
+      registerB: decoded[3],
+      registerD: decoded[4],
+    ),
+  );
 
   /// `B` (1-bit).
   final int b;
@@ -617,22 +738,6 @@ class LoadAndStoreWithImmediateOffset extends ThumbInstructionSet {
   /// Register `D` (3-bits).
   final int registerD;
 
-  /// Creates a [LoadAndStoreWithImmediateOffset] by decoding [bits].
-  factory LoadAndStoreWithImmediateOffset.decodeBits(int bits) {
-    return LoadAndStoreWithImmediateOffset.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [LoadAndStoreWithImmediateOffset] converting a previously [decoded] list.
-  factory LoadAndStoreWithImmediateOffset.fromList(List<int> decoded) {
-    return LoadAndStoreWithImmediateOffset(
-      b: decoded[0],
-      l: decoded[1],
-      offset5: decoded[2],
-      registerB: decoded[3],
-      registerD: decoded[4],
-    );
-  }
-
   /// Creates a [LoadAndStoreWithImmediateOffset] from the provided variables.
   ///
   /// > **NOTE**: Bits are **not** checked for correctness or size!
@@ -647,7 +752,12 @@ class LoadAndStoreWithImmediateOffset extends ThumbInstructionSet {
         assert(offset5 != null),
         assert(registerB != null),
         assert(registerD != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitLoadAndStoreWithImmediateOffset(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -663,7 +773,15 @@ class LoadAndStoreWithImmediateOffset extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$10$loadAndStoreHalfword].
 class LoadAndStoreHalfWord extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$10$loadAndStoreHalfword;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$10$loadAndStoreHalfword,
+    (decoded) => LoadAndStoreHalfWord(
+      l: decoded[0],
+      offset5: decoded[1],
+      registerB: decoded[2],
+      registerD: decoded[3],
+    ),
+  );
 
   /// `L` (1-bit).
   final int l;
@@ -677,21 +795,6 @@ class LoadAndStoreHalfWord extends ThumbInstructionSet {
   /// Register `D` (3-bits).
   final int registerD;
 
-  /// Creates a [LoadAndStoreHalfWord] by decoding [bits].
-  factory LoadAndStoreHalfWord.decodeBits(int bits) {
-    return LoadAndStoreHalfWord.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [LoadAndStoreHalfWord] converting a previously [decoded] list.
-  factory LoadAndStoreHalfWord.fromList(List<int> decoded) {
-    return LoadAndStoreHalfWord(
-      l: decoded[0],
-      offset5: decoded[1],
-      registerB: decoded[2],
-      registerD: decoded[3],
-    );
-  }
-
   /// Creates a [LoadAndStoreHalfWord] from the provided variables.
   ///
   /// > **NOTE**: Bits are **not** checked for correctness or size!
@@ -704,7 +807,12 @@ class LoadAndStoreHalfWord extends ThumbInstructionSet {
         assert(offset5 != null),
         assert(registerB != null),
         assert(registerD != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitLoadAndStoreHalfWord(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -719,7 +827,14 @@ class LoadAndStoreHalfWord extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$11$spRelativeLoadAndStore].
 class SPRelativeLoadAndStore extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$11$spRelativeLoadAndStore;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$11$spRelativeLoadAndStore,
+    (decoded) => SPRelativeLoadAndStore(
+      l: decoded[0],
+      registerD: decoded[1],
+      word8: decoded[2],
+    ),
+  );
 
   /// `L` (1-bit).
   final int l;
@@ -729,20 +844,6 @@ class SPRelativeLoadAndStore extends ThumbInstructionSet {
 
   /// Word (8-bits).
   final int word8;
-
-  /// Creates a [SPRelativeLoadAndStore] by decoding [bits].
-  factory SPRelativeLoadAndStore.decodeBits(int bits) {
-    return SPRelativeLoadAndStore.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [SPRelativeLoadAndStore] converting a previously [decoded] list.
-  factory SPRelativeLoadAndStore.fromList(List<int> decoded) {
-    return SPRelativeLoadAndStore(
-      l: decoded[0],
-      registerD: decoded[1],
-      word8: decoded[2],
-    );
-  }
 
   /// Creates a [SPRelativeLoadAndStore] from the provided variables.
   ///
@@ -754,7 +855,12 @@ class SPRelativeLoadAndStore extends ThumbInstructionSet {
   })  : assert(l != null),
         assert(registerD != null),
         assert(word8 != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitSPRelativeLoadAndStore(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -768,7 +874,14 @@ class SPRelativeLoadAndStore extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$12$loadAddress].
 class LoadAddress extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$12$loadAddress;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$12$loadAddress,
+    (decoded) => LoadAddress(
+      sp: decoded[0],
+      registerD: decoded[1],
+      word8: decoded[2],
+    ),
+  );
 
   /// `SP` (1-bit).
   final int sp;
@@ -778,20 +891,6 @@ class LoadAddress extends ThumbInstructionSet {
 
   /// Word (8-bits).
   final int word8;
-
-  /// Creates a [LoadAddress] by decoding [bits].
-  factory LoadAddress.decodeBits(int bits) {
-    return LoadAddress.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [LoadAddress] converting a previously [decoded] list.
-  factory LoadAddress.fromList(List<int> decoded) {
-    return LoadAddress(
-      sp: decoded[0],
-      registerD: decoded[1],
-      word8: decoded[2],
-    );
-  }
 
   /// Creates a [LoadAddress] from the provided variables.
   ///
@@ -803,7 +902,12 @@ class LoadAddress extends ThumbInstructionSet {
   })  : assert(sp != null),
         assert(registerD != null),
         assert(word8 != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitLoadAddress(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -817,26 +921,19 @@ class LoadAddress extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$13$addOffsetToStackPointer].
 class AddOffsetToStackPointer extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$13$addOffsetToStackPointer;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$13$addOffsetToStackPointer,
+    (decoded) => AddOffsetToStackPointer(
+      s: decoded[0],
+      sWord7: decoded[1],
+    ),
+  );
 
   /// `S` (1-bit).
   final int s;
 
   /// S-Word (7-bits).
   final int sWord7;
-
-  /// Creates a [AddOffsetToStackPointer] by decoding [bits].
-  factory AddOffsetToStackPointer.decodeBits(int bits) {
-    return AddOffsetToStackPointer.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [AddOffsetToStackPointer] converting a previously [decoded] list.
-  factory AddOffsetToStackPointer.fromList(List<int> decoded) {
-    return AddOffsetToStackPointer(
-      s: decoded[0],
-      sWord7: decoded[1],
-    );
-  }
 
   /// Creates a [AddOffsetToStackPointer] from the provided variables.
   ///
@@ -846,7 +943,12 @@ class AddOffsetToStackPointer extends ThumbInstructionSet {
     @required this.sWord7,
   })  : assert(s != null),
         assert(sWord7 != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitAddOffsetToStackPointer(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -859,7 +961,14 @@ class AddOffsetToStackPointer extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$14$pushAndPopRegisters].
 class PushAndPopRegisters extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$14$pushAndPopRegisters;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$14$pushAndPopRegisters,
+    (decoded) => PushAndPopRegisters(
+      l: decoded[0],
+      r: decoded[1],
+      registerList: decoded[2],
+    ),
+  );
 
   /// `L` (1-bit).
   final int l;
@@ -869,20 +978,6 @@ class PushAndPopRegisters extends ThumbInstructionSet {
 
   /// Register list (8-bits).
   final int registerList;
-
-  /// Creates a [PushAndPopRegisters] by decoding [bits].
-  factory PushAndPopRegisters.decodeBits(int bits) {
-    return PushAndPopRegisters.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [PushAndPopRegisters] converting a previously [decoded] list.
-  factory PushAndPopRegisters.fromList(List<int> decoded) {
-    return PushAndPopRegisters(
-      l: decoded[0],
-      r: decoded[1],
-      registerList: decoded[2],
-    );
-  }
 
   /// Creates a [PushAndPopRegisters] from the provided variables.
   ///
@@ -894,7 +989,12 @@ class PushAndPopRegisters extends ThumbInstructionSet {
   })  : assert(l != null),
         assert(r != null),
         assert(registerList != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitPushAndPopRegisters(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -908,7 +1008,14 @@ class PushAndPopRegisters extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$15$multipleLoadAndStore].
 class MultipleLoadAndStore extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$15$multipleLoadAndStore;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$15$multipleLoadAndStore,
+    (decoded) => MultipleLoadAndStore(
+      l: decoded[0],
+      registerB: decoded[1],
+      registerList: decoded[2],
+    ),
+  );
 
   /// `L` (1-bit).
   final int l;
@@ -918,20 +1025,6 @@ class MultipleLoadAndStore extends ThumbInstructionSet {
 
   /// Register list (8-bits).
   final int registerList;
-
-  /// Creates a [MultipleLoadAndStore] by decoding [bits].
-  factory MultipleLoadAndStore.decodeBits(int bits) {
-    return MultipleLoadAndStore.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [MultipleLoadAndStore] converting a previously [decoded] list.
-  factory MultipleLoadAndStore.fromList(List<int> decoded) {
-    return MultipleLoadAndStore(
-      l: decoded[0],
-      registerB: decoded[1],
-      registerList: decoded[2],
-    );
-  }
 
   /// Creates a [MultipleLoadAndStore] from the provided variables.
   ///
@@ -943,7 +1036,12 @@ class MultipleLoadAndStore extends ThumbInstructionSet {
   })  : assert(l != null),
         assert(registerB != null),
         assert(registerList != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitMultipleLoadAndStore(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -957,26 +1055,19 @@ class MultipleLoadAndStore extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$16$conditionalBranch].
 class ConditionalBranch extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$16$conditionalBranch;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$16$conditionalBranch,
+    (decoded) => ConditionalBranch(
+      condition: decoded[0],
+      softSet8: decoded[1],
+    ),
+  );
 
   /// Condition (4-bits).
   final int condition;
 
   /// Softset (8-bits).
   final int softSet8;
-
-  /// Creates a [ConditionalBranch] by decoding [bits].
-  factory ConditionalBranch.decodeBits(int bits) {
-    return ConditionalBranch.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [ConditionalBranch] converting a previously [decoded] list.
-  factory ConditionalBranch.fromList(List<int> decoded) {
-    return ConditionalBranch(
-      condition: decoded[0],
-      softSet8: decoded[1],
-    );
-  }
 
   /// Creates a [ConditionalBranch] from the provided variables.
   ///
@@ -986,7 +1077,12 @@ class ConditionalBranch extends ThumbInstructionSet {
     @required this.softSet8,
   })  : assert(condition != null),
         assert(softSet8 != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitConditionalBranch(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -999,22 +1095,15 @@ class ConditionalBranch extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$17$softwareInterrupt].
 class SoftwareInterrupt extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$17$softwareInterrupt;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$17$softwareInterrupt,
+    (decoded) => SoftwareInterrupt(
+      value8: decoded[0],
+    ),
+  );
 
   /// Value (8-bits).
   final int value8;
-
-  /// Creates a [SoftwareInterrupt] by decoding [bits].
-  factory SoftwareInterrupt.decodeBits(int bits) {
-    return SoftwareInterrupt.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [SoftwareInterrupt] converting a previously [decoded] list.
-  factory SoftwareInterrupt.fromList(List<int> decoded) {
-    return SoftwareInterrupt(
-      value8: decoded[0],
-    );
-  }
 
   /// Creates a [SoftwareInterrupt] from the provided variables.
   ///
@@ -1022,7 +1111,12 @@ class SoftwareInterrupt extends ThumbInstructionSet {
   SoftwareInterrupt({
     @required this.value8,
   })  : assert(value8 != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitSoftwareInterrupt(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -1034,22 +1128,15 @@ class SoftwareInterrupt extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$18$unconditionalBranch].
 class UnconditionalBranch extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$18$unconditionalBranch;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$18$unconditionalBranch,
+    (decoded) => UnconditionalBranch(
+      offset11: decoded[0],
+    ),
+  );
 
   /// Offset (11-bits).
   final int offset11;
-
-  /// Creates a [UnconditionalBranch] by decoding [bits].
-  factory UnconditionalBranch.decodeBits(int bits) {
-    return UnconditionalBranch.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [UnconditionalBranch] converting a previously [decoded] list.
-  factory UnconditionalBranch.fromList(List<int> decoded) {
-    return UnconditionalBranch(
-      offset11: decoded[0],
-    );
-  }
 
   /// Creates a [UnconditionalBranch] from the provided variables.
   ///
@@ -1057,7 +1144,12 @@ class UnconditionalBranch extends ThumbInstructionSet {
   UnconditionalBranch({
     @required this.offset11,
   })  : assert(offset11 != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitUnconditionalBranch(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {
@@ -1069,26 +1161,19 @@ class UnconditionalBranch extends ThumbInstructionSet {
 
 /// Decoded object from [ThumbInstructionSet.$19$longBranchWithLink].
 class LongBranchWithLink extends ThumbInstructionSet {
-  static final _F = ThumbInstructionSet.$19$longBranchWithLink;
+  static final decoder = ThumbInstructionSetDecoder._(
+    ThumbInstructionSet.$19$longBranchWithLink,
+    (decoded) => LongBranchWithLink(
+      h: decoded[0],
+      offset: decoded[1],
+    ),
+  );
 
   /// `H` (1-bit).
   final int h;
 
   /// Offset (11-bits).
   final int offset;
-
-  /// Creates a [LongBranchWithLink] by decoding [bits].
-  factory LongBranchWithLink.decodeBits(int bits) {
-    return LongBranchWithLink.fromList(_F.capture(bits));
-  }
-
-  /// Creates a [LongBranchWithLink] converting a previously [decoded] list.
-  factory LongBranchWithLink.fromList(List<int> decoded) {
-    return LongBranchWithLink(
-      h: decoded[0],
-      offset: decoded[1],
-    );
-  }
 
   /// Creates a [LongBranchWithLink] from the provided variables.
   ///
@@ -1098,7 +1183,12 @@ class LongBranchWithLink extends ThumbInstructionSet {
     @required this.offset,
   })  : assert(h != null),
         assert(offset != null),
-        super._(_F);
+        super._(decoder._format);
+
+  @override
+  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+    return visitor.visitLongBranchWithLink(this, context);
+  }
 
   @override
   Map<String, Object> toJson() {

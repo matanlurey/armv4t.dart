@@ -16,13 +16,17 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      MoveShiftedRegister.decodeBits(input),
+      MoveShiftedRegister.decoder.decodeBits(input),
       MoveShiftedRegister(
         opcode: coded['P'],
         offset: coded['O'],
         registerS: coded['S'],
         registerD: coded['D'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      MoveShiftedRegister.decoder,
     );
   });
 
@@ -39,13 +43,17 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      AddAndSubtract.decodeBits(input),
+      AddAndSubtract.decoder.decodeBits(input),
       AddAndSubtract(
         opcode: coded['P'],
         registerNOrOffset3: coded['N'],
         registerS: coded['S'],
         registerD: coded['D'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      AddAndSubtract.decoder,
     );
   });
 
@@ -61,12 +69,16 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      MoveCompareAddAndSubtractImmediate.decodeBits(input),
+      MoveCompareAddAndSubtractImmediate.decoder.decodeBits(input),
       MoveCompareAddAndSubtractImmediate(
         opcode: coded['P'],
         registerD: coded['D'],
         offset: coded['O'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      MoveCompareAddAndSubtractImmediate.decoder,
     );
   });
 
@@ -82,12 +94,16 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      ALUOperation.decodeBits(input),
+      ALUOperation.decoder.decodeBits(input),
       ALUOperation(
         opcode: coded['P'],
         registerS: coded['S'],
         registerD: coded['D'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      ALUOperation.decoder,
     );
   });
 
@@ -105,7 +121,7 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      HighRegisterOperationsAndBranchExchange.decodeBits(input),
+      HighRegisterOperationsAndBranchExchange.decoder.decodeBits(input),
       HighRegisterOperationsAndBranchExchange(
         opcode: coded['P'],
         h1: coded['H'],
@@ -113,6 +129,10 @@ void main() {
         registerSOrHS: coded['S'],
         registerDOrHD: coded['D'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      HighRegisterOperationsAndBranchExchange.decoder,
     );
   });
 
@@ -127,11 +147,15 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      PCRelativeLoad.decodeBits(input),
+      PCRelativeLoad.decoder.decodeBits(input),
       PCRelativeLoad(
         registerD: coded['D'],
         word8: coded['W'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      PCRelativeLoad.decoder,
     );
   });
 
@@ -149,7 +173,7 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      LoadAndStoreWithRelativeOffset.decodeBits(input),
+      LoadAndStoreWithRelativeOffset.decoder.decodeBits(input),
       LoadAndStoreWithRelativeOffset(
         l: coded['L'],
         b: coded['B'],
@@ -157,6 +181,10 @@ void main() {
         registerB: coded['N'],
         registerD: coded['D'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      LoadAndStoreWithRelativeOffset.decoder,
     );
   });
 
@@ -174,7 +202,7 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      LoadAndStoreSignExtendedByteAndHalfWord.decodeBits(input),
+      LoadAndStoreSignExtendedByteAndHalfWord.decoder.decodeBits(input),
       LoadAndStoreSignExtendedByteAndHalfWord(
         h: coded['H'],
         s: coded['S'],
@@ -182,6 +210,10 @@ void main() {
         registerB: coded['B'],
         registerD: coded['D'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      LoadAndStoreSignExtendedByteAndHalfWord.decoder,
     );
   });
 
@@ -199,7 +231,7 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      LoadAndStoreWithImmediateOffset.decodeBits(input),
+      LoadAndStoreWithImmediateOffset.decoder.decodeBits(input),
       LoadAndStoreWithImmediateOffset(
         b: coded['B'],
         l: coded['L'],
@@ -207,6 +239,10 @@ void main() {
         registerB: coded['N'],
         registerD: coded['D'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      LoadAndStoreWithImmediateOffset.decoder,
     );
   });
 
@@ -223,13 +259,17 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      LoadAndStoreHalfWord.decodeBits(input),
+      LoadAndStoreHalfWord.decoder.decodeBits(input),
       LoadAndStoreHalfWord(
         l: coded['L'],
         offset5: coded['O'],
         registerB: coded['B'],
         registerD: coded['D'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      LoadAndStoreHalfWord.decoder,
     );
   });
 
@@ -245,12 +285,16 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      SPRelativeLoadAndStore.decodeBits(input),
+      SPRelativeLoadAndStore.decoder.decodeBits(input),
       SPRelativeLoadAndStore(
         l: coded['L'],
         registerD: coded['D'],
         word8: coded['W'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      SPRelativeLoadAndStore.decoder,
     );
   });
 
@@ -266,12 +310,16 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      LoadAddress.decodeBits(input),
+      LoadAddress.decoder.decodeBits(input),
       LoadAddress(
         sp: coded['S'],
         registerD: coded['D'],
         word8: coded['W'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      LoadAddress.decoder,
     );
   });
 
@@ -286,11 +334,15 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      AddOffsetToStackPointer.decodeBits(input),
+      AddOffsetToStackPointer.decoder.decodeBits(input),
       AddOffsetToStackPointer(
         s: coded['S'],
         sWord7: coded['W'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      AddOffsetToStackPointer.decoder,
     );
   });
 
@@ -306,12 +358,16 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      PushAndPopRegisters.decodeBits(input),
+      PushAndPopRegisters.decoder.decodeBits(input),
       PushAndPopRegisters(
         l: coded['L'],
         r: coded['R'],
         registerList: coded['T'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      PushAndPopRegisters.decoder,
     );
   });
 
@@ -327,12 +383,16 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      MultipleLoadAndStore.decodeBits(input),
+      MultipleLoadAndStore.decoder.decodeBits(input),
       MultipleLoadAndStore(
         l: coded['L'],
         registerB: coded['B'],
         registerList: coded['T'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      MultipleLoadAndStore.decoder,
     );
   });
 
@@ -347,11 +407,15 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      ConditionalBranch.decodeBits(input),
+      ConditionalBranch.decoder.decodeBits(input),
       ConditionalBranch(
         condition: coded['C'],
         softSet8: coded['S'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      ConditionalBranch.decoder,
     );
   });
 
@@ -365,10 +429,14 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      SoftwareInterrupt.decodeBits(input),
+      SoftwareInterrupt.decoder.decodeBits(input),
       SoftwareInterrupt(
         value8: coded['V'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      SoftwareInterrupt.decoder,
     );
   });
 
@@ -382,10 +450,14 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      UnconditionalBranch.decodeBits(input),
+      UnconditionalBranch.decoder.decodeBits(input),
       UnconditionalBranch(
         offset11: coded['O'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      UnconditionalBranch.decoder,
     );
   });
 
@@ -400,11 +472,15 @@ void main() {
     });
     expect(ThumbInstructionSet.allFormats.match(input), format);
     expect(
-      LongBranchWithLink.decodeBits(input),
+      LongBranchWithLink.decoder.decodeBits(input),
       LongBranchWithLink(
         h: coded['H'],
         offset: coded['O'],
       ),
+    );
+    expect(
+      ThumbInstructionSet.mapDecoders[format],
+      LongBranchWithLink.decoder,
     );
   });
 }
