@@ -14,6 +14,16 @@ void main() {
       'S': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      MoveShiftedRegister.decodeBits(input),
+      MoveShiftedRegister(
+        opcode: coded['P'],
+        offset: coded['O'],
+        registerS: coded['S'],
+        registerD: coded['D'],
+      ),
+    );
   });
 
   test('should decode 02:ADD_AND_SUBTRACT', () {
@@ -27,6 +37,16 @@ void main() {
       'S': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      AddAndSubtract.decodeBits(input),
+      AddAndSubtract(
+        opcode: coded['P'],
+        registerNOrOffset3: coded['N'],
+        registerS: coded['S'],
+        registerD: coded['D'],
+      ),
+    );
   });
 
   test('should decode 03:MOVE_COMPARE_ADD_AND_SUBTRACT_IMMEDIATE', () {
@@ -39,6 +59,15 @@ void main() {
       'D': '101'.parseBits(),
       'O': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      MoveCompareAddAndSubtractImmediate.decodeBits(input),
+      MoveCompareAddAndSubtractImmediate(
+        opcode: coded['P'],
+        registerD: coded['D'],
+        offset: coded['O'],
+      ),
+    );
   });
 
   test('should decode 04:ALU_OPERATION', () {
@@ -51,6 +80,15 @@ void main() {
       'S': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      ALUOperation.decodeBits(input),
+      ALUOperation(
+        opcode: coded['P'],
+        registerS: coded['S'],
+        registerD: coded['D'],
+      ),
+    );
   });
 
   test('should decode 05:HIGH_REGISTER_OPERATIONS_AND_BRANCH_EXCHANGE', () {
@@ -65,6 +103,17 @@ void main() {
       'S': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      HighRegisterOperationsAndBranchExchange.decodeBits(input),
+      HighRegisterOperationsAndBranchExchange(
+        opcode: coded['P'],
+        h1: coded['H'],
+        h2: coded['J'],
+        registerSOrHS: coded['S'],
+        registerDOrHD: coded['D'],
+      ),
+    );
   });
 
   test('should decode 06:PC_RELATIVE_LOAD', () {
@@ -76,6 +125,14 @@ void main() {
       'D': '101'.parseBits(),
       'W': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      PCRelativeLoad.decodeBits(input),
+      PCRelativeLoad(
+        registerD: coded['D'],
+        word8: coded['W'],
+      ),
+    );
   });
 
   test('should decode 07:LOAD_AND_STORE_WITH_RELATIVE_OFFSET', () {
@@ -90,24 +147,43 @@ void main() {
       'N': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      LoadAndStoreWithRelativeOffset.decodeBits(input),
+      LoadAndStoreWithRelativeOffset(
+        l: coded['L'],
+        b: coded['B'],
+        registerO: coded['O'],
+        registerB: coded['N'],
+        registerD: coded['D'],
+      ),
+    );
   });
 
-  test(
-    'should decode 08:LOAD_AND_STORE_SIGN_EXTENDED_BYTE_AND_HALFWORD',
-    () {
-      //              0101   HS1O   OOBB   BDDD
-      final input = ('0101' '1110' '0110' '1010').parseBits();
-      final format = ThumbInstructionSet.$08$loadAndStoreSignExtended;
-      final coded = Map.fromIterables(format.names, format.capture(input));
-      expect(coded, {
-        'H': 1,
-        'S': 1,
-        'O': '001'.parseBits(),
-        'B': '101'.parseBits(),
-        'D': '010'.parseBits(),
-      });
-    },
-  );
+  test('should decode 08:LOAD_AND_STORE_SIGN_EXTENDED_BYTE_AND_HALFWORD', () {
+    //              0101   HS1O   OOBB   BDDD
+    final input = ('0101' '1110' '0110' '1010').parseBits();
+    final format = ThumbInstructionSet.$08$loadAndStoreSignExtended;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'H': 1,
+      'S': 1,
+      'O': '001'.parseBits(),
+      'B': '101'.parseBits(),
+      'D': '010'.parseBits(),
+    });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      LoadAndStoreSignExtendedByteAndHalfWord.decodeBits(input),
+      LoadAndStoreSignExtendedByteAndHalfWord(
+        h: coded['H'],
+        s: coded['S'],
+        registerO: coded['O'],
+        registerB: coded['B'],
+        registerD: coded['D'],
+      ),
+    );
+  });
 
   test('should decode 09:LOAD_AND_STORE_WITH_IMMEDIATE_OFFSET', () {
     //              011B   LOOO   OONN   NDDD
@@ -121,6 +197,17 @@ void main() {
       'N': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      LoadAndStoreWithImmediateOffset.decodeBits(input),
+      LoadAndStoreWithImmediateOffset(
+        b: coded['B'],
+        l: coded['L'],
+        offset5: coded['O'],
+        registerB: coded['N'],
+        registerD: coded['D'],
+      ),
+    );
   });
 
   test('should decode 10:LOAD_AND_STORE_HALFWORD', () {
@@ -134,6 +221,16 @@ void main() {
       'B': '101'.parseBits(),
       'D': '010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      LoadAndStoreHalfWord.decodeBits(input),
+      LoadAndStoreHalfWord(
+        l: coded['L'],
+        offset5: coded['O'],
+        registerB: coded['B'],
+        registerD: coded['D'],
+      ),
+    );
   });
 
   test('should decode 11:SP_RELATIVE_LOAD_AND_STORE', () {
@@ -146,6 +243,15 @@ void main() {
       'D': '101'.parseBits(),
       'W': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      SPRelativeLoadAndStore.decodeBits(input),
+      SPRelativeLoadAndStore(
+        l: coded['L'],
+        registerD: coded['D'],
+        word8: coded['W'],
+      ),
+    );
   });
 
   test('should decode 12:LOAD_ADDRESS', () {
@@ -158,18 +264,34 @@ void main() {
       'D': '101'.parseBits(),
       'W': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      LoadAddress.decodeBits(input),
+      LoadAddress(
+        sp: coded['S'],
+        registerD: coded['D'],
+        word8: coded['W'],
+      ),
+    );
   });
 
   test('should decode 13:ADD_OFFSET_TO_STACK_POINTER', () {
-    //              1010   SDDD   WWWW   WWWW
-    final input = ('1010' '1101' '0110' '1010').parseBits();
+    //              1011   0000   SWWW   WWWW
+    final input = ('1011' '0000' '0110' '1010').parseBits();
     final format = ThumbInstructionSet.$13$addOffsetToStackPointer;
     final coded = Map.fromIterables(format.names, format.capture(input));
     expect(coded, {
-      'S': 1,
-      'D': '101'.parseBits(),
-      'W': '01101010'.parseBits(),
+      'S': 0,
+      'W': '1101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      AddOffsetToStackPointer.decodeBits(input),
+      AddOffsetToStackPointer(
+        s: coded['S'],
+        sWord7: coded['W'],
+      ),
+    );
   });
 
   test('should decode 14:PUSH_AND_POP_REGISTERS', () {
@@ -182,6 +304,15 @@ void main() {
       'R': 1,
       'T': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      PushAndPopRegisters.decodeBits(input),
+      PushAndPopRegisters(
+        l: coded['L'],
+        r: coded['R'],
+        registerList: coded['T'],
+      ),
+    );
   });
 
   test('should decode 15:MULTIPLE_LOAD_AND_STORE', () {
@@ -194,6 +325,15 @@ void main() {
       'B': '101'.parseBits(),
       'T': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      MultipleLoadAndStore.decodeBits(input),
+      MultipleLoadAndStore(
+        l: coded['L'],
+        registerB: coded['B'],
+        registerList: coded['T'],
+      ),
+    );
   });
 
   test('should decode 16:CONDITIONAL_BRANCH', () {
@@ -205,6 +345,14 @@ void main() {
       'C': '1101'.parseBits(),
       'S': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      ConditionalBranch.decodeBits(input),
+      ConditionalBranch(
+        condition: coded['C'],
+        softSet8: coded['S'],
+      ),
+    );
   });
 
   test('should decode 17:SOFTWARE_INTERRUPT', () {
@@ -215,6 +363,13 @@ void main() {
     expect(coded, {
       'V': '01101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      SoftwareInterrupt.decodeBits(input),
+      SoftwareInterrupt(
+        value8: coded['V'],
+      ),
+    );
   });
 
   test('should decode 18:UNCONDITIONAL_BRANCH', () {
@@ -225,6 +380,13 @@ void main() {
     expect(coded, {
       'O': '10101101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      UnconditionalBranch.decodeBits(input),
+      UnconditionalBranch(
+        offset11: coded['O'],
+      ),
+    );
   });
 
   test('should decode 19:LONG_BRANCH_WITH_LINK', () {
@@ -236,5 +398,13 @@ void main() {
       'H': 1,
       'O': '10101101010'.parseBits(),
     });
+    expect(ThumbInstructionSet.allFormats.match(input), format);
+    expect(
+      LongBranchWithLink.decodeBits(input),
+      LongBranchWithLink(
+        h: coded['H'],
+        offset: coded['O'],
+      ),
+    );
   });
 }
