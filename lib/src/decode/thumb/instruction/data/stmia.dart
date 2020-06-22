@@ -1,10 +1,8 @@
 part of '../../instruction.dart';
 
-/// Bitwise AND.
+/// Store Multiple.
 ///
 /// Lo register operand | Hi register operand | Condition codes set
 /// ------------------- | ------------------- | -------------------
-/// ✔                   | 🗙                   | ✔
-///
-/// `Rd := Rn AND Op2`.
-class AND extends ThumbInstruction {}
+/// ✔                   | 🗙                   | 🗙
+class STMIA extends ThumbInstruction {}
