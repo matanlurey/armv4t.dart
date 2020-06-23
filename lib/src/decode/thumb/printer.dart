@@ -1,6 +1,64 @@
+import 'package:binary/binary.dart';
+
 import 'package:armv4t/src/decode/thumb/instruction.dart';
+import 'package:meta/meta.dart';
 
 class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
+  /// Given an 8-bit list, where the k-th byte set represents the k-th register.
+  ///
+  /// Any registers in a row are emitted using the format `Rn-Rm`; otherwise
+  /// they are emitted using `Rn`. Every register or register set is separated
+  /// by commas before emitting.
+  ///
+  /// It is considered valid to have _no_ registers (e.g. just the PC/LR).
+  @visibleForTesting
+  static String describeRegisterList(int registerList, [String suffix]) {
+    if (registerList == 0) {
+      return '';
+    }
+    final output = <String>[];
+    int rangeStart;
+
+    void write(int current) {
+      if (current - 1 == rangeStart) {
+        // Print the previous set bit.
+        output.add('R${rangeStart}');
+      } else {
+        // Print a range beteween the start and the current index.
+        output.add('R${rangeStart}-R${current - 1}');
+      }
+
+      // Clear the range.
+      rangeStart = null;
+    }
+
+    for (var i = 0; i < 8; i++) {
+      if (registerList.isSet(i)) {
+        if (rangeStart == null) {
+          // If we haven't started a range, start one.
+          rangeStart = i;
+        } else {
+          // Otherwise it's fine - we are just waiting until we find a 0 bit.
+        }
+      } else {
+        if (rangeStart != null) {
+          // Write a range from the start register to the previous register.
+          write(i);
+        }
+      }
+    }
+
+    if (rangeStart != null) {
+      write(8);
+    }
+
+    if (suffix != null) {
+      output.add(suffix);
+    }
+
+    return output.join(',');
+  }
+
   const ThumbInstructionPrinter();
 
   @override
@@ -546,42 +604,50 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     PUSH$Registers i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'PUSH '
+      '{${describeRegisterList(i.registerList)}}';
 
   @override
   String visitPUSH$RegistersAndLinkRegister(
     PUSH$RegistersAndLinkRegister i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'PUSH '
+      '{${describeRegisterList(i.registerList, 'LR')}}';
 
   @override
   String visitPOP$Registers(
     POP$Registers i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'POP '
+      '{${describeRegisterList(i.registerList)}}';
 
   @override
-  String visitPOP$RegistersAndLinkRegister(
+  String visitPOP$RegistersAndProgramCounter(
     POP$RegistersAndLinkRegister i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'POP '
+      '{${describeRegisterList(i.registerList, 'PC')}}';
 
   @override
   String visitSTMIA(
     STMIA i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'STMIA '
+      'R${i.baseRegister}!, '
+      '{${describeRegisterList(i.registerList)}}';
 
   @override
   String visitLDMIA(
     LDMIA i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'LDMIA '
+      'R${i.baseRegister}!, '
+      '{${describeRegisterList(i.registerList)}}';
 
   @override
   String visitBEQ(
@@ -712,17 +778,10 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
       '${i.immdediateValue}';
 
   @override
-  String visitBL$1(
-    BL$1 i, [
+  String visitBL(
+    BL i, [
     void _,
   ]) =>
       'BL '
       '${i.offset}';
-
-  @override
-  String visitBL$2(
-    BL$2 i, [
-    void _,
-  ]) =>
-      throw UnimplementedError();
 }

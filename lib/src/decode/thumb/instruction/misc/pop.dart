@@ -49,5 +49,5 @@ class POP$RegistersAndLinkRegister extends POP {
     ThumbInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      visitor.visitPOP$RegistersAndLinkRegister(this, context);
+      visitor.visitPOP$RegistersAndProgramCounter(this, context);
 }
