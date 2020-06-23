@@ -67,7 +67,12 @@ abstract class ThumbInstruction {
   @override
   String toString() {
     if (assertionsEnabled) {
-      return accept(const ThumbInstructionPrinter());
+      try {
+        return accept(const ThumbInstructionPrinter());
+      } on UnimplementedError catch (_) {
+        // TODO: Remove once ThumbInstructionPrinter is complete.
+        return super.toString();
+      }
     } else {
       return super.toString();
     }
