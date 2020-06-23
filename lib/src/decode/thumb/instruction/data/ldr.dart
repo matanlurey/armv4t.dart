@@ -34,11 +34,11 @@ class LDR$AddUnsignedImmediate extends LDR {
 /// Calculate the source address by adding together the value in [baseRegister]
 /// and the value in [offsetRegister]. Load the contents of the address into
 /// [destinationRegister].
-class LDR$Indexed extends LDR {
+class LDR$RelativeOffset extends LDR {
   final int baseRegister;
   final int offsetRegister;
 
-  const LDR$Indexed({
+  const LDR$RelativeOffset({
     @required this.baseRegister,
     @required this.offsetRegister,
     @required int destinationRegister,
@@ -51,11 +51,11 @@ class LDR$Indexed extends LDR {
 ///
 /// Calculate the source address by adding together the value in [baseRegister]
 /// and [immediateValue]. Loads [destinationRegister] from the address.
-class LDR$Immediate extends LDR {
+class LDR$ImmediateOffset extends LDR {
   final int immediateValue;
   final int baseRegister;
 
-  const LDR$Immediate({
+  const LDR$ImmediateOffset({
     @required this.immediateValue,
     @required this.baseRegister,
     @required int destinationRegister,
@@ -67,12 +67,28 @@ class LDR$Immediate extends LDR {
 /// A sub-type of [LDR].
 ///
 /// Adds unsigned offset (255 words, 1020 bytes) in [immediateValue] to the
-/// current value of the `SP` (`R7`). Load the word from the resulting address
-/// into [destinationRegister].
-class LDR$Relative extends LDR {
+/// current value of the program counter (`PC`). Load the word from the
+/// resulting address into [destinationRegister].
+class LDR$PCRelative extends LDR {
   final int immediateValue;
 
-  const LDR$Relative({
+  const LDR$PCRelative({
+    @required this.immediateValue,
+    @required int destinationRegister,
+  }) : super._(
+          destinationRegister: destinationRegister,
+        );
+}
+
+/// A sub-type of [LDR].
+///
+/// Adds unsigned offset (255 words, 1020 bytes) in [immediateValue] to the
+/// current value of the `SP` (`R7`). Load the word from the resulting address
+/// into [destinationRegister].
+class LDR$SPRelative extends LDR {
+  final int immediateValue;
+
+  const LDR$SPRelative({
     @required this.immediateValue,
     @required int destinationRegister,
   }) : super._(

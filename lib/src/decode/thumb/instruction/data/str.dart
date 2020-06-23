@@ -18,11 +18,11 @@ abstract class STR extends ThumbInstruction {
 /// Pre-indexed word store: Calculate the target address by adding together the
 /// value in [baseRegister] and the value in [offsetRegister]. Store the
 /// contents of [destinationRegister] at the address.
-class STR$Indexed extends STR {
+class STR$RelativeOffset extends STR {
   final int baseRegister;
   final int offsetRegister;
 
-  const STR$Indexed({
+  const STR$RelativeOffset({
     @required this.offsetRegister,
     @required this.baseRegister,
     @required int destinationRegister,
@@ -36,11 +36,11 @@ class STR$Indexed extends STR {
 /// Calculate the target address by adding together the value of [baseRegister]
 /// and [immediateValue]. Store the contents of [destinationRegister] at the
 /// address.
-class STR$Immediate extends STR {
+class STR$ImmediateOffset extends STR {
   final int baseRegister;
   final int immediateValue;
 
-  const STR$Immediate({
+  const STR$ImmediateOffset({
     @required this.immediateValue,
     @required this.baseRegister,
     @required int destinationRegister,
@@ -54,10 +54,10 @@ class STR$Immediate extends STR {
 /// Adds unsigned offsewt (255 words, 1020 bytes) in [immediateValue] to the
 /// current value of the `SP` (`R7`). Store the contents of
 /// [destinationRegister] at the resulting address.
-class STR$Relative extends STR {
+class STR$SPRelative extends STR {
   final int immediateValue;
 
-  const STR$Relative({
+  const STR$SPRelative({
     @required this.immediateValue,
     @required int destinationRegister,
   }) : super._(

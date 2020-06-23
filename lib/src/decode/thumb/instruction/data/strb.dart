@@ -20,10 +20,10 @@ abstract class STRB extends ThumbInstruction {
 /// Pre-indexed word load: Calculate the target address by adding together the
 /// value in [baseRegister] and the value in [offsetRegister]. Store the byte
 /// value in [destinationRegister] at the resulting address.
-class STRB$Indexed extends STRB {
+class STRB$RelativeOffset extends STRB {
   final int offsetRegister;
 
-  const STRB$Indexed._({
+  const STRB$RelativeOffset({
     @required this.offsetRegister,
     @required int baseRegister,
     @required int destinationRegister,
@@ -38,10 +38,10 @@ class STRB$Indexed extends STRB {
 /// Calculate the target address by adding together the value in [baseRegister]
 /// and [immediateValue]. Store the byte value in [destinationRegister] at the
 /// address.
-class STRB$Immediate extends STRB {
+class STRB$ImmediateOffset extends STRB {
   final int immediateValue;
 
-  const STRB$Immediate({
+  const STRB$ImmediateOffset({
     @required this.immediateValue,
     @required int baseRegister,
     @required int destinationRegister,

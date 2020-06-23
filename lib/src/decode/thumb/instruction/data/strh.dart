@@ -19,10 +19,10 @@ abstract class STRH extends ThumbInstruction {
 ///
 /// Add [offsetRegister] to the base address in [baseRegister]. Store bits 0-15
 /// of [destinationRegister] at the resulting address.
-class STRH$Indexed extends STRH {
+class STRH$SignExtendedByteOrHalfWord extends STRH {
   final int offsetRegister;
 
-  const STRH$Indexed._({
+  const STRH$SignExtendedByteOrHalfWord({
     @required this.offsetRegister,
     @required int baseRegister,
     @required int destinationRegister,
@@ -36,10 +36,10 @@ class STRH$Indexed extends STRH {
 ///
 /// Add [immediateValue] to the base address in [baseRegister] and store bits
 /// 0-15 of [destinationRegister] at the resulting address.
-class STRH$Immediate extends STRB {
+class STRH$HalfWord extends STRB {
   final int immediateValue;
 
-  const STRH$Immediate({
+  const STRH$HalfWord({
     @required this.immediateValue,
     @required int baseRegister,
     @required int destinationRegister,

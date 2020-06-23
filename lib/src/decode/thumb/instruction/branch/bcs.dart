@@ -8,5 +8,5 @@ part of '../../instruction.dart';
 /// ------------------- | ------------------- | -------------------
 /// ✔                   | 🗙                   | 🗙
 class BCS extends ThumbInstruction {
-  const BCS._() : super._();
+  const BCS() : super._();
 }

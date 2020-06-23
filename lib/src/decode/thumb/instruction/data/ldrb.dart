@@ -20,10 +20,10 @@ abstract class LDRB extends ThumbInstruction {
 /// Pre-indexed byte load: Calculate the source address by adding together the
 /// value in [baseRegister] and the value in [offsetRegister]. Load the byte
 /// value at the resulting address.
-class LDRB$Indexed extends LDRB {
+class LDRB$RelativeOffset extends LDRB {
   final int offsetRegister;
 
-  const LDRB$Indexed({
+  const LDRB$RelativeOffset({
     @required this.offsetRegister,
     @required int baseRegister,
     @required int destinationRegister,
@@ -38,10 +38,10 @@ class LDRB$Indexed extends LDRB {
 /// Calculate source address by adding together the value in [baseRegister] and
 /// [immediateValue]. Load the byte value at the address into
 /// [destinationRegister].
-class LDRB$Immediate extends LDRB {
+class LDRB$ImmediateOffset extends LDRB {
   final int immediateValue;
 
-  const LDRB$Immediate({
+  const LDRB$ImmediateOffset({
     @required this.immediateValue,
     @required int baseRegister,
     @required int destinationRegister,

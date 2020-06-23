@@ -20,10 +20,10 @@ abstract class LDRH extends ThumbInstruction {
 /// Add [offsetRegister] to the base address in [baseRegister]. Load bits 0-15
 /// of [destinationRegister] from the resulting address, and set bits 16-31 of
 /// [destinationRegister] to 0.
-class LDRH$Indexed extends LDRH {
+class LDRH$SignExtendedByteOrHalfWord extends LDRH {
   final int offsetRegister;
 
-  const LDRH$Indexed._({
+  const LDRH$SignExtendedByteOrHalfWord({
     @required this.offsetRegister,
     @required int baseRegister,
     @required int destinationRegister,
@@ -38,10 +38,10 @@ class LDRH$Indexed extends LDRH {
 /// Add [immediateValue] to the base address in [baseRegister]. Load bits 0-15
 /// from the resulting address into [destinationRegister] and sets bits 16-31
 /// to zero.
-class LDRH$Immediate extends STRB {
+class LDRH$HalfWord extends STRB {
   final int immediateValue;
 
-  const LDRH$Immediate({
+  const LDRH$HalfWord({
     @required this.immediateValue,
     @required int baseRegister,
     @required int destinationRegister,
