@@ -594,29 +594,29 @@ void main() {
 
     test('PUSH', () {
       expect(
-        () => decode(encode(0, 0, 16)).accept(_printer),
-        throwsUnimplementedError,
+        decode(encode(0, 0, 16)),
+        _matchesASM('PUSH {R4}'),
       );
     });
 
     test('PUSH [LR]', () {
       expect(
-        () => decode(encode(0, 1, 16)).accept(_printer),
-        throwsUnimplementedError,
+        decode(encode(0, 1, 16)),
+        _matchesASM('PUSH {R4,LR}'),
       );
     });
 
     test('POP', () {
       expect(
-        () => decode(encode(1, 0, 16)).accept(_printer),
-        throwsUnimplementedError,
+        decode(encode(1, 0, 16)),
+        _matchesASM('POP {R4}'),
       );
     });
 
-    test('POP [LR]', () {
+    test('POP [PC]', () {
       expect(
-        () => decode(encode(1, 1, 16)).accept(_printer),
-        throwsUnimplementedError,
+        decode(encode(1, 1, 16)),
+        _matchesASM('POP {R4,PC}'),
       );
     });
   });
@@ -633,15 +633,15 @@ void main() {
 
     test('STMIA', () {
       expect(
-        () => decode(encode(0, 2, 16)).accept(_printer),
-        throwsUnimplementedError,
+        decode(encode(0, 2, 16)),
+        _matchesASM('STMIA R2!, {R4}'),
       );
     });
 
     test('LDMIA', () {
       expect(
-        () => decode(encode(1, 2, 16)).accept(_printer),
-        throwsUnimplementedError,
+        decode(encode(1, 2, 16)),
+        _matchesASM('LDMIA R2!, {R4}'),
       );
     });
   });
@@ -711,15 +711,8 @@ void main() {
       ].join('').parseBits();
     }
 
-    test('BL1', () {
+    test('BL', () {
       expect(decode(encode(0, 16)), _matchesASM('BL 16'));
-    });
-
-    test('BL2', () {
-      expect(
-        () => decode(encode(1, 16)).accept(_printer),
-        throwsUnimplementedError,
-      );
     });
   });
 }
@@ -739,12 +732,11 @@ class _ThumbAssemblyMatcher extends Matcher {
   }
 
   @override
-  bool matches(Object describe, Map<Object, Object> _) {
+  bool matches(Object describe, Map<Object, Object> matchState) {
     if (describe is ThumbInstruction) {
-      return equals(_assembly).matches(
-        describe.accept(_printer),
-        <Object, Object>{},
-      );
+      final matcher = equals(_assembly);
+      final result = describe.accept(_printer);
+      return matcher.matches(result, matchState);
     } else {
       return false;
     }

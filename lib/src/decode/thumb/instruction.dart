@@ -67,12 +67,7 @@ abstract class ThumbInstruction {
   @override
   String toString() {
     if (assertionsEnabled) {
-      try {
-        return accept(const ThumbInstructionPrinter());
-      } on UnimplementedError catch (_) {
-        // TODO: Remove once ThumbInstructionPrinter is complete.
-        return super.toString();
-      }
+      return accept(const ThumbInstructionPrinter());
     } else {
       return super.toString();
     }
@@ -677,9 +672,8 @@ class ThumbDecoder implements ThumbSetVisitor<ThumbInstruction, void> {
   ]) {
     switch (set.h) {
       case 0:
-        return BL$1(offset: set.offset);
       case 1:
-        return BL$2(offset: set.offset);
+        return BL(offset: set.offset, h: set.h);
       default:
         throw StateError('Invalid H: ${set.h}');
     }
@@ -997,7 +991,7 @@ abstract class ThumbInstructionVisitor<R, C> {
     C context,
   ]);
 
-  R visitPOP$RegistersAndLinkRegister(
+  R visitPOP$RegistersAndProgramCounter(
     POP$RegistersAndLinkRegister instruction, [
     C context,
   ]);
@@ -1092,13 +1086,8 @@ abstract class ThumbInstructionVisitor<R, C> {
     C context,
   ]);
 
-  R visitBL$1(
-    BL$1 instruction, [
-    C context,
-  ]);
-
-  R visitBL$2(
-    BL$2 instruction, [
+  R visitBL(
+    BL instruction, [
     C context,
   ]);
 }
