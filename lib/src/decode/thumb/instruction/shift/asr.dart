@@ -35,8 +35,8 @@ class ASR$Immediate extends ASR {
 /// A sub-type of [ASR].
 ///
 /// `Rd := Rd >> Rs`
-class LSR$ALU extends ASR {
-  const LSR$ALU({
+class ASR$ALU extends ASR {
+  const ASR$ALU({
     @required int destinationRegister,
     @required int sourceRegister,
   }) : super._(

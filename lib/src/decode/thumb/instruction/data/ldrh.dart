@@ -10,7 +10,7 @@ abstract class LDRH extends ThumbInstruction {
   final int destinationRegister;
 
   const LDRH._({
-    @required this.baseRegister,,
+    @required this.baseRegister,
     @required this.destinationRegister,
   }) : super._();
 }
