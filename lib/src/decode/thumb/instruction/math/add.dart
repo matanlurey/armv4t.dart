@@ -17,11 +17,11 @@ abstract class ADD extends ThumbInstruction {
 ///
 /// Adds contents of [otherRegister] to [sourceRegister]. Place the results ib
 /// [destinationRegister].
-class ADD$Register extends ADD {
+class ADD$AddSubtract$Register extends ADD {
   final int otherRegister;
   final int sourceRegister;
 
-  const ADD$Register({
+  const ADD$AddSubtract$Register({
     @required int destinationRegister,
     @required this.sourceRegister,
     @required this.otherRegister,
@@ -34,11 +34,11 @@ class ADD$Register extends ADD {
 ///
 /// Adds 3-bit [immediateValue] to the contents of [sourceRegister]. Place the
 /// results in [destinationRegister].
-class ADD$Offset3 extends ADD {
+class ADD$AddSubtract$Offset3 extends ADD {
   final int immediateValue;
   final int sourceRegister;
 
-  const ADD$Offset3({
+  const ADD$AddSubtract$Offset3({
     @required int destinationRegister,
     @required this.sourceRegister,
     @required this.immediateValue,
@@ -51,10 +51,10 @@ class ADD$Offset3 extends ADD {
 ///
 /// Adds 8-bit [immediateValue] to contents of [destinationRegister] and places
 /// the result [destinationRegister].
-class ADD$Offset8 extends ADD {
+class ADD$MoveCompareAddSubtractImmediate extends ADD {
   final int immediateValue;
 
-  const ADD$Offset8({
+  const ADD$MoveCompareAddSubtractImmediate({
     @required int destinationRegister,
     @required this.immediateValue,
   }) : super._(

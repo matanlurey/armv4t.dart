@@ -16,10 +16,10 @@ abstract class MOV extends ThumbInstruction {
 /// A sub-type of [MOV].
 ///
 /// Move 8-bit [immediateValue] into [destinationRegister].
-class MOV$Immediate extends MOV {
+class MOV$MoveCompareAddSubtractImmediate extends MOV {
   final int immediateValue;
 
-  const MOV$Immediate({
+  const MOV$MoveCompareAddSubtractImmediate({
     @required this.immediateValue,
     @required int destinationRegister,
   }) : super._(

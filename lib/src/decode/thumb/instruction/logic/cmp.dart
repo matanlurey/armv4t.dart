@@ -2,8 +2,6 @@ part of '../../instruction.dart';
 
 /// Compare.
 ///
-/// Compare contents of [destinationRegister] with 8-bit [immediateValue].
-///
 /// Lo register operand | Hi register operand | Condition codes set
 /// ------------------- | ------------------- | -------------------
 /// ✔                   | ✔                   | ✔
@@ -18,10 +16,10 @@ abstract class CMP extends ThumbInstruction {
 /// A sub-type of [CMP].
 ///
 /// Compare contents of [destinationRegister] with 8-bit [immediateValue].
-class CMP$Immediate extends CMP {
+class CMP$MoveCompareAddSubtractImmediate extends CMP {
   final int immediateValue;
 
-  const CMP$Immediate({
+  const CMP$MoveCompareAddSubtractImmediate({
     @required this.immediateValue,
     @required int destinationRegister,
   }) : super._(

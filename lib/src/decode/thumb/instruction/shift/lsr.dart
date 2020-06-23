@@ -19,10 +19,10 @@ abstract class LSR extends ThumbInstruction {
 ///
 /// Perform logical shift right on [sourceRegister] by a 5-bit [immediateValue]
 /// and store the result in [destinationRegister].
-class LSR$Immediate extends LSR {
+class LSR$MoveShiftedRegister extends LSR {
   final int immediateValue;
 
-  const LSR$Immediate({
+  const LSR$MoveShiftedRegister({
     @required this.immediateValue,
     @required int destinationRegister,
     @required int sourceRegister,

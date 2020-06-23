@@ -19,10 +19,10 @@ abstract class LSL extends ThumbInstruction {
 ///
 /// Shifts [sourceRegister] by a 5-bit [immediateValue] and store the result in
 /// [destinationRegister].
-class LSL$Immediate extends LSL {
+class LSL$MoveShiftedRegister extends LSL {
   final int immediateValue;
 
-  const LSL$Immediate({
+  const LSL$MoveShiftedRegister({
     @required this.immediateValue,
     @required int destinationRegister,
     @required int sourceRegister,

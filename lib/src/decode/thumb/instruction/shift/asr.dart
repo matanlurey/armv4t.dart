@@ -19,10 +19,10 @@ abstract class ASR extends ThumbInstruction {
 ///
 /// Performs arithmetic shift right on [sourceRegister] by a 5-bit
 /// [immediateValue] and stores the result in [destinationRegister].
-class ASR$Immediate extends ASR {
+class ASR$MoveShiftedRegister extends ASR {
   final int immediateValue;
 
-  const ASR$Immediate({
+  const ASR$MoveShiftedRegister({
     @required this.immediateValue,
     @required int destinationRegister,
     @required int sourceRegister,
