@@ -23,6 +23,13 @@ class ADD$AddSubtract$Register extends ADD {
     @required this.sourceRegister,
     @required this.otherRegister,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$AddSubtract$Register(this, context);
 }
 
 /// A sub-type of [ADD].
@@ -39,6 +46,13 @@ class ADD$AddSubtract$Offset3 extends ADD {
     @required this.sourceRegister,
     @required this.immediateValue,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$AddSubtract$Offset3(this, context);
 }
 
 /// A sub-type of [ADD].
@@ -53,6 +67,13 @@ class ADD$MoveCompareAddSubtractImmediate extends ADD {
     @required this.destinationRegister,
     @required this.immediateValue,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$MoveCompareAddSubtractImmediate(this, context);
 }
 
 /// A sub-type of [ADD].
@@ -66,6 +87,13 @@ class ADD$HiToLo extends ADD {
     @required this.destinationRegister,
     @required this.sourceRegister,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$HiToLo(this, context);
 }
 
 /// A sub-type of [ADD].
@@ -79,6 +107,13 @@ class ADD$LoToHi extends ADD {
     @required this.destinationRegister,
     @required this.sourceRegister,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$LoToHi(this, context);
 }
 
 /// A sub-type of [ADD].
@@ -92,6 +127,13 @@ class ADD$HiToHi extends ADD {
     @required this.destinationRegister,
     @required this.sourceRegister,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$HiToHi(this, context);
 }
 
 /// A sub-type of [ADD].
@@ -106,6 +148,13 @@ class ADD$LoadAddress$PC extends ADD {
     @required this.destinationRegister,
     @required this.immediateValue,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$LoadAddress$PC(this, context);
 }
 
 /// A sub-type of [ADD].
@@ -120,6 +169,13 @@ class ADD$LoadAddress$SP extends ADD {
     @required this.destinationRegister,
     @required this.immediateValue,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$LoadAddress$SP(this, context);
 }
 
 /// A sub-type of [ADD].
@@ -131,6 +187,13 @@ class ADD$OffsetToStackPointer$Positive extends ADD {
   const ADD$OffsetToStackPointer$Positive({
     @required this.immediateValue,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$OffsetToStackPointer$Positive(this, context);
 }
 
 /// A sub-type of [ADD].
@@ -142,4 +205,11 @@ class ADD$OffsetToStackPointer$Negative extends ADD {
   const ADD$OffsetToStackPointer$Negative({
     @required this.immediateValue,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADD$OffsetToStackPointer$Negative(this, context);
 }

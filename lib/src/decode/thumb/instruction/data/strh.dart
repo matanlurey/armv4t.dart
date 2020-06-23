@@ -30,6 +30,13 @@ class STRH$SignExtendedByteOrHalfWord extends STRH {
           baseRegister: baseRegister,
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSTRH$SignExtendedByteOrHalfWord(this, context);
 }
 
 /// A sub-type of [STRH].
@@ -47,4 +54,11 @@ class STRH$HalfWord extends STRB {
           baseRegister: baseRegister,
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSTRH$HalfWord(this, context);
 }

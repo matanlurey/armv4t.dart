@@ -31,6 +31,13 @@ class LDRH$SignExtendedByteOrHalfWord extends LDRH {
           baseRegister: baseRegister,
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitLDRH$SignExtendedByteOrHalfWord(this, context);
 }
 
 /// A sub-type of [LDRH].
@@ -49,4 +56,11 @@ class LDRH$HalfWord extends STRB {
           baseRegister: baseRegister,
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitLDRH$HalfWord(this, context);
 }

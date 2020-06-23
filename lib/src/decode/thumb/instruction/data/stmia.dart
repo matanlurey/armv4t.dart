@@ -16,4 +16,11 @@ class STMIA extends ThumbInstruction {
     @required this.baseRegister,
     @required this.registerList,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSTMIA(this, context);
 }

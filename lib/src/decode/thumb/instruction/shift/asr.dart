@@ -30,6 +30,13 @@ class ASR$MoveShiftedRegister extends ASR {
           destinationRegister: destinationRegister,
           sourceRegister: sourceRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitASR$MoveShiftedRegister(this, context);
 }
 
 /// A sub-type of [ASR].
@@ -43,4 +50,11 @@ class ASR$ALU extends ASR {
           destinationRegister: destinationRegister,
           sourceRegister: sourceRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitASR$ALU(this, context);
 }

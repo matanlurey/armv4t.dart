@@ -25,6 +25,13 @@ class MOV$MoveCompareAddSubtractImmediate extends MOV {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitMOV$MoveCompareAddSubtractImmediate(this, context);
 }
 
 /// A sub-type of [MOV].
@@ -40,6 +47,13 @@ class MOV$HiToLo extends MOV {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitMOV$HiToLo(this, context);
 }
 
 /// A sub-type of [MOV].
@@ -55,6 +69,13 @@ class MOV$LoToHi extends MOV {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitMOV$LoToHi(this, context);
 }
 
 /// A sub-type of [MOV].
@@ -69,4 +90,11 @@ class MOV$HiToHi extends MOV {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitMOV$HiToHi(this, context);
 }

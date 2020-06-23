@@ -25,6 +25,13 @@ class CMP$MoveCompareAddSubtractImmediate extends CMP {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitCMP$MoveCompareAddSubtractImmediate(this, context);
 }
 
 /// A sub-type of [CMP].
@@ -39,6 +46,13 @@ class CMP$ALU extends CMP {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitCMP$ALU(this, context);
 }
 
 /// A sub-type of [CMP].
@@ -54,6 +68,13 @@ class CMP$HiToLo extends CMP {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitCMP$HiToLo(this, context);
 }
 
 /// A sub-type of [CMP].
@@ -69,6 +90,13 @@ class CMP$LoToHi extends CMP {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitCMP$LoToHi(this, context);
 }
 
 /// A sub-type of [CMP].
@@ -84,4 +112,11 @@ class CMP$HiToHi extends CMP {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitCMP$HiToHi(this, context);
 }

@@ -29,6 +29,13 @@ class BL$1 extends BL {
   }) : super._(
           offset: offset,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitBL$1(this, context);
 }
 
 /// Sub-type of [BL].
@@ -58,4 +65,11 @@ class BL$2 extends BL {
   }) : super._(
           offset: offset,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitBL$2(this, context);
 }

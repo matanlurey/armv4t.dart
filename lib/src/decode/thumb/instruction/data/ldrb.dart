@@ -31,6 +31,13 @@ class LDRB$RelativeOffset extends LDRB {
           baseRegister: baseRegister,
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitLDRB$RelativeOffset(this, context);
 }
 
 /// A sub-type of [LDRB].
@@ -49,4 +56,11 @@ class LDRB$ImmediateOffset extends LDRB {
           baseRegister: baseRegister,
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitLDRB$ImmediateOffset(this, context);
 }

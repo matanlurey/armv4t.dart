@@ -15,4 +15,11 @@ class B extends ThumbInstruction {
   const B({
     @required this.immdediateValue,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitB(this, context);
 }

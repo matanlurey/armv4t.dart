@@ -31,12 +31,13 @@ void main() {
   });
 
   test('should decode 02:ADD_AND_SUBTRACT', () {
-    //              0001   11PN   NNSS   SDDD
+    //              0001   1IPN   NNSS   SDDD
     final input = ('0001' '1101' '0110' '1010').parseBits();
     final format = ThumbInstructionSet.$02$addAndSubtract;
     final coded = Map.fromIterables(format.names, format.capture(input));
     expect(coded, {
       'P': '0'.parseBits(),
+      'I': '1'.parseBits(),
       'N': '101'.parseBits(),
       'S': '101'.parseBits(),
       'D': '010'.parseBits(),
@@ -45,6 +46,7 @@ void main() {
     expect(
       AddAndSubtract.decoder.decodeBits(input),
       AddAndSubtract(
+        i: coded['I'],
         opcode: coded['P'],
         registerNOrOffset3: coded['N'],
         registerS: coded['S'],

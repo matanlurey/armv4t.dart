@@ -23,6 +23,13 @@ class PUSH$Registers extends PUSH {
   }) : super._(
           registerList: registerList,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitPUSH$Registers(this, context);
 }
 
 //// A sub-type of [PUSH].
@@ -35,4 +42,11 @@ class PUSH$RegistersAndLinkRegister extends PUSH {
   }) : super._(
           registerList: registerList,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitPUSH$RegistersAndLinkRegister(this, context);
 }

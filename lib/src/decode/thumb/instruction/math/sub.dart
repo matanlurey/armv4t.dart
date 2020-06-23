@@ -28,6 +28,13 @@ class SUB$AddSubtract$Register extends SUB {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSUB$AddSubtract$Register(this, context);
 }
 
 /// A sub-type of [SUB].
@@ -45,6 +52,13 @@ class SUB$AddSubtract$Offset3 extends SUB {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSUB$AddSubtract$Offset3(this, context);
 }
 
 /// A sub-type of [SUB].
@@ -60,4 +74,11 @@ class SUB$MoveCompareAddSubtractImmediate extends SUB {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSUB$MoveCompareAddSubtractImmediate(this, context);
 }

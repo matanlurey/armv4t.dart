@@ -31,6 +31,13 @@ class STRB$RelativeOffset extends STRB {
           baseRegister: baseRegister,
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSTRB$RelativeOffset(this, context);
 }
 
 /// A sub-type of [LDR].
@@ -49,4 +56,11 @@ class STRB$ImmediateOffset extends STRB {
           baseRegister: baseRegister,
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSTRB$ImmediateOffset(this, context);
 }

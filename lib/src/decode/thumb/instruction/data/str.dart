@@ -29,6 +29,13 @@ class STR$RelativeOffset extends STR {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSTR$RelativeOffset(this, context);
 }
 
 /// A sub-type of [STR].
@@ -47,6 +54,13 @@ class STR$ImmediateOffset extends STR {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSTR$ImmediateOffset(this, context);
 }
 
 /// A sub-type of [STR].
@@ -63,4 +77,11 @@ class STR$SPRelative extends STR {
   }) : super._(
           destinationRegister: destinationRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSTR$SPRelative(this, context);
 }

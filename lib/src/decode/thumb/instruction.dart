@@ -1,3 +1,5 @@
+import 'package:armv4t/src/decode/thumb/printer.dart';
+import 'package:armv4t/src/utils.dart';
 import 'package:meta/meta.dart';
 
 import 'format.dart';
@@ -55,10 +57,25 @@ part 'instruction/shift/ror.dart';
 /// An **internal** representation of a decoded `THUMB` instruction.
 abstract class ThumbInstruction {
   const ThumbInstruction._();
+
+  /// Invokes the correct sub-method of [visitor], optionally with [context].
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]);
+
+  @override
+  String toString() {
+    if (assertionsEnabled) {
+      return accept(const ThumbInstructionPrinter());
+    } else {
+      return super.toString();
+    }
+  }
 }
 
 /// Further decodes a [ThumbInstructionSet] into a [ThumbInstruction].
-class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
+class ThumbDecoder implements ThumbSetVisitor<ThumbInstruction, void> {
   @alwaysThrows
   // ignore: prefer_void_to_null
   static Null _unrecognizedOpcode(int opcode) {
@@ -99,34 +116,38 @@ class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
     AddAndSubtract set, [
     void _,
   ]) {
-    switch (set.opcode) {
-      case 0x0:
+    if (set.opcode == 0) {
+      if (set.i == 0) {
         return ADD$AddSubtract$Register(
           otherRegister: set.registerNOrOffset3,
           sourceRegister: set.registerS,
           destinationRegister: set.registerD,
         );
-      case 0x1:
+      } else if (set.i == 1) {
         return ADD$AddSubtract$Offset3(
           immediateValue: set.registerNOrOffset3,
           sourceRegister: set.registerS,
           destinationRegister: set.registerD,
         );
-      case 0x2:
+      }
+    } else if (set.opcode == 1) {
+      if (set.i == 0) {
         return SUB$AddSubtract$Register(
           otherRegister: set.registerNOrOffset3,
           sourceRegister: set.registerS,
           destinationRegister: set.registerD,
         );
-      case 0x3:
+      } else if (set.i == 1) {
         return SUB$AddSubtract$Offset3(
           immediateValue: set.registerNOrOffset3,
           sourceRegister: set.registerS,
           destinationRegister: set.registerD,
         );
-      default:
-        return _unrecognizedOpcode(set.opcode);
+      }
+    } else {
+      return _unrecognizedOpcode(set.opcode);
     }
+    throw StateError('Unrecognized "I": ${set.i}');
   }
 
   @override
@@ -256,63 +277,81 @@ class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
     HighRegisterOperationsAndBranchExchange set, [
     void _,
   ]) {
-    switch (set.opcode) {
-      case 0x0:
+    if (set.opcode == 0) {
+      if (set.h1 == 0 && set.h2 == 1) {
         return ADD$HiToLo(
           destinationRegister: set.registerDOrHD,
           sourceRegister: set.registerSOrHS,
         );
-      case 0x1:
-        return ADD$LoToHi(
-          destinationRegister: set.registerDOrHD,
-          sourceRegister: set.registerSOrHS,
-        );
-      case 0x2:
-        return ADD$HiToHi(
-          destinationRegister: set.registerDOrHD,
-          sourceRegister: set.registerSOrHS,
-        );
-      case 0x3:
+      } else if (set.h1 == 1) {
+        if (set.h2 == 0) {
+          return ADD$LoToHi(
+            destinationRegister: set.registerDOrHD,
+            sourceRegister: set.registerSOrHS,
+          );
+        } else if (set.h2 == 1) {
+          return ADD$HiToHi(
+            destinationRegister: set.registerDOrHD,
+            sourceRegister: set.registerSOrHS,
+          );
+        }
+      }
+    } else if (set.opcode == 1) {
+      if (set.h1 == 0 && set.h2 == 1) {
         return CMP$HiToLo(
           destinationRegister: set.registerDOrHD,
           sourceRegister: set.registerSOrHS,
         );
-      case 0x4:
-        return CMP$LoToHi(
-          destinationRegister: set.registerDOrHD,
-          sourceRegister: set.registerSOrHS,
-        );
-      case 0x5:
-        return CMP$HiToHi(
-          destinationRegister: set.registerDOrHD,
-          sourceRegister: set.registerSOrHS,
-        );
-      case 0x6:
+      } else if (set.h1 == 1) {
+        if (set.h2 == 0) {
+          return CMP$LoToHi(
+            destinationRegister: set.registerDOrHD,
+            sourceRegister: set.registerSOrHS,
+          );
+        } else if (set.h2 == 1) {
+          return CMP$HiToHi(
+            destinationRegister: set.registerDOrHD,
+            sourceRegister: set.registerSOrHS,
+          );
+        }
+      }
+    } else if (set.opcode == 2) {
+      if (set.h1 == 0 && set.h2 == 1) {
         return MOV$HiToLo(
           destinationRegister: set.registerDOrHD,
           sourceRegister: set.registerSOrHS,
         );
-      case 0x7:
-        return MOV$LoToHi(
-          destinationRegister: set.registerDOrHD,
-          sourceRegister: set.registerSOrHS,
-        );
-      case 0x8:
-        return MOV$HiToHi(
-          destinationRegister: set.registerDOrHD,
-          sourceRegister: set.registerSOrHS,
-        );
-      case 0x9:
-        return BX$Lo(
-          sourceRegister: set.registerSOrHS,
-        );
-      case 0xA:
-        return BX$Hi(
-          sourceRegister: set.registerSOrHS,
-        );
-      default:
-        return _unrecognizedOpcode(set.opcode);
+      } else if (set.h1 == 1) {
+        if (set.h2 == 0) {
+          return MOV$LoToHi(
+            destinationRegister: set.registerDOrHD,
+            sourceRegister: set.registerSOrHS,
+          );
+        } else if (set.h2 == 1) {
+          return MOV$HiToHi(
+            destinationRegister: set.registerDOrHD,
+            sourceRegister: set.registerSOrHS,
+          );
+        }
+      }
+    } else if (set.opcode == 3) {
+      if (set.h1 == 0) {
+        if (set.h2 == 0) {
+          return BX$Lo(
+            sourceRegister: set.registerSOrHS,
+          );
+        } else if (set.h2 == 1) {
+          return BX$Hi(
+            sourceRegister: set.registerSOrHS,
+          );
+        }
+      }
+    } else {
+      return _unrecognizedOpcode(set.opcode);
     }
+    throw StateError(
+      'Unrecognized Op/H1/H2: ${set.opcode}/${set.h1}/${set.h2}',
+    );
   }
 
   @override
@@ -578,33 +617,33 @@ class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
   ]) {
     switch (set.condition) {
       case 0x0:
-        return BEQ();
+        return BEQ(label: set.softSet8);
       case 0x1:
-        return BNE();
+        return BNE(label: set.softSet8);
       case 0x2:
-        return BCS();
+        return BCS(label: set.softSet8);
       case 0x3:
-        return BCC();
+        return BCC(label: set.softSet8);
       case 0x4:
-        return BMI();
+        return BMI(label: set.softSet8);
       case 0x5:
-        return BPL();
+        return BPL(label: set.softSet8);
       case 0x6:
-        return BVS();
+        return BVS(label: set.softSet8);
       case 0x7:
-        return BVC();
+        return BVC(label: set.softSet8);
       case 0x8:
-        return BHI();
+        return BHI(label: set.softSet8);
       case 0x9:
-        return BLS();
+        return BLS(label: set.softSet8);
       case 0xA:
-        return BGE();
+        return BGE(label: set.softSet8);
       case 0xB:
-        return BLT();
+        return BLT(label: set.softSet8);
       case 0xC:
-        return BGT();
+        return BGT(label: set.softSet8);
       case 0xD:
-        return BLE();
+        return BLE(label: set.softSet8);
       default:
         throw StateError('Invalid Cond: ${set.condition}');
     }
@@ -640,4 +679,421 @@ class Decoder implements ThumbInstructionSetVisitor<ThumbInstruction, void> {
         throw StateError('Invalid H: ${set.h}');
     }
   }
+}
+
+abstract class ThumbInstructionVisitor<R, C> {
+  R visitLSL$MoveShiftedRegister(
+    LSL$MoveShiftedRegister instruction, [
+    C context,
+  ]);
+
+  R visitLSR$MoveShiftedRegister(
+    LSR$MoveShiftedRegister instruction, [
+    C context,
+  ]);
+
+  R visitASR$MoveShiftedRegister(
+    ASR$MoveShiftedRegister instruction, [
+    C context,
+  ]);
+
+  R visitADD$AddSubtract$Register(
+    ADD$AddSubtract$Register instruction, [
+    C context,
+  ]);
+
+  R visitADD$AddSubtract$Offset3(
+    ADD$AddSubtract$Offset3 instruction, [
+    C context,
+  ]);
+
+  R visitSUB$AddSubtract$Register(
+    SUB$AddSubtract$Register instruction, [
+    C context,
+  ]);
+
+  R visitSUB$AddSubtract$Offset3(
+    SUB$AddSubtract$Offset3 instruction, [
+    C context,
+  ]);
+
+  R visitMOV$MoveCompareAddSubtractImmediate(
+    MOV$MoveCompareAddSubtractImmediate instruction, [
+    C context,
+  ]);
+
+  R visitCMP$MoveCompareAddSubtractImmediate(
+    CMP$MoveCompareAddSubtractImmediate instruction, [
+    C context,
+  ]);
+
+  R visitADD$MoveCompareAddSubtractImmediate(
+    ADD$MoveCompareAddSubtractImmediate instruction, [
+    C context,
+  ]);
+
+  R visitSUB$MoveCompareAddSubtractImmediate(
+    SUB$MoveCompareAddSubtractImmediate instruction, [
+    C context,
+  ]);
+
+  R visitAND(
+    AND instruction, [
+    C context,
+  ]);
+
+  R visitEOR(
+    EOR instruction, [
+    C context,
+  ]);
+
+  R visitLSL$ALU(
+    LSL$ALU instruction, [
+    C context,
+  ]);
+
+  R visitLSR$ALU(
+    LSR$ALU instruction, [
+    C context,
+  ]);
+
+  R visitASR$ALU(
+    ASR$ALU instruction, [
+    C context,
+  ]);
+
+  R visitADC(
+    ADC instruction, [
+    C context,
+  ]);
+
+  R visitSBC(
+    SBC instruction, [
+    C context,
+  ]);
+
+  R visitROR(
+    ROR instruction, [
+    C context,
+  ]);
+
+  R visitTST(
+    TST instruction, [
+    C context,
+  ]);
+
+  R visitNEG(
+    NEG instruction, [
+    C context,
+  ]);
+
+  R visitCMP$ALU(
+    CMP$ALU instruction, [
+    C context,
+  ]);
+
+  R visitCMN(
+    CMN instruction, [
+    C context,
+  ]);
+
+  R visitORR(
+    ORR instruction, [
+    C context,
+  ]);
+
+  R visitMUL(
+    MUL instruction, [
+    C context,
+  ]);
+
+  R visitBIC(
+    BIC instruction, [
+    C context,
+  ]);
+
+  R visitMVN(
+    MVN instruction, [
+    C context,
+  ]);
+
+  R visitADD$HiToLo(
+    ADD$HiToLo instruction, [
+    C context,
+  ]);
+
+  R visitADD$LoToHi(
+    ADD$LoToHi instruction, [
+    C context,
+  ]);
+
+  R visitADD$HiToHi(
+    ADD$HiToHi instruction, [
+    C context,
+  ]);
+
+  R visitCMP$HiToLo(
+    CMP$HiToLo instruction, [
+    C context,
+  ]);
+
+  R visitCMP$LoToHi(
+    CMP$LoToHi instruction, [
+    C context,
+  ]);
+
+  R visitCMP$HiToHi(
+    CMP$HiToHi instruction, [
+    C context,
+  ]);
+
+  R visitMOV$HiToLo(
+    MOV$HiToLo instruction, [
+    C context,
+  ]);
+
+  R visitMOV$LoToHi(
+    MOV$LoToHi instruction, [
+    C context,
+  ]);
+
+  R visitMOV$HiToHi(
+    MOV$HiToHi instruction, [
+    C context,
+  ]);
+
+  R visitBX$Lo(
+    BX$Lo instruction, [
+    C context,
+  ]);
+
+  R visitBX$Hi(
+    BX$Hi instruction, [
+    C context,
+  ]);
+
+  R visitLDR$PCRelative(
+    LDR$PCRelative instruction, [
+    C context,
+  ]);
+
+  R visitSTR$RelativeOffset(
+    STR$RelativeOffset instruction, [
+    C context,
+  ]);
+
+  R visitSTRB$RelativeOffset(
+    STRB$RelativeOffset instruction, [
+    C context,
+  ]);
+
+  R visitLDR$RelativeOffset(
+    LDR$RelativeOffset instruction, [
+    C context,
+  ]);
+
+  R visitLDRB$RelativeOffset(
+    LDRB$RelativeOffset instruction, [
+    C context,
+  ]);
+
+  R visitSTRH$SignExtendedByteOrHalfWord(
+    STRH$SignExtendedByteOrHalfWord instruction, [
+    C context,
+  ]);
+
+  R visitLDRH$SignExtendedByteOrHalfWord(
+    LDRH$SignExtendedByteOrHalfWord instruction, [
+    C context,
+  ]);
+
+  R visitLDSB(
+    LDSB instruction, [
+    C context,
+  ]);
+
+  R visitLDSH(
+    LDSH instruction, [
+    C context,
+  ]);
+
+  R visitSTR$ImmediateOffset(
+    STR$ImmediateOffset instruction, [
+    C context,
+  ]);
+
+  R visitLDR$ImmediateOffset(
+    LDR$ImmediateOffset instruction, [
+    C context,
+  ]);
+
+  R visitSTRB$ImmediateOffset(
+    STRB$ImmediateOffset instruction, [
+    C context,
+  ]);
+
+  R visitLDRB$ImmediateOffset(
+    LDRB$ImmediateOffset instruction, [
+    C context,
+  ]);
+
+  R visitSTRH$HalfWord(
+    STRH$HalfWord instruction, [
+    C context,
+  ]);
+
+  R visitLDRH$HalfWord(
+    LDRH$HalfWord instruction, [
+    C context,
+  ]);
+
+  R visitSTR$SPRelative(
+    STR$SPRelative instruction, [
+    C context,
+  ]);
+
+  R visitLDR$SPRelative(
+    LDR$SPRelative instruction, [
+    C context,
+  ]);
+
+  R visitADD$LoadAddress$PC(
+    ADD$LoadAddress$PC instruction, [
+    C context,
+  ]);
+
+  R visitADD$LoadAddress$SP(
+    ADD$LoadAddress$SP instruction, [
+    C context,
+  ]);
+
+  R visitADD$OffsetToStackPointer$Positive(
+    ADD$OffsetToStackPointer$Positive instruction, [
+    C context,
+  ]);
+
+  R visitADD$OffsetToStackPointer$Negative(
+    ADD$OffsetToStackPointer$Negative instruction, [
+    C context,
+  ]);
+
+  R visitPUSH$Registers(
+    PUSH$Registers instruction, [
+    C context,
+  ]);
+
+  R visitPUSH$RegistersAndLinkRegister(
+    PUSH$RegistersAndLinkRegister instruction, [
+    C context,
+  ]);
+
+  R visitPOP$Registers(
+    POP$Registers instruction, [
+    C context,
+  ]);
+
+  R visitPOP$RegistersAndLinkRegister(
+    POP$RegistersAndLinkRegister instruction, [
+    C context,
+  ]);
+
+  R visitSTMIA(
+    STMIA instruction, [
+    C context,
+  ]);
+
+  R visitLDMIA(
+    LDMIA instruction, [
+    C context,
+  ]);
+
+  R visitBEQ(
+    BEQ instruction, [
+    C context,
+  ]);
+
+  R visitBNE(
+    BNE instruction, [
+    C context,
+  ]);
+
+  R visitBCS(
+    BCS instruction, [
+    C context,
+  ]);
+
+  R visitBCC(
+    BCC instruction, [
+    C context,
+  ]);
+
+  R visitBMI(
+    BMI instruction, [
+    C context,
+  ]);
+
+  R visitBPL(
+    BPL instruction, [
+    C context,
+  ]);
+
+  R visitBVS(
+    BVS instruction, [
+    C context,
+  ]);
+
+  R visitBVC(
+    BVC instruction, [
+    C context,
+  ]);
+
+  R visitBHI(
+    BHI instruction, [
+    C context,
+  ]);
+
+  R visitBLS(
+    BLS instruction, [
+    C context,
+  ]);
+
+  R visitBGE(
+    BGE instruction, [
+    C context,
+  ]);
+
+  R visitBLT(
+    BLT instruction, [
+    C context,
+  ]);
+
+  R visitBGT(
+    BGT instruction, [
+    C context,
+  ]);
+
+  R visitBLE(
+    BLE instruction, [
+    C context,
+  ]);
+
+  R visitSWI(
+    SWI instruction, [
+    C context,
+  ]);
+
+  R visitB(
+    B instruction, [
+    C context,
+  ]);
+
+  R visitBL$1(
+    BL$1 instruction, [
+    C context,
+  ]);
+
+  R visitBL$2(
+    BL$2 instruction, [
+    C context,
+  ]);
 }

@@ -19,4 +19,11 @@ class LDSH extends ThumbInstruction {
     @required this.offsetRegister,
     @required this.destinationRegister,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitLDSH(this, context);
 }

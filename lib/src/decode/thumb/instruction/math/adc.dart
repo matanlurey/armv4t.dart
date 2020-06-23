@@ -15,4 +15,11 @@ class ADC extends ThumbInstruction {
     @required this.sourceRegister,
     @required this.destinationRegister,
   }) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitADC(this, context);
 }

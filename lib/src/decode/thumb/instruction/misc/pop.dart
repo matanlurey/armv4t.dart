@@ -23,6 +23,13 @@ class POP$Registers extends POP {
   }) : super._(
           registerList: registerList,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitPOP$Registers(this, context);
 }
 
 //// A sub-type of [POP].
@@ -36,4 +43,11 @@ class POP$RegistersAndLinkRegister extends POP {
   }) : super._(
           registerList: registerList,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitPOP$RegistersAndLinkRegister(this, context);
 }

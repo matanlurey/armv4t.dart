@@ -30,6 +30,13 @@ class LSL$MoveShiftedRegister extends LSL {
           destinationRegister: destinationRegister,
           sourceRegister: sourceRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitLSL$MoveShiftedRegister(this, context);
 }
 
 /// A sub-type of [LSL].
@@ -43,4 +50,11 @@ class LSL$ALU extends LSL {
           destinationRegister: destinationRegister,
           sourceRegister: sourceRegister,
         );
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitLSL$ALU(this, context);
 }

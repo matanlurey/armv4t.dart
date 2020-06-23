@@ -15,4 +15,11 @@ class SWI extends ThumbInstruction {
   final int value;
 
   const SWI({@required this.value}) : super._();
+
+  @override
+  R accept<R, C>(
+    ThumbInstructionVisitor<R, C> visitor, [
+    C context,
+  ]) =>
+      visitor.visitSWI(this, context);
 }

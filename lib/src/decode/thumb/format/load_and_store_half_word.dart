@@ -39,7 +39,7 @@ class LoadAndStoreHalfWord extends ThumbInstructionSet {
         super._(decoder._format);
 
   @override
-  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+  R accept<R, C>(ThumbSetVisitor<R, C> visitor, [C context]) {
     return visitor.visitLoadAndStoreHalfWord(this, context);
   }
 
