@@ -28,7 +28,7 @@ part 'format/unconditional_branch.dart';
 ///
 /// For testing, individual [BitPattern] implementations are accessible as
 /// static fields (e.g. `[$01$moveShiftedRegister]`), and a sorted
-/// [BitPatternGrpup] is accessible as [allFormats].
+/// [BitPatternGroup] is accessible as [allFormats].
 abstract class ThumbInstructionSet {
   /// Move shifted register.
   static final $01$moveShiftedRegister = BitPatternBuilder.parse(

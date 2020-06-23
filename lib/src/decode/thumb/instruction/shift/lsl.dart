@@ -2,20 +2,45 @@ part of '../../instruction.dart';
 
 /// Logical shift left.
 ///
-/// Shifts [soruceRegister] by a 5-bit [immediateValue] and store the result in
-/// [destinationRegister].
-///
 /// Lo register operand | Hi register operand | Condition codes set
 /// ------------------- | ------------------- | -------------------
 /// ✔                   | 🗙                   | ✔
-class LSL extends ThumbInstruction {
+abstract class LSL extends ThumbInstruction {
   final int destinationRegister;
   final int sourceRegister;
-  final int immediateValue;
 
-  const LSL({
+  const LSL._({
     @required this.destinationRegister,
     @required this.sourceRegister,
-    @required this.immediateValue,
   }) : super._();
+}
+
+/// A sub-type of [LSL].
+///
+/// Shifts [sourceRegister] by a 5-bit [immediateValue] and store the result in
+/// [destinationRegister].
+class LSL$Immediate extends LSL {
+  final int immediateValue;
+
+  const LSL$Immediate({
+    @required this.immediateValue,
+    @required int destinationRegister,
+    @required int sourceRegister,
+  }) : super._(
+          destinationRegister: destinationRegister,
+          sourceRegister: sourceRegister,
+        );
+}
+
+/// A sub-type of [LSL].
+///
+/// `Rd := Rd << Rs`
+class LSL$ALU extends LSL {
+  const LSL$ALU({
+    @required int destinationRegister,
+    @required int sourceRegister,
+  }) : super._(
+          destinationRegister: destinationRegister,
+          sourceRegister: sourceRegister,
+        );
 }

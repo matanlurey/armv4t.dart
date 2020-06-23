@@ -5,4 +5,46 @@ part of '../../instruction.dart';
 /// Lo register operand | Hi register operand | Condition codes set
 /// ------------------- | ------------------- | -------------------
 /// ✔                   | 🗙                   | 🗙
-class STRH extends ThumbInstruction {}
+abstract class STRH extends ThumbInstruction {
+  final int baseRegister;
+  final int destinationRegister;
+
+  const STRH._({
+    @required this.baseRegister,
+    @required this.destinationRegister,
+  }) : super._();
+}
+
+/// A sub-type of [STRH].
+///
+/// Add [offsetRegister] to the base address in [baseRegister]. Store bits 0-15
+/// of [destinationRegister] at the resulting address.
+class STRH$Indexed extends STRH {
+  final int offsetRegister;
+
+  const STRH$Indexed._({
+    @required this.offsetRegister,
+    @required int baseRegister,
+    @required int destinationRegister,
+  }) : super._(
+          baseRegister: baseRegister,
+          destinationRegister: destinationRegister,
+        );
+}
+
+/// A sub-type of [STRH].
+///
+/// Add [immediateValue] to the base address in [baseRegister] and store bits
+/// 0-15 of [destinationRegister] at the resulting address.
+class STRH$Immediate extends STRB {
+  final int immediateValue;
+
+  const STRH$Immediate({
+    @required this.immediateValue,
+    @required int baseRegister,
+    @required int destinationRegister,
+  }) : super._(
+          baseRegister: baseRegister,
+          destinationRegister: destinationRegister,
+        );
+}
