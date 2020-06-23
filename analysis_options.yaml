@@ -14,6 +14,7 @@ linter:
     - avoid_null_checks_in_equality_operators
     - avoid_print
     - await_only_futures
+    - comment_references
     - hash_and_equals
     - package_api_docs
     - package_names

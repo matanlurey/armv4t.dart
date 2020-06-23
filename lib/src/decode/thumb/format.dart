@@ -28,7 +28,7 @@ part 'format/unconditional_branch.dart';
 ///
 /// For testing, individual [BitPattern] implementations are accessible as
 /// static fields (e.g. `[$01$moveShiftedRegister]`), and a sorted
-/// [BitPatternGrpup] is accessible as [allFormats].
+/// [BitPatternGroup] is accessible as [allFormats].
 abstract class ThumbInstructionSet {
   /// Move shifted register.
   static final $01$moveShiftedRegister = BitPatternBuilder.parse(
@@ -37,7 +37,7 @@ abstract class ThumbInstructionSet {
 
   /// Add and subtract.
   static final $02$addAndSubtract = BitPatternBuilder.parse(
-    '0001_11PN_NNSS_SDDD',
+    '0001_1IPN_NNSS_SDDD',
   ).build('02:ADD_AND_SUBTRACT');
 
   /// Move, compare, add, and subtract immediate.
@@ -165,7 +165,7 @@ abstract class ThumbInstructionSet {
   const ThumbInstructionSet._(this._format) : assert(_format != null);
 
   /// Delegates to the appropriate method of [visitor], optionally [context].
-  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]);
+  R accept<R, C>(ThumbSetVisitor<R, C> visitor, [C context]);
 
   @override
   bool operator ==(Object o) {
@@ -208,7 +208,7 @@ class ThumbInstructionSetDecoder<T extends ThumbInstructionSet> {
 }
 
 /// Implement to in order to visit known sub-types of [ThumbInstructionSet].
-abstract class ThumbInstructionSetVisitor<R, C> {
+abstract class ThumbSetVisitor<R, C> {
   R visitMoveShiftedRegister(
     MoveShiftedRegister set, [
     C context,

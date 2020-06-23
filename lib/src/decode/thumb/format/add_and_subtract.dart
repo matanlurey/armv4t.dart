@@ -5,15 +5,19 @@ class AddAndSubtract extends ThumbInstructionSet {
   static final decoder = ThumbInstructionSetDecoder._(
     ThumbInstructionSet.$02$addAndSubtract,
     (decoded) => AddAndSubtract(
-      opcode: decoded[0],
-      registerNOrOffset3: decoded[1],
-      registerS: decoded[2],
-      registerD: decoded[3],
+      i: decoded[0],
+      opcode: decoded[1],
+      registerNOrOffset3: decoded[2],
+      registerS: decoded[3],
+      registerD: decoded[4],
     ),
   );
 
-  /// OpCode (2-bits).
+  /// OpCode (1-bit).
   final int opcode;
+
+  /// `I` (1-bit).
+  final int i;
 
   /// Register `N` or Offset (3-bits).
   final int registerNOrOffset3;
@@ -29,6 +33,7 @@ class AddAndSubtract extends ThumbInstructionSet {
   /// > **NOTE**: Bits are **not** checked for correctness or size!
   AddAndSubtract({
     @required this.opcode,
+    @required this.i,
     @required this.registerNOrOffset3,
     @required this.registerS,
     @required this.registerD,
@@ -39,7 +44,7 @@ class AddAndSubtract extends ThumbInstructionSet {
         super._(decoder._format);
 
   @override
-  R accept<R, C>(ThumbInstructionSetVisitor<R, C> visitor, [C context]) {
+  R accept<R, C>(ThumbSetVisitor<R, C> visitor, [C context]) {
     return visitor.visitAddAndSubtract(this, context);
   }
 
@@ -47,6 +52,7 @@ class AddAndSubtract extends ThumbInstructionSet {
   Map<String, Object> toJson() {
     return {
       'Op': opcode,
+      'I': i,
       'Rn/Offset3': registerNOrOffset3,
       'Rs': registerS,
       'Rd': registerD,
