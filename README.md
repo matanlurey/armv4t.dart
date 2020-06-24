@@ -27,10 +27,12 @@ A few different resources and documents used to develop this package.
 
 ### Documentation
 
+- [ARM Assembler Guide](doc/arm-assembler-guide.pdf)
 - [ARM CPU Overview](https://problemkaputt.de/gbatek.htm#armcpuoverview)
+- [ARM THUMB Programmers Guide](doc/arm-thumb-programmers-model.pdf)
 - [ARMv4T Instruction Set][]
-- [ARM7/TDMI Datasheet](https://github.com/matanlurey/gba.dart/blob/master/doc/pdf/arm7-tdmi-datasheet.pdf)
-- [ARM7/TDMI Instruction Timings](https://github.com/matanlurey/gba.dart/blob/master/doc/pdf/arm7-tdmi-instruction-timings.pdf)
+- [ARM7/TDMI Datasheet](doc/arm7tdmi-data-sheet.pdf)
+- [ARM7/TDMI Instruction Timings](doc/arm7tdmi-timings.pdf)
 - [CowBitSpec: CPU](https://www.cs.rit.edu/~tjh8300/CowBite/CowBiteSpec.htm#CPU)
 - [Designing Emulators for Complex Systems (Reddit)](https://www.reddit.com/r/EmuDev/comments/con6kg/when_designing_emulators_for_more_complex_systems/)
 - [Emulating the GBA](https://web.archive.org/web/20150428041044/http://6bit.net/shonumi/2015/04/19/emulating-the-gba/)
