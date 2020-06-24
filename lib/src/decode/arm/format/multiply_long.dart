@@ -4,14 +4,14 @@ part of '../format.dart';
 class MultiplyLongAndMutiplyAccumulateLong extends ArmInstructionSet {
   static final decoder = ArmInstructionSetDecoder._(
     ArmInstructionSet.$01$dataProcessingOrPsrTransfer,
-    (decoded) => DataProcessingOrPSRTransfer(
+    (decoded) => MultiplyLongAndMutiplyAccumulateLong(
       condition: decoded[0],
-      i: decoded[1],
-      opcode: decoded[2],
-      s: decoded[3],
+      a: decoded[1],
+      s: decoded[2],
+      registerD: decoded[3],
       registerN: decoded[4],
-      registerD: decoded[5],
-      operand2: decoded[6],
+      registerS: decoded[5],
+      registerM: decoded[6],
     ),
   );
 
@@ -33,10 +33,10 @@ class MultiplyLongAndMutiplyAccumulateLong extends ArmInstructionSet {
   /// Operand register 3.
   final int registerM;
 
-  /// Creates a [MultiplyAndMutiplyAccumulate] from the provided variables.
+  /// Creates a [MultiplyLongAndMutiplyAccumulateLong] from the provided variables.
   ///
   /// > **NOTE**: Bits are **not** checked for correctness or size!
-  MultiplyAndMutiplyAccumulate({
+  MultiplyLongAndMutiplyAccumulateLong({
     @required int condition,
     @required this.a,
     @required this.s,
