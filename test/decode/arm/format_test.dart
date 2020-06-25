@@ -106,4 +106,34 @@ void main() {
       MultiplyLongAndMutiplyAccumulateLong.decoder,
     );
   });
+
+  test('should decode 04:SINGLE_DATA_SWAP', () {
+    //               CCCC   0001   0B00   NNNN   DDDD   0000   1001   MMMM
+    final string = ('0000' '0001' '0000' '1010' '1010' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$04$singleDataSwap;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'B': '0'.parseBits(),
+      'N': '1010'.parseBits(),
+      'D': '1010'.parseBits(),
+      'M': '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      SingleDataSwap.decoder.decodeBits(input),
+      SingleDataSwap(
+        condition: coded['C'],
+        b: coded['B'],
+        registerN: coded['N'],
+        registerD: coded['D'],
+        registerM: coded['M'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      SingleDataSwap.decoder,
+    );
+  });
 }
