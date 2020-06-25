@@ -252,4 +252,22 @@ void main() {
       SingleDataTransfer.decoder,
     );
   });
+
+  test('should decode 09:UNDEFINED', () {
+    //               CCCC   011X   XXXX   XXXX   XXXX   XXXX   XXX1   ZZZZ
+    final string = ('0000' '0111' '0110' '1111' '1111' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$09$undefined;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, containsPair('C', '0000'.parseBits()));
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      Undefined.decoder.decodeBits(input),
+      Undefined(condition: coded['C']),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      Undefined.decoder,
+    );
+  });
 }
