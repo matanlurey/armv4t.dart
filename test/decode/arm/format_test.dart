@@ -36,4 +36,38 @@ void main() {
       DataProcessingOrPSRTransfer.decoder,
     );
   });
+
+  test('should decode 02:MULTIPLY', () {
+    //               CCCC   0000   00AS   DDDD   NNNN   FFFF   1001   MMMM
+    final string = ('0000' '0000' '1010' '1010' '1010' '1010' '1010' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$01$dataProcessingOrPsrTransfer;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'A': '1'.parseBits(),
+      'S': '0'.parseBits(),
+      'D': '1010'.parseBits(),
+      'N': '1010'.parseBits(),
+      'F': '1010'.parseBits(),
+      'M': '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      MultiplyAndMutiplyAccumulate.decoder.decodeBits(input),
+      MultiplyAndMutiplyAccumulate(
+        condition: coded['C'],
+        a: coded['A'],
+        s: coded['S'],
+        registerD: coded['D'],
+        registerN: coded['N'],
+        registerS: coded['S'],
+        registerM: coded['M'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      MultiplyAndMutiplyAccumulate.decoder,
+    );
+  });
 }
