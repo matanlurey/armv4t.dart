@@ -12,9 +12,10 @@ class HalfWordAndSignedDataTransferImmediateOffset extends ArmInstructionSet {
       l: decoded[4],
       registerN: decoded[5],
       registerD: decoded[6],
-      s: decoded[7],
-      h: decoded[8],
-      offset: decoded[9],
+      offsetHighNibble: decoded[7],
+      s: decoded[8],
+      h: decoded[9],
+      offsetLowNibble: decoded[10],
     ),
   );
 
@@ -36,14 +37,17 @@ class HalfWordAndSignedDataTransferImmediateOffset extends ArmInstructionSet {
   /// Destination register.
   final int registerD;
 
+  /// Offset immediate value (High nibble).
+  final int offsetHighNibble;
+
   /// Signed.
   final int s;
 
   /// Half-word.
   final int h;
 
-  /// Offset immediate value.
-  final int offset;
+  /// Offset immediate value (Low nibble).
+  final int offsetLowNibble;
 
   /// Creates a [HalfWordAndSignedDataTransferImmediateOffset] from the provided variables.
   ///
@@ -56,9 +60,10 @@ class HalfWordAndSignedDataTransferImmediateOffset extends ArmInstructionSet {
     @required this.l,
     @required this.registerN,
     @required this.registerD,
+    @required this.offsetHighNibble,
     @required this.s,
     @required this.h,
-    @required this.offset,
+    @required this.offsetLowNibble,
   }) : super._(condition, decoder._format);
 
   @override
@@ -79,9 +84,10 @@ class HalfWordAndSignedDataTransferImmediateOffset extends ArmInstructionSet {
       'L': l,
       'Rn': registerN,
       'Rd': registerD,
+      'Offset <High Nibble>': offsetHighNibble,
       'S': s,
       'H': h,
-      'Offset': offset,
+      'Offset <Low Nibble>': offsetLowNibble,
     };
   }
 }

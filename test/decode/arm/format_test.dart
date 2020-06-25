@@ -170,4 +170,46 @@ void main() {
       HalfWordAndSignedDataTransferRegisterOffset.decoder,
     );
   });
+
+  test('should decode 07:HALF_WORD_DATA_TRANSFER_IMMEDIATE_OFFSET', () {
+    //               CCCC   000P   U1WL   NNNN   DDDD   OOOO   1SH1   KKKK
+    final string = ('0000' '0001' '0110' '1111' '1111' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$07$halfWordDataTranseferImmediate;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'P': '1'.parseBits(),
+      'U': '0'.parseBits(),
+      'W': '1'.parseBits(),
+      'L': '0'.parseBits(),
+      'N': '1111'.parseBits(),
+      'D': '1111'.parseBits(),
+      'O': '0000'.parseBits(),
+      'S': '0'.parseBits(),
+      'H': '0'.parseBits(),
+      'K': '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      HalfWordAndSignedDataTransferImmediateOffset.decoder.decodeBits(input),
+      HalfWordAndSignedDataTransferImmediateOffset(
+        condition: coded['C'],
+        p: coded['P'],
+        u: coded['U'],
+        w: coded['W'],
+        l: coded['L'],
+        registerN: coded['N'],
+        registerD: coded['D'],
+        offsetHighNibble: coded['O'],
+        s: coded['S'],
+        h: coded['H'],
+        offsetLowNibble: coded['K'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      HalfWordAndSignedDataTransferImmediateOffset.decoder,
+    );
+  });
 }

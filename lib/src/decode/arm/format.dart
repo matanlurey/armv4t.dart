@@ -58,7 +58,7 @@ abstract class ArmInstructionSet {
 
   /// Halfword Data Transfer: Immediate Offset.
   static final $07$halfWordDataTranseferImmediate = BitPatternBuilder.parse(
-    'CCCC_000P_U1WL_NNNN_DDDD_OOOO_KKKK_KKKK',
+    'CCCC_000P_U1WL_NNNN_DDDD_OOOO_1SH1_KKKK',
   ).build('07:HALF_WORD_DATA_TRANSFER_IMMEDIATE_OFFSET');
 
   /// Single Data Transfer.
