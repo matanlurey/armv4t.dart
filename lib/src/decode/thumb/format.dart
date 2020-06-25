@@ -185,7 +185,7 @@ abstract class ThumbInstructionSet {
   Map<String, Object> toJson();
 
   @override
-  String toString() => '$runtimeType $toJson()';
+  String toString() => '$runtimeType ${toJson()}';
 }
 
 /// Implements decoding a `List<int>` or `int` into a [T] [ThumbInstructionSet].
