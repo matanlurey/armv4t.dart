@@ -270,4 +270,40 @@ void main() {
       Undefined.decoder,
     );
   });
+
+  test('should decode 10:BLOCK_DATA_TRANSFER', () {
+    //               CCCC   100P   USWL   NNNN   RRRR   RRRR   RRRR   RRRR
+    final string = ('0000' '1001' '0110' '1111' '1111' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$10$blockDataTransfer;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'P': '1'.parseBits(),
+      'U': '0'.parseBits(),
+      'S': '1'.parseBits(),
+      'W': '1'.parseBits(),
+      'L': '0'.parseBits(),
+      'N': '1111'.parseBits(),
+      'R': '1111' '0000' '1001' '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      BlockDataTransfer.decoder.decodeBits(input),
+      BlockDataTransfer(
+        condition: coded['C'],
+        p: coded['P'],
+        u: coded['U'],
+        s: coded['S'],
+        w: coded['W'],
+        l: coded['L'],
+        registerN: coded['N'],
+        regsiterList: coded['R'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      BlockDataTransfer.decoder,
+    );
+  });
 }
