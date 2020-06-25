@@ -306,4 +306,30 @@ void main() {
       BlockDataTransfer.decoder,
     );
   });
+
+  test('should decode 11:BRANCH', () {
+    //               CCCC   101L   OOOO   OOOO   OOOO   OOOO   OOOO   OOOO
+    final string = ('0000' '1011' '0110' '1111' '1111' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$11$branch;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'L': '1'.parseBits(),
+      'O': '0110' '1111' '1111' '0000' '1001' '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      Branch.decoder.decodeBits(input),
+      Branch(
+        condition: coded['C'],
+        l: coded['L'],
+        offset: coded['O'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      Branch.decoder,
+    );
+  });
 }
