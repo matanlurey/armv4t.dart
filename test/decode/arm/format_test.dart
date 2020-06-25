@@ -130,4 +130,44 @@ void main() {
       BranchAndExchange.decoder,
     );
   });
+
+  test('should decode 06:HALF_WORD_DATA_TRANSFER_REGISTER_OFFSET', () {
+    //               CCCC   000P   U0WL   NNNN   DDDD   0000   1SH1   MMMM
+    final string = ('0000' '0001' '0010' '1111' '1111' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$06$halfWordDataTransferRegister;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'P': '1'.parseBits(),
+      'U': '0'.parseBits(),
+      'W': '1'.parseBits(),
+      'L': '0'.parseBits(),
+      'N': '1111'.parseBits(),
+      'D': '1111'.parseBits(),
+      'S': '0'.parseBits(),
+      'H': '0'.parseBits(),
+      'M': '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      HalfWordAndSignedDataTransferRegisterOffset.decoder.decodeBits(input),
+      HalfWordAndSignedDataTransferRegisterOffset(
+        condition: coded['C'],
+        p: coded['P'],
+        u: coded['U'],
+        w: coded['W'],
+        l: coded['L'],
+        registerN: coded['N'],
+        registerD: coded['D'],
+        s: coded['S'],
+        h: coded['H'],
+        registerM: coded['M'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      HalfWordAndSignedDataTransferRegisterOffset.decoder,
+    );
+  });
 }

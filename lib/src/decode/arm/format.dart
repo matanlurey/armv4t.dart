@@ -53,7 +53,7 @@ abstract class ArmInstructionSet {
 
   /// Halfword Data Transfer: Register Offset.
   static final $06$halfWordDataTransferRegister = BitPatternBuilder.parse(
-    'CCCC_000P_U0WL_NNNN_DDDD_OOOO_1SH1_KKKK',
+    'CCCC_000P_U0WL_NNNN_DDDD_0000_1SH1_MMMM',
   ).build('06:HALF_WORD_DATA_TRANSFER_REGISTER_OFFSET');
 
   /// Halfword Data Transfer: Immediate Offset.
