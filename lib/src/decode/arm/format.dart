@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:binary/binary.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
@@ -51,12 +53,12 @@ abstract class ArmInstructionSet {
 
   /// Halfword Data Transfer: Register Offset.
   static final $06$halfWordDataTransferRegister = BitPatternBuilder.parse(
-    'CCCC_000P_U0WL_NNNN_DDDD_OOOO_1SH1_PPPP',
+    'CCCC_000P_U0WL_NNNN_DDDD_OOOO_1SH1_KKKK',
   ).build('06:HALF_WORD_DATA_TRANSFER_REGISTER_OFFSET');
 
   /// Halfword Data Transfer: Immediate Offset.
   static final $07$halfWordDataTranseferImmediate = BitPatternBuilder.parse(
-    'CCCC_000P_U1WL_NNNN_DDDD_OOOO_PPPP_PPPP',
+    'CCCC_000P_U1WL_NNNN_DDDD_OOOO_KKKK_KKKK',
   ).build('07:HALF_WORD_DATA_TRANSFER_IMMEDIATE_OFFSET');
 
   /// Single Data Transfer.
@@ -66,7 +68,7 @@ abstract class ArmInstructionSet {
 
   /// Undefined.
   static final $09$undefined = BitPatternBuilder.parse(
-    'CCCC_011X_XXXX_XXXX_XXXX_XXXX_XXX1_XXXX',
+    'CCCC_011X_XXXX_XXXX_XXXX_XXXX_XXX1_ZZZZ',
   ).build('09:UNDEFINED');
 
   /// Block Data Transfer.
@@ -81,7 +83,7 @@ abstract class ArmInstructionSet {
 
   /// Coprocessor Data Transfer.
   static final $12$coprocessorDataTransfer = BitPatternBuilder.parse(
-    'CCCC_110P_UNWL_NNNN_DDDD_PPPP_OOOO_OOOO',
+    'CCCC_110P_UNWL_MMMM_DDDD_KKKK_OOOO_OOOO',
   ).build('12:COPROCESSOR_DATA_TRANSFER');
 
   /// Coprocessor Data Operation.
@@ -100,7 +102,34 @@ abstract class ArmInstructionSet {
   ).build('15:SOFTWARE_INTERRUPT');
 
   /// A known list of all the different [ArmInstructionSetDecoder] instances.
-  static final allFormats = <void>[];
+  static final _decoders = [
+    DataProcessingOrPSRTransfer.decoder,
+    MultiplyAndMutiplyAccumulate.decoder,
+    MultiplyLongAndMutiplyAccumulateLong.decoder,
+    SingleDataSwap.decoder,
+    BranchAndExchange.decoder,
+    HalfWordAndSignedDataTransferRegisterOffset.decoder,
+    HalfWordAndSignedDataTransferImmediateOffset.decoder,
+    SingleDataTransfer.decoder,
+    Undefined.decoder,
+    BlockDataTransfer.decoder,
+    Branch.decoder,
+    CoprocessorDataTransfer.decoder,
+    CoprocessorDataOperation.decoder,
+    CoprocessorRegisterTransfer.decoder,
+    SoftwareInterrupt.decoder,
+  ];
+
+  /// A collection of all the known formats in [ArmInstructionSet], sorted.
+  static final allFormats = _decoders.map((d) => d._format).toList().toGroup();
+
+  static Map<BitPattern<void>, ArmInstructionSetDecoder> _mapDecoders() {
+    final m = {for (final decoder in _decoders) decoder._format: decoder};
+    return HashMap.identity()..addAll(m);
+  }
+
+  /// Create a Map of [BitPattern] -> [ArmInstructionSetDecoder].
+  static final mapDecoders = _mapDecoders();
 
   /// Format used to match and decode the instruction.
   final BitPattern<List<int>> _format;
@@ -157,6 +186,76 @@ class ArmInstructionSetDecoder<T extends ArmInstructionSet> {
 abstract class ArmSetVisitor<R, C> {
   R visitDataProcessingOrPSRTransfer(
     DataProcessingOrPSRTransfer instruction, [
+    C context,
+  ]);
+
+  R visitMultiplyAndMutiplyAccumulate(
+    MultiplyAndMutiplyAccumulate instruction, [
+    C context,
+  ]);
+
+  R visitMultiplyLongAndMutiplyAccumulateLong(
+    MultiplyLongAndMutiplyAccumulateLong instruction, [
+    C context,
+  ]);
+
+  R visitSingleDataSwap(
+    SingleDataSwap instruction, [
+    C context,
+  ]);
+
+  R visitBranchAndExchange(
+    BranchAndExchange instruction, [
+    C context,
+  ]);
+
+  R visitHalfWordAndSignedDataTransferRegisterOffset(
+    HalfWordAndSignedDataTransferRegisterOffset instruction, [
+    C context,
+  ]);
+
+  R visitHalfWordAndSignedDataTransferImmediateOffset(
+    HalfWordAndSignedDataTransferImmediateOffset instruction, [
+    C context,
+  ]);
+
+  R visitSingleDataTransfer(
+    SingleDataTransfer instruction, [
+    C context,
+  ]);
+
+  R visitUndefined(
+    Undefined instruction, [
+    C context,
+  ]);
+
+  R visitBlockDataTransfer(
+    BlockDataTransfer instruction, [
+    C context,
+  ]);
+
+  R visitBranch(
+    Branch instruction, [
+    C context,
+  ]);
+
+  R visitCoprocessorDataTransfer(
+    CoprocessorDataTransfer instruction, [
+    C context,
+  ]);
+
+  R visitCoprocessorDataOperation(
+    CoprocessorDataOperation instruction, [
+    C context,
+  ]);
+
+  R visitCoprocessorRegisterTransfer(
+    CoprocessorRegisterTransfer instruction, [
+    C context,
+  ]);
+
+  R visitSoftwareInterrupt(
+    SoftwareInterrupt instruction, [
     C context,
   ]);
 }

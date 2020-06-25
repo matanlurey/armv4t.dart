@@ -3,7 +3,7 @@ part of '../format.dart';
 /// Decoded object from [ArmInstructionSet.$07$halfWordDataTranseferImmediate].
 class HalfWordAndSignedDataTransferImmediateOffset extends ArmInstructionSet {
   static final decoder = ArmInstructionSetDecoder._(
-    ArmInstructionSet.$01$dataProcessingOrPsrTransfer,
+    ArmInstructionSet.$07$halfWordDataTranseferImmediate,
     (decoded) => HalfWordAndSignedDataTransferImmediateOffset(
       condition: decoded[0],
       p: decoded[1],
@@ -63,7 +63,10 @@ class HalfWordAndSignedDataTransferImmediateOffset extends ArmInstructionSet {
 
   @override
   R accept<R, C>(ArmSetVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitHalfWordAndSignedDataTransferImmediateOffset(
+      this,
+      context,
+    );
   }
 
   @override

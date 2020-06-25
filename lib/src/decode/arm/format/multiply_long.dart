@@ -3,7 +3,7 @@ part of '../format.dart';
 /// Decoded object from [ArmInstructionSet.$03$multiplyLong].
 class MultiplyLongAndMutiplyAccumulateLong extends ArmInstructionSet {
   static final decoder = ArmInstructionSetDecoder._(
-    ArmInstructionSet.$01$dataProcessingOrPsrTransfer,
+    ArmInstructionSet.$03$multiplyLong,
     (decoded) => MultiplyLongAndMutiplyAccumulateLong(
       condition: decoded[0],
       a: decoded[1],
@@ -48,7 +48,7 @@ class MultiplyLongAndMutiplyAccumulateLong extends ArmInstructionSet {
 
   @override
   R accept<R, C>(ArmSetVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitMultiplyLongAndMutiplyAccumulateLong(this, context);
   }
 
   @override

@@ -3,7 +3,7 @@ part of '../format.dart';
 /// Decoded object from [ArmInstructionSet.$08$singleDataTransfer].
 class SingleDataTransfer extends ArmInstructionSet {
   static final decoder = ArmInstructionSetDecoder._(
-    ArmInstructionSet.$01$dataProcessingOrPsrTransfer,
+    ArmInstructionSet.$08$singleDataTransfer,
     (decoded) => SingleDataTransfer(
       condition: decoded[0],
       i: decoded[1],
@@ -63,7 +63,7 @@ class SingleDataTransfer extends ArmInstructionSet {
 
   @override
   R accept<R, C>(ArmSetVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitSingleDataTransfer(this, context);
   }
 
   @override

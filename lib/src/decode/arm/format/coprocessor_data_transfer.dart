@@ -63,7 +63,7 @@ class CoprocessorDataTransfer extends ArmInstructionSet {
 
   @override
   R accept<R, C>(ArmSetVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitCoprocessorDataTransfer(this, context);
   }
 
   @override
