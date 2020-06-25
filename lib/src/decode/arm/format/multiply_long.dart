@@ -6,14 +6,18 @@ class MultiplyLongAndMutiplyAccumulateLong extends ArmInstructionSet {
     ArmInstructionSet.$03$multiplyLong,
     (decoded) => MultiplyLongAndMutiplyAccumulateLong(
       condition: decoded[0],
-      a: decoded[1],
-      s: decoded[2],
-      registerD: decoded[3],
-      registerN: decoded[4],
-      registerS: decoded[5],
-      registerM: decoded[6],
+      u: decoded[1],
+      a: decoded[2],
+      s: decoded[3],
+      registerD: decoded[4],
+      registerN: decoded[5],
+      registerS: decoded[6],
+      registerM: decoded[7],
     ),
   );
+
+  /// Whether unsigned.
+  final int u;
 
   /// Whether to accumulate.
   final int a;
@@ -38,6 +42,7 @@ class MultiplyLongAndMutiplyAccumulateLong extends ArmInstructionSet {
   /// > **NOTE**: Bits are **not** checked for correctness or size!
   MultiplyLongAndMutiplyAccumulateLong({
     @required int condition,
+    @required this.u,
     @required this.a,
     @required this.s,
     @required this.registerD,
@@ -55,6 +60,7 @@ class MultiplyLongAndMutiplyAccumulateLong extends ArmInstructionSet {
   Map<String, Object> toJson() {
     return {
       'Cond': condition,
+      'U': u,
       'A': a,
       'S': s,
       'Rd': registerD,

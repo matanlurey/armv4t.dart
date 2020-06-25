@@ -70,4 +70,40 @@ void main() {
       MultiplyAndMutiplyAccumulate.decoder,
     );
   });
+
+  test('should decode 03:MULTIPLY_LONG', () {
+    //               CCCC   0000   1UAS   DDDD   FFFF   NNNN   1001   MMMM
+    final string = ('0000' '0000' '1010' '1010' '1010' '1010' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$03$multiplyLong;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'U': '0'.parseBits(),
+      'A': '1'.parseBits(),
+      'S': '0'.parseBits(),
+      'D': '1010'.parseBits(),
+      'F': '1010'.parseBits(),
+      'N': '1010'.parseBits(),
+      'M': '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      MultiplyLongAndMutiplyAccumulateLong.decoder.decodeBits(input),
+      MultiplyLongAndMutiplyAccumulateLong(
+        condition: coded['C'],
+        u: coded['U'],
+        a: coded['A'],
+        s: coded['S'],
+        registerD: coded['D'],
+        registerN: coded['N'],
+        registerS: coded['F'],
+        registerM: coded['M'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      MultiplyLongAndMutiplyAccumulateLong.decoder,
+    );
+  });
 }
