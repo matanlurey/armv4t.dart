@@ -332,4 +332,138 @@ void main() {
       Branch.decoder,
     );
   });
+
+  test('should decode 12:COPROCESSOR_DATA_TRANSFER', () {
+    //               CCCC   110P   UNWL   MMMM   DDDD   KKKK   OOOO   OOOO
+    final string = ('0000' '1101' '0110' '1111' '1111' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$12$coprocessorDataTransfer;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'P': '1'.parseBits(),
+      'U': '0'.parseBits(),
+      'N': '1'.parseBits(),
+      'W': '1'.parseBits(),
+      'L': '0'.parseBits(),
+      'M': '1111'.parseBits(),
+      'D': '1111'.parseBits(),
+      'K': '0000'.parseBits(),
+      'O': '1001' '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      CoprocessorDataTransfer.decoder.decodeBits(input),
+      CoprocessorDataTransfer(
+        condition: coded['C'],
+        p: coded['P'],
+        u: coded['U'],
+        n: coded['N'],
+        w: coded['W'],
+        l: coded['L'],
+        registerN: coded['M'],
+        cpRegisterD: coded['D'],
+        cpNumber: coded['K'],
+        offset: coded['O'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      CoprocessorDataTransfer.decoder,
+    );
+  });
+
+  test('should decode 13:COPROCESSOR_DATA_OPERATION', () {
+    //               CCCC   1110   OOOO   NNNN   DDDD   PPPP   VVV0   MMMM
+    final string = ('0000' '1110' '0110' '1111' '1111' '0000' '1000' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$13$coprocessorDataOperation;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'O': '0110'.parseBits(),
+      'N': '1111'.parseBits(),
+      'D': '1111'.parseBits(),
+      'P': '0000'.parseBits(),
+      'V': '100'.parseBits(),
+      'M': '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      CoprocessorDataOperation.decoder.decodeBits(input),
+      CoprocessorDataOperation(
+        condition: coded['C'],
+        cpOpCode: coded['O'],
+        cpOperandRegister1: coded['N'],
+        cpDestinationRegister: coded['D'],
+        cpNumber: coded['P'],
+        cpInformation: coded['V'],
+        cpOperandRegister2: coded['M'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      CoprocessorDataOperation.decoder,
+    );
+  });
+
+  test('should decode 14:COPROCESSOR_REGISTER_TRANSFER', () {
+    //               CCCC   1110   OOOL   NNNN   DDDD   PPPP   VVV1   MMMM
+    final string = ('0000' '1110' '0110' '1111' '1111' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$14$coprocessorRegisterTransfer;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'O': '011'.parseBits(),
+      'L': '0'.parseBits(),
+      'N': '1111'.parseBits(),
+      'D': '1111'.parseBits(),
+      'P': '0000'.parseBits(),
+      'V': '100'.parseBits(),
+      'M': '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      CoprocessorRegisterTransfer.decoder.decodeBits(input),
+      CoprocessorRegisterTransfer(
+        condition: coded['C'],
+        cpOpCode: coded['O'],
+        l: coded['L'],
+        cpRegisterN: coded['N'],
+        registerD: coded['D'],
+        cpNumber: coded['P'],
+        cpInformation: coded['V'],
+        cpRegisterM: coded['M'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      CoprocessorRegisterTransfer.decoder,
+    );
+  });
+
+  test('should decode 15:SOFTWARE_INTERRUPT', () {
+    //               CCCC   1111   XXXX   XXXX   XXXX   XXXX   XXXX   XXXX
+    final string = ('0000' '1111' '0110' '1111' '1111' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$15$softwareInterrupt;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'X': '0110' '1111' '1111' '0000' '1001' '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      SoftwareInterrupt.decoder.decodeBits(input),
+      SoftwareInterrupt(
+        condition: coded['C'],
+        comment: coded['X'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      SoftwareInterrupt.decoder,
+    );
+  });
 }
