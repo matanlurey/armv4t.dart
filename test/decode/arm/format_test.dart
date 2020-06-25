@@ -39,9 +39,9 @@ void main() {
 
   test('should decode 02:MULTIPLY', () {
     //               CCCC   0000   00AS   DDDD   NNNN   FFFF   1001   MMMM
-    final string = ('0000' '0000' '1010' '1010' '1010' '1010' '1010' '1010');
+    final string = ('0000' '0000' '0010' '1010' '1010' '1010' '1001' '1010');
     final input = string.parseBits();
-    final format = ArmInstructionSet.$01$dataProcessingOrPsrTransfer;
+    final format = ArmInstructionSet.$02$multiply;
     final coded = Map.fromIterables(format.names, format.capture(input));
     expect(coded, {
       'C': '0000'.parseBits(),
@@ -61,7 +61,7 @@ void main() {
         s: coded['S'],
         registerD: coded['D'],
         registerN: coded['N'],
-        registerS: coded['S'],
+        registerS: coded['F'],
         registerM: coded['M'],
       ),
     );
