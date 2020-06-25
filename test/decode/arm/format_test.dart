@@ -212,4 +212,44 @@ void main() {
       HalfWordAndSignedDataTransferImmediateOffset.decoder,
     );
   });
+
+  test('should decode 08:SINGLE_DATA_TRANSFER', () {
+    //               CCCC   01IP   UBWL   NNNN   DDDD   OOOO   OOOO   OOOO
+    final string = ('0000' '0101' '0110' '1111' '1111' '0000' '1001' '1010');
+    final input = string.parseBits();
+    final format = ArmInstructionSet.$08$singleDataTransfer;
+    final coded = Map.fromIterables(format.names, format.capture(input));
+    expect(coded, {
+      'C': '0000'.parseBits(),
+      'I': '0'.parseBits(),
+      'P': '1'.parseBits(),
+      'U': '0'.parseBits(),
+      'B': '1'.parseBits(),
+      'W': '1'.parseBits(),
+      'L': '0'.parseBits(),
+      'N': '1111'.parseBits(),
+      'D': '1111'.parseBits(),
+      'O': '0000' '1001' '1010'.parseBits(),
+    });
+    expect(ArmInstructionSet.allFormats.match(input), format);
+    expect(
+      SingleDataTransfer.decoder.decodeBits(input),
+      SingleDataTransfer(
+        condition: coded['C'],
+        i: coded['I'],
+        p: coded['P'],
+        u: coded['U'],
+        b: coded['B'],
+        w: coded['W'],
+        l: coded['L'],
+        registerN: coded['N'],
+        registerD: coded['D'],
+        offset: coded['O'],
+      ),
+    );
+    expect(
+      ArmInstructionSet.mapDecoders[format],
+      SingleDataTransfer.decoder,
+    );
+  });
 }
