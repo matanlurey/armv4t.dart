@@ -191,4 +191,204 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
   }
 }
 
-abstract class ArmInstructionVisitor<R, C> {}
+abstract class ArmInstructionVisitor<R, C> {
+  R visitB(
+    B instruction, [
+    C context,
+  ]);
+
+  R visitBL(
+    BL instruction, [
+    C context,
+  ]);
+
+  R visitBX(
+    BX instruction, [
+    C context,
+  ]);
+
+  R visitLDM(
+    LDM instruction, [
+    C context,
+  ]);
+
+  R visitLDR(
+    LDR instruction, [
+    C context,
+  ]);
+
+  R visitLDRB(
+    LDRB instruction, [
+    C context,
+  ]);
+
+  R visitLDRH(
+    LDRH instruction, [
+    C context,
+  ]);
+
+  R visitLDRSB(
+    LDRSB instruction, [
+    C context,
+  ]);
+
+  R visitLDRSH(
+    LDRSH instruction, [
+    C context,
+  ]);
+
+  R visitMOV(
+    MOV instruction, [
+    C context,
+  ]);
+
+  R visitMRS(
+    MRS instruction, [
+    C context,
+  ]);
+
+  R visitMSR(
+    MSR instruction, [
+    C context,
+  ]);
+
+  R visitMVN(
+    MVN instruction, [
+    C context,
+  ]);
+
+  R visitSTM(
+    STM instruction, [
+    C context,
+  ]);
+
+  R visitSTR(
+    STR instruction, [
+    C context,
+  ]);
+
+  R visitSTRB(
+    STRB instruction, [
+    C context,
+  ]);
+
+  R visitSTRH(
+    STRH instruction, [
+    C context,
+  ]);
+
+  R visitSWP(
+    SWP instruction, [
+    C context,
+  ]);
+
+  R visitSWPB(
+    SWPB instruction, [
+    C context,
+  ]);
+
+  R visitAND(
+    AND instruction, [
+    C context,
+  ]);
+
+  R visitBIC(
+    BIC instruction, [
+    C context,
+  ]);
+
+  R visitCMN(
+    CMN instruction, [
+    C context,
+  ]);
+
+  R visitCMP(
+    CMP instruction, [
+    C context,
+  ]);
+
+  R visitEOR(
+    EOR instruction, [
+    C context,
+  ]);
+
+  R visitORR(
+    ORR instruction, [
+    C context,
+  ]);
+
+  R visitTEQ(
+    TEQ instruction, [
+    C context,
+  ]);
+
+  R visitTST(
+    TST instruction, [
+    C context,
+  ]);
+
+  R visitADC(
+    ADC instruction, [
+    C context,
+  ]);
+
+  R visitADD(
+    ADD instruction, [
+    C context,
+  ]);
+
+  R visitMLA(
+    MLA instruction, [
+    C context,
+  ]);
+
+  R visitMUL(
+    MUL instruction, [
+    C context,
+  ]);
+
+  R visitRSB(
+    RSB instruction, [
+    C context,
+  ]);
+
+  R visitRSC(
+    RSC instruction, [
+    C context,
+  ]);
+
+  R visitSBC(
+    SBC instruction, [
+    C context,
+  ]);
+
+  R visitSUB(
+    SUB instruction, [
+    C context,
+  ]);
+
+  R visitSMLAL(
+    SMLAL instruction, [
+    C context,
+  ]);
+
+  R visitSMULL(
+    SMULL instruction, [
+    C context,
+  ]);
+
+  R visitUMLAL(
+    UMLAL instruction, [
+    C context,
+  ]);
+
+  R visitUMULL(
+    UMULL instruction, [
+    C context,
+  ]);
+
+  R visitSWI(
+    SWI instruction, [
+    C context,
+  ]);
+}

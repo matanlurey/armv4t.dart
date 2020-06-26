@@ -49,5 +49,5 @@ class MSR extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitMSR(this, context);
 }

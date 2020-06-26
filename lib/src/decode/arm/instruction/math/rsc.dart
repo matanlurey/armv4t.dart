@@ -44,5 +44,5 @@ class RSC extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitRSC(this, context);
 }

@@ -38,5 +38,5 @@ class SWP extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitSWP(this, context);
 }

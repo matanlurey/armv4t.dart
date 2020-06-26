@@ -44,5 +44,5 @@ class MVN extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitMVN(this, context);
 }

@@ -30,5 +30,5 @@ class BX extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitBX(this, context);
 }

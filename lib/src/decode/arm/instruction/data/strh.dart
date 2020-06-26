@@ -43,5 +43,5 @@ class STRH extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitSTRH(this, context);
 }

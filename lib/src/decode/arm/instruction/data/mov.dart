@@ -45,5 +45,5 @@ class MOV extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitMOV(this, context);
 }

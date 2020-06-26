@@ -35,5 +35,5 @@ class ORR extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitORR(this, context);
 }

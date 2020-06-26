@@ -50,5 +50,5 @@ class SBC extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitSBC(this, context);
 }

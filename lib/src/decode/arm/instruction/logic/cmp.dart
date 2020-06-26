@@ -38,5 +38,5 @@ class CMP extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitCMP(this, context);
 }

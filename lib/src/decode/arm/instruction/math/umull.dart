@@ -43,5 +43,5 @@ class UMULL extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitUMULL(this, context);
 }

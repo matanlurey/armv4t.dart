@@ -47,5 +47,5 @@ class LDRSH extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitLDRSH(this, context);
 }

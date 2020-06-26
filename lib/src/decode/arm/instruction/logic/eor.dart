@@ -35,5 +35,5 @@ class EOR extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitEOR(this, context);
 }

@@ -41,5 +41,5 @@ class TEQ extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitTEQ(this, context);
 }

@@ -39,5 +39,5 @@ class AND extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitAND(this, context);
 }

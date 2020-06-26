@@ -44,5 +44,5 @@ class UMLAL extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitUMLAL(this, context);
 }

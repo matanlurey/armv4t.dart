@@ -42,5 +42,5 @@ class STR extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitSTR(this, context);
 }

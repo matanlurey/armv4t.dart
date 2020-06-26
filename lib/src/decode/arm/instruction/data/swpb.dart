@@ -38,5 +38,5 @@ class SWPB extends ArmInstruction {
     ArmInstructionVisitor<R, C> visitor, [
     C context,
   ]) =>
-      throw UnimplementedError();
+      visitor.visitSWPB(this, context);
 }
