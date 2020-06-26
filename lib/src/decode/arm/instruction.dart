@@ -4,46 +4,6 @@ import 'package:meta/meta.dart';
 import 'format.dart';
 import 'printer.dart';
 
-part 'instruction/branch/b.dart';
-part 'instruction/branch/bl.dart';
-part 'instruction/branch/bx.dart';
-part 'instruction/coprocessor/cdp.dart';
-part 'instruction/coprocessor/ldc.dart';
-part 'instruction/coprocessor/mcr.dart';
-part 'instruction/coprocessor/mrc.dart';
-part 'instruction/coprocessor/stc.dart';
-part 'instruction/data/ldm.dart';
-part 'instruction/data/ldr.dart';
-part 'instruction/data/ldrb.dart';
-part 'instruction/data/ldrh.dart';
-part 'instruction/data/ldrsb.dart';
-part 'instruction/data/ldrsh.dart';
-part 'instruction/data/mov.dart';
-part 'instruction/data/mrs.dart';
-part 'instruction/data/msr.dart';
-part 'instruction/data/mvn.dart';
-part 'instruction/data/stm.dart';
-part 'instruction/data/str.dart';
-part 'instruction/data/strb.dart';
-part 'instruction/data/strh.dart';
-part 'instruction/math/adc.dart';
-part 'instruction/math/add.dart';
-part 'instruction/math/mla.dart';
-part 'instruction/math/mlal.dart';
-part 'instruction/math/mul.dart';
-part 'instruction/math/mull.dart';
-part 'instruction/math/rsb.dart';
-part 'instruction/math/rsc.dart';
-part 'instruction/math/sbc.dart';
-part 'instruction/math/smlal.dart';
-part 'instruction/math/smull.dart';
-part 'instruction/math/sub.dart';
-part 'instruction/math/umlal.dart';
-part 'instruction/math/umull.dart';
-part 'instruction/misc/swi.dart';
-part 'instruction/misc/swp.dart';
-part 'instruction/misc/swpb.dart';
-
 /// An **internal** representation of a decoded `ARM` instruction.
 abstract class ArmInstruction {
   /// Condition field.
