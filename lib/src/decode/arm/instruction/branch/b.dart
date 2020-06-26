@@ -15,16 +15,12 @@ part of '../../instruction.dart';
 /// which has been previously loaded into a register. In this case, the program
 /// counter (`PC`) must be manually saved in `R14` is a _Branch with Link_-type
 /// operation is required.
-class B extends ArmInstruction {
-  /// Whether this is a `BL` (_Branch with Link_) instruction or not.
-  final int link;
-
+abstract class B$BL extends ArmInstruction {
   /// 24-bit offset.
   final int offset;
 
-  const B({
+  const B$BL._({
     @required int condition,
-    @required this.link,
     @required this.offset,
   }) : super._(condition);
 
@@ -34,4 +30,15 @@ class B extends ArmInstruction {
     C context,
   ]) =>
       throw UnimplementedError();
+}
+
+/// A sub-type of the [B$BL] instruction specifically for `B`.
+class B extends B$BL {
+  const B({
+    @required int condition,
+    @required int offset,
+  }) : super._(
+          condition: condition,
+          offset: offset,
+        );
 }

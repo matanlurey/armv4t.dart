@@ -5,6 +5,7 @@ import 'format.dart';
 import 'printer.dart';
 
 part 'instruction/branch/b.dart';
+part 'instruction/branch/bl.dart';
 part 'instruction/branch/bx.dart';
 part 'instruction/coprocessor/cdp.dart';
 part 'instruction/coprocessor/ldc.dart';
@@ -28,7 +29,9 @@ part 'instruction/data/strh.dart';
 part 'instruction/math/adc.dart';
 part 'instruction/math/add.dart';
 part 'instruction/math/mla.dart';
+part 'instruction/math/mlal.dart';
 part 'instruction/math/mul.dart';
+part 'instruction/math/mull.dart';
 part 'instruction/math/rsb.dart';
 part 'instruction/math/rsc.dart';
 part 'instruction/math/sbc.dart';

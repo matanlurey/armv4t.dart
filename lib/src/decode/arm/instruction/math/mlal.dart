@@ -1,8 +1,8 @@
 part of '../../instruction.dart';
 
-/// A sub-type of [MULL$MLAL$UMULL$SMULL$UMLAL$SMLAL] specifically for `UMULL`.
-class UMULL extends MULL$MLAL$UMULL$SMULL$UMLAL$SMLAL {
-  const UMULL({
+/// A sub-type of [MULL$MLAL$UMULL$SMULL$UMLAL$SMLAL] specifically for `MLAL`.
+class MLAL extends MULL$MLAL$UMULL$SMULL$UMLAL$SMLAL {
+  const MLAL({
     @required int condition,
     @required int s,
     @required int sourceOrDestinationRegisterHi,

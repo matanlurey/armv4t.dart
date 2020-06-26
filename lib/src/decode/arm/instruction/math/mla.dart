@@ -1,14 +1,20 @@
 part of '../../instruction.dart';
 
-class MLA extends ArmInstruction {
+/// A sub-type of [MUL$MLA] specifically for the `MLA` instruction.
+class MLA extends MUL$MLA {
   const MLA({
     @required int condition,
-  }) : super._(condition);
-
-  @override
-  R accept<R, C>(
-    ArmInstructionVisitor<R, C> visitor, [
-    C context,
-  ]) =>
-      throw UnimplementedError();
+    @required int s,
+    @required int destinationRegister,
+    @required int operandRegister1,
+    @required int operandRegister2,
+    @required int operandRegister3,
+  }) : super._(
+          condition: condition,
+          s: s,
+          destinationRegister: destinationRegister,
+          operandRegister1: operandRegister1,
+          operandRegister2: operandRegister2,
+          operandRegister3: operandRegister3,
+        );
 }

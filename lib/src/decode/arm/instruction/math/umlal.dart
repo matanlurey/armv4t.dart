@@ -1,14 +1,20 @@
 part of '../../instruction.dart';
 
-class UMLAL extends ArmInstruction {
+/// A sub-type of [MULL$MLAL$UMULL$SMULL$UMLAL$SMLAL] specifically for `UMLAL`.
+class UMLAL extends MULL$MLAL$UMULL$SMULL$UMLAL$SMLAL {
   const UMLAL({
     @required int condition,
-  }) : super._(condition);
-
-  @override
-  R accept<R, C>(
-    ArmInstructionVisitor<R, C> visitor, [
-    C context,
-  ]) =>
-      throw UnimplementedError();
+    @required int s,
+    @required int sourceOrDestinationRegisterHi,
+    @required int sourceOrDestinationRegisterLo,
+    @required int operandRegister1,
+    @required int operandRegister2,
+  }) : super._(
+          condition: condition,
+          s: s,
+          sourceOrDestinationRegisterHi: sourceOrDestinationRegisterHi,
+          sourceOrDestinationRegisterLo: sourceOrDestinationRegisterLo,
+          operandRegister1: operandRegister1,
+          operandRegister2: operandRegister2,
+        );
 }
