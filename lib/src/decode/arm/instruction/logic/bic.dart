@@ -14,6 +14,9 @@ part of '../../instruction.dart';
 /// ## Flags updated if [s] is used:
 /// `N`, `Z`
 class BIC extends ArmInstruction {
+  /// Whether [shifterOperand] is an immediate vlaue.
+  final int i;
+
   /// Whether to set flags on the CPSR.
   final int s;
 
@@ -28,6 +31,7 @@ class BIC extends ArmInstruction {
 
   const BIC({
     @required int condition,
+    @required this.i,
     @required this.s,
     @required this.sourceRegister,
     @required this.destinationRegister,

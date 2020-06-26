@@ -20,6 +20,9 @@ part of '../../instruction.dart';
 /// ## Flags updated:
 /// `N`, `Z`, `C`
 class TEQ extends ArmInstruction {
+  /// Whether [shifterOperand] is an immediate vlaue.
+  final int i;
+
   /// `Rn`.
   final int sourceRegister;
 
@@ -31,6 +34,7 @@ class TEQ extends ArmInstruction {
 
   const TEQ({
     @required int condition,
+    @required this.i,
     @required this.sourceRegister,
     @required this.destinationRegister,
     @required this.shifterOperand,

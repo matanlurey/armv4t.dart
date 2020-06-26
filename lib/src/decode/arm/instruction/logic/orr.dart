@@ -14,6 +14,9 @@ part of '../../instruction.dart';
 /// ## Flags updated:
 /// `N`, `Z`, `C`
 class ORR extends ArmInstruction {
+  /// Whether [shifterOperand] is an immediate vlaue.
+  final int i;
+
   /// `Rn`.
   final int sourceRegister;
 
@@ -25,6 +28,7 @@ class ORR extends ArmInstruction {
 
   const ORR({
     @required int condition,
+    @required this.i,
     @required this.sourceRegister,
     @required this.destinationRegister,
     @required this.shifterOperand,

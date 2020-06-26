@@ -16,6 +16,9 @@ part of '../../instruction.dart';
 /// ## Flags updated if [s] is used:
 /// `N`, `Z`, `V`, `C`
 class ADC extends ArmInstruction {
+  /// Whether [shifterOperand] is an immediate vlaue.
+  final int i;
+
   /// Whether to set flags on the CPSR.
   final int s;
 
@@ -30,6 +33,7 @@ class ADC extends ArmInstruction {
 
   const ADC({
     @required int condition,
+    @required this.i,
     @required this.s,
     @required this.sourceRegister,
     @required this.destinationRegister,

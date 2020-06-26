@@ -17,6 +17,9 @@ part of '../../instruction.dart';
 /// ## Flags updated:
 /// `N`, `Z`, `V`, `C`
 class CMP extends ArmInstruction {
+  /// Whether [shifterOperand] is an immediate vlaue.
+  final int i;
+
   /// `Rn`.
   final int sourceRegister;
 
@@ -28,6 +31,7 @@ class CMP extends ArmInstruction {
 
   const CMP({
     @required int condition,
+    @required this.i,
     @required this.sourceRegister,
     @required this.destinationRegister,
     @required this.shifterOperand,

@@ -17,6 +17,9 @@ part of '../../instruction.dart';
 /// > NOTE: The carry flag (`C`) is the complement of the borrow flag. If a
 /// > borrow is required by the operation, `C` will be set to `0`.
 class RSB extends ArmInstruction {
+  /// Whether [shifterOperand] is an immediate vlaue.
+  final int i;
+
   /// Whether to set flags on the CPSR.
   final int s;
 
@@ -31,6 +34,7 @@ class RSB extends ArmInstruction {
 
   const RSB({
     @required int condition,
+    @required this.i,
     @required this.s,
     @required this.sourceRegister,
     @required this.destinationRegister,

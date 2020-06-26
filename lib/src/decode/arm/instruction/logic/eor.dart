@@ -14,6 +14,12 @@ part of '../../instruction.dart';
 /// ## Flags updated:
 /// `N`, `Z`, `C`
 class EOR extends ArmInstruction {
+  /// Whether [shifterOperand] is an immediate vlaue.
+  final int i;
+
+  /// Whether to set flags on the CPSR.
+  final int s;
+
   /// `Rn`.
   final int sourceRegister;
 
@@ -25,6 +31,8 @@ class EOR extends ArmInstruction {
 
   const EOR({
     @required int condition,
+    @required this.i,
+    @required this.s,
     @required this.sourceRegister,
     @required this.destinationRegister,
     @required this.shifterOperand,

@@ -18,6 +18,9 @@ part of '../../instruction.dart';
 /// ## Flags updated:
 /// `N`, `Z`, `C`
 class TST extends ArmInstruction {
+  /// Whether [shifterOperand] is an immediate vlaue.
+  final int i;
+
   /// `Rn`.
   final int sourceRegister;
 
@@ -29,6 +32,7 @@ class TST extends ArmInstruction {
 
   const TST({
     @required int condition,
+    @required this.i,
     @required this.sourceRegister,
     @required this.destinationRegister,
     @required this.shifterOperand,

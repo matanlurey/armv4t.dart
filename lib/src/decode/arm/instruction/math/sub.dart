@@ -20,6 +20,9 @@ class SUB extends ArmInstruction {
   /// Whether to set flags on the CPSR.
   final int s;
 
+  /// Whether [shifterOperand] is an immediate vlaue.
+  final int i;
+
   /// `Rn`.
   final int sourceRegister;
 
@@ -32,6 +35,7 @@ class SUB extends ArmInstruction {
   const SUB({
     @required int condition,
     @required this.s,
+    @required this.i,
     @required this.sourceRegister,
     @required this.destinationRegister,
     @required this.shifterOperand,
