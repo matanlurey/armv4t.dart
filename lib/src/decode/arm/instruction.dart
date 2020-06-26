@@ -4,6 +4,33 @@ import 'package:meta/meta.dart';
 import 'format.dart';
 import 'printer.dart';
 
+part 'instruction/branch/b.dart';
+part 'instruction/branch/bl.dart';
+part 'instruction/branch/bx.dart';
+part 'instruction/data/mov.dart';
+part 'instruction/data/mvn.dart';
+part 'instruction/logic/and.dart';
+part 'instruction/logic/bic.dart';
+part 'instruction/logic/cmn.dart';
+part 'instruction/logic/cmp.dart';
+part 'instruction/logic/eor.dart';
+part 'instruction/logic/orr.dart';
+part 'instruction/logic/teq.dart';
+part 'instruction/logic/tst.dart';
+part 'instruction/math/adc.dart';
+part 'instruction/math/add.dart';
+part 'instruction/math/mla.dart';
+part 'instruction/math/mul.dart';
+part 'instruction/math/rsb.dart';
+part 'instruction/math/rsc.dart';
+part 'instruction/math/sbc.dart';
+part 'instruction/math/sub.dart';
+part 'instruction/math/smlal.dart';
+part 'instruction/math/smull.dart';
+part 'instruction/math/umlal.dart';
+part 'instruction/math/umull.dart';
+part 'instruction/misc/swi.dart';
+
 /// An **internal** representation of a decoded `ARM` instruction.
 abstract class ArmInstruction {
   /// Condition field.
