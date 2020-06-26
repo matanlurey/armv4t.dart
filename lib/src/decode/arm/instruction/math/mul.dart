@@ -2,7 +2,7 @@ part of '../../instruction.dart';
 
 /// Multiply.
 ///
-/// [MLA] performs a 32x32 multiply operation, and stores a 32-bit result. Since
+/// [MUL] performs a 32x32 multiply operation, and stores a 32-bit result. Since
 /// only the least significant 32-bits are stored, the result is the same for
 /// both signed and unsigned numbers.
 ///

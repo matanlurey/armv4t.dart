@@ -72,211 +72,303 @@ abstract class ArmInstruction {
 class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
   @override
   ArmInstruction visitDataProcessingOrPSRTransfer(
-    DataProcessingOrPSRTransfer instruction, [
+    DataProcessingOrPSRTransfer set, [
     void _,
   ]) {
-    switch (instruction.opcode) {
+    // TODO: Implement PSR parsers.
+    switch (set.opcode) {
       case 0x0:
         return AND(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0x1:
         return EOR(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0x2:
         return SUB(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0x3:
         return RSB(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0x4:
         return ADD(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0x5:
         return ADC(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0x6:
         return SBC(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0x7:
         return RSC(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0x8:
         return TST(
-          condition: instruction.condition,
-          i: instruction.i,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0x9:
         return TEQ(
-          condition: instruction.condition,
-          i: instruction.i,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0xA:
         return CMP(
-          condition: instruction.condition,
-          i: instruction.i,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0xB:
         return CMN(
-          condition: instruction.condition,
-          i: instruction.i,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0xC:
         return ORR(
-          condition: instruction.condition,
-          i: instruction.i,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0xD:
         return MOV(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0xE:
         return BIC(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          sourceRegister: instruction.registerN,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          sourceRegister: set.registerN,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       case 0xF:
         return MVN(
-          condition: instruction.condition,
-          i: instruction.i,
-          s: instruction.s,
-          destinationRegister: instruction.registerD,
-          shifterOperand: instruction.operand2,
+          condition: set.condition,
+          i: set.i,
+          s: set.s,
+          destinationRegister: set.registerD,
+          shifterOperand: set.operand2,
         );
       default:
-        throw StateError('Unexpected opcode: ${instruction.opcode}');
+        throw StateError('Unexpected opcode: ${set.opcode}');
     }
   }
 
   @override
   ArmInstruction visitMultiplyAndMutiplyAccumulate(
-    MultiplyAndMutiplyAccumulate instruction, [
+    MultiplyAndMutiplyAccumulate set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    if (set.a == 0) {
+      return MUL(
+        condition: set.condition,
+        s: set.s,
+        destinationRegister: set.registerD,
+        sourceRegister: set.registerS,
+        operandRegister: set.registerN,
+      );
+    } else if (set.a == 1) {
+      return MLA(
+        condition: set.condition,
+        s: set.s,
+        destinationRegister: set.registerD,
+        sourceRegister: set.registerS,
+        operandRegister1: set.registerN,
+        operandRegister2: set.registerM,
+      );
+    } else {
+      throw StateError('Unexpected A: ${set.a}');
+    }
   }
 
   @override
   ArmInstruction visitMultiplyLongAndMutiplyAccumulateLong(
-    MultiplyLongAndMutiplyAccumulateLong instruction, [
+    MultiplyLongAndMutiplyAccumulateLong set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    if (set.u == 0) {
+      if (set.a == 0) {
+        return SMULL(
+          condition: set.condition,
+          s: set.s,
+          destinationRegisterMSW: set.registerD,
+          destinationRegisterLSW: set.registerN,
+          sourceRegister: set.registerS,
+          operandRegister: set.registerM,
+        );
+      } else if (set.a == 1) {
+        return SMLAL(
+          condition: set.condition,
+          s: set.s,
+          destinationRegisterMSW: set.registerD,
+          destinationRegisterLSW: set.registerN,
+          sourceRegister: set.registerS,
+          operandRegister: set.registerM,
+        );
+      }
+    } else if (set.s == 1) {
+      if (set.a == 0) {
+        return UMULL(
+          condition: set.condition,
+          s: set.s,
+          destinationRegisterMSW: set.registerD,
+          destinationRegisterLSW: set.registerN,
+          sourceRegister: set.registerS,
+          operandRegister: set.registerM,
+        );
+      } else if (set.a == 1) {
+        return UMLAL(
+          condition: set.condition,
+          s: set.s,
+          destinationRegisterMSW: set.registerD,
+          destinationRegisterLSW: set.registerN,
+          sourceRegister: set.registerS,
+          operandRegister: set.registerM,
+        );
+      }
+    }
+    throw StateError('Unexpected S or A: ${set.s}, ${set.a}');
   }
 
   @override
   ArmInstruction visitSingleDataSwap(
-    SingleDataSwap instruction, [
+    SingleDataSwap set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    if (set.b == 0) {
+      return SWP(
+        condition: set.condition,
+        sourceRegister1: set.registerN,
+        sourceRegister2: set.registerM,
+        destinationRegister: set.registerD,
+        // TODO: Do we need this?
+        sbZ: 0,
+      );
+    } else if (set.b == 1) {
+      return SWPB(
+        condition: set.condition,
+        sourceRegister1: set.registerN,
+        sourceRegister2: set.registerM,
+        destinationRegister: set.registerD,
+        // TODO: Do we need this?
+        sbZ: 0,
+      );
+    } else {
+      throw StateError('Unexpected B: ${set.b}');
+    }
   }
 
   @override
   ArmInstruction visitBranchAndExchange(
-    BranchAndExchange instruction, [
+    BranchAndExchange set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    return BX(
+      condition: set.condition,
+      targetAddress: set.registerN,
+    );
   }
 
   @override
   ArmInstruction visitHalfWordAndSignedDataTransferRegisterOffset(
-    HalfWordAndSignedDataTransferRegisterOffset instruction, [
+    HalfWordAndSignedDataTransferRegisterOffset set, [
     void _,
   ]) {
+    // LDRH, STRH, LDSRB, LDSRSH.
     throw UnimplementedError();
   }
 
   @override
   ArmInstruction visitHalfWordAndSignedDataTransferImmediateOffset(
-    HalfWordAndSignedDataTransferImmediateOffset instruction, [
+    HalfWordAndSignedDataTransferImmediateOffset set, [
     void _,
   ]) {
+    // LDRH, STRH, LDSRB, LDSRSH.
     throw UnimplementedError();
   }
 
   @override
   ArmInstruction visitSingleDataTransfer(
-    SingleDataTransfer instruction, [
+    SingleDataTransfer set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    if (set.l == 0) {
+      throw UnimplementedError();
+    } else if (set.l == 1) {
+      throw UnimplementedError();
+    } else {
+      throw StateError('Unexpected L: ${set.l}');
+    }
   }
 
   @override
   ArmInstruction visitUndefined(
-    Undefined instruction, [
+    Undefined set, [
     void _,
   ]) {
     throw UnimplementedError();
@@ -284,23 +376,55 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
 
   @override
   ArmInstruction visitBlockDataTransfer(
-    BlockDataTransfer instruction, [
+    BlockDataTransfer set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    if (set.l == 0) {
+      return LDM(
+        condition: set.condition,
+        p: set.p,
+        u: set.u,
+        w: set.w,
+        sourceRegister: set.registerN,
+        registerList: set.regsiterList,
+      );
+    } else if (set.l == 1) {
+      return STM(
+        condition: set.condition,
+        p: set.p,
+        u: set.u,
+        w: set.w,
+        sourceRegister: set.registerN,
+        registerList: set.regsiterList,
+      );
+    } else {
+      throw StateError('Unexpected L: ${set.l}');
+    }
   }
 
   @override
   ArmInstruction visitBranch(
-    Branch instruction, [
+    Branch set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    if (set.l == 0) {
+      return B(
+        condition: set.condition,
+        targetAddress: set.offset,
+      );
+    } else if (set.l == 1) {
+      return BL(
+        condition: set.condition,
+        targetAddress: set.offset,
+      );
+    } else {
+      throw StateError('Unexpected L: ${set.l}');
+    }
   }
 
   @override
   ArmInstruction visitCoprocessorDataTransfer(
-    CoprocessorDataTransfer instruction, [
+    CoprocessorDataTransfer set, [
     void _,
   ]) {
     throw UnimplementedError();
@@ -308,7 +432,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
 
   @override
   ArmInstruction visitCoprocessorDataOperation(
-    CoprocessorDataOperation instruction, [
+    CoprocessorDataOperation set, [
     void _,
   ]) {
     throw UnimplementedError();
@@ -316,7 +440,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
 
   @override
   ArmInstruction visitCoprocessorRegisterTransfer(
-    CoprocessorRegisterTransfer instruction, [
+    CoprocessorRegisterTransfer set, [
     void _,
   ]) {
     throw UnimplementedError();
@@ -324,10 +448,13 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
 
   @override
   ArmInstruction visitSoftwareInterrupt(
-    SoftwareInterrupt instruction, [
+    SoftwareInterrupt set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    return SWI(
+      condition: set.condition,
+      immediate24: set.comment,
+    );
   }
 }
 
