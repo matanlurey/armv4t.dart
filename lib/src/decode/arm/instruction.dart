@@ -1,10 +1,10 @@
 import 'package:armv4t/src/utils.dart';
+import 'package:meta/meta.dart';
 
 import 'format.dart';
 import 'printer.dart';
 
 part 'instruction/branch/b.dart';
-part 'instruction/branch/bl.dart';
 part 'instruction/branch/bx.dart';
 part 'instruction/coprocessor/cdp.dart';
 part 'instruction/coprocessor/ldc.dart';
@@ -43,7 +43,10 @@ part 'instruction/misc/swpb.dart';
 
 /// An **internal** representation of a decoded `ARM` instruction.
 abstract class ArmInstruction {
-  const ArmInstruction._();
+  /// Condition field.
+  final int condition;
+
+  const ArmInstruction._(this.condition);
 
   /// Invokes the correct sub-method of [visitor], optionally with [context].
   R accept<R, C>(
