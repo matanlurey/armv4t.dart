@@ -75,7 +75,147 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     DataProcessingOrPSRTransfer instruction, [
     void _,
   ]) {
-    throw UnimplementedError();
+    switch (instruction.opcode) {
+      case 0x0:
+        return AND(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0x1:
+        return EOR(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0x2:
+        return SUB(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0x3:
+        return RSB(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0x4:
+        return ADD(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0x5:
+        return ADC(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0x6:
+        return SBC(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0x7:
+        return RSC(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0x8:
+        return TST(
+          condition: instruction.condition,
+          i: instruction.i,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0x9:
+        return TEQ(
+          condition: instruction.condition,
+          i: instruction.i,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0xA:
+        return CMP(
+          condition: instruction.condition,
+          i: instruction.i,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0xB:
+        return CMN(
+          condition: instruction.condition,
+          i: instruction.i,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0xC:
+        return ORR(
+          condition: instruction.condition,
+          i: instruction.i,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0xD:
+        return MOV(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0xE:
+        return BIC(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          sourceRegister: instruction.registerN,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      case 0xF:
+        return MVN(
+          condition: instruction.condition,
+          i: instruction.i,
+          s: instruction.s,
+          destinationRegister: instruction.registerD,
+          shifterOperand: instruction.operand2,
+        );
+      default:
+        throw StateError('Unexpected opcode: ${instruction.opcode}');
+    }
   }
 
   @override
