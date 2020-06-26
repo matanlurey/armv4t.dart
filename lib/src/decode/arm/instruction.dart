@@ -7,6 +7,11 @@ import 'printer.dart';
 part 'instruction/branch/b.dart';
 part 'instruction/branch/bl.dart';
 part 'instruction/branch/bx.dart';
+part 'instruction/coprocessor/cdp.dart';
+part 'instruction/coprocessor/ldc.dart';
+part 'instruction/coprocessor/mcr.dart';
+part 'instruction/coprocessor/mrc.dart';
+part 'instruction/coprocessor/stc.dart';
 part 'instruction/data/ldm.dart';
 part 'instruction/data/ldr.dart';
 part 'instruction/data/ldrb.dart';
@@ -656,6 +661,31 @@ abstract class ArmInstructionVisitor<R, C> {
 
   R visitSWI(
     SWI instruction, [
+    C context,
+  ]);
+
+  R visitCDP(
+    CDP instruction, [
+    C context,
+  ]);
+
+  R visitLDC(
+    LDC instruction, [
+    C context,
+  ]);
+
+  R visitMCR(
+    MCR instruction, [
+    C context,
+  ]);
+
+  R visitMRC(
+    MRC instruction, [
+    C context,
+  ]);
+
+  R visitSTC(
+    STC instruction, [
     C context,
   ]);
 }
