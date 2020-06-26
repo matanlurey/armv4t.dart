@@ -3,15 +3,15 @@ part of '../../instruction.dart';
 /// Load Multiple.
 ///
 /// The [LDM] instruction permits block moves of memory to the registers and
-/// enables efficient stack operations. The registers may be lsited in any
+/// enables efficient stack operations. The registers may be listed in any
 /// order, but the registers are always loaded in order with the lowest
 /// numbered register getting the value from the lowest memory address. If `Rn`
 /// is also listed in the register list and register writeback ([w]-bit) is set,
 /// the final value in `Rn` is unpredictable.
 ///
-/// The [addressingMode] field determines how the _next address_ is calculated
+/// The `addressingMode` field determines how the _next address_ is calculated
 /// (bits [p] and [w]), which controls how the address is updated in conjunction
-/// with each register load. The four [addressingMode] values are:
+/// with each register load. The four `addressingMode` values are:
 ///
 /// - `IA` - Increment address by 4 after each load (post-increment).
 /// - `IB`  Increment address by 4 before each load (pre-increment).
