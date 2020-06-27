@@ -13,20 +13,14 @@ part of '../../instruction.dart';
 ///   Rd <- CPSR/SPSR
 /// ```
 class MRS extends ArmInstruction {
-  final int r;
-
-  final int sb0_1;
-
+  /// `0` = CPSR, `1` = SPSR_<current mode>.
+  final int sourcePSR;
   final int destinationRegister;
-
-  final int sb0_2;
 
   const MRS({
     @required int condition,
-    @required this.r,
-    @required this.sb0_1,
+    @required this.sourcePSR,
     @required this.destinationRegister,
-    @required this.sb0_2,
   }) : super._(condition);
 
   @override

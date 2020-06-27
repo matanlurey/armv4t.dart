@@ -50,12 +50,19 @@ void main() {
         'MVN',
       ];
 
+      final _psrTransfer = ['TST', 'TEQ', 'CMP', 'CMN'];
+
       for (var opCode = 0; opCode < opCodes.length; opCode++) {
         test('${opCodes[opCode]}', () {
           if (opCodes[opCode] == 'MOV' || opCodes[opCode] == 'MVN') {
             expect(
               decode(encode(0, opCode, 0, 2, 4, 6)),
               _matchesASM('${opCodes[opCode]} R4, R6'),
+            );
+          } else if (_psrTransfer.contains(opCodes[opCode])) {
+            expect(
+              decode(encode(0, opCode, 1, 2, 4, 6)),
+              _matchesASM('${opCodes[opCode]} R4, R2, R6'),
             );
           } else {
             expect(
@@ -81,12 +88,47 @@ void main() {
       });
     });
 
-    test('MRS', () {
-      // TODO: Test.
+    test('MRS <CPSR>', () {
+      expect(
+        decode(encode(0, 0x8, 0, 2, 4, 0)),
+        _matchesASM('MRS R4, CPSR'),
+      );
     });
 
-    test('MSR', () {
-      // TODO: Test.
+    test('MRS <SPSR>', () {
+      expect(
+        decode(encode(0, 0xA, 0, 2, 4, 0)),
+        _matchesASM('MRS R4, SPSR'),
+      );
+    });
+
+    test('MSR: Register <CPSR>', () {
+      expect(
+        decode(encode(0, 0x9, 0, 0, 0, 6)),
+        _matchesASM('MSR CPSR, R6'),
+      );
+    });
+
+    test('MSR: Register <SPSR>', () {
+      expect(
+        decode(encode(0, 0xB, 0, 0, 0, 6)),
+        _matchesASM('MSR SPSR, R6'),
+      );
+    });
+
+    test('MSR: Immediate', () {
+      expect(
+        decode(encode(1, 0x9, 0, 0, 0, 6)),
+        _matchesASM('MSR CPSR, #6'),
+      );
+    });
+
+    test('MSR: <Field Masks>', () {
+      final results = <String>[];
+      for (int i = 0; i <= '1111'.parseBits(); i++) {
+        results.add(decode(encode(1, 0x9, 0, i, 0, 6)).accept(_printer));
+      }
+      expect(results.toSet(), results, reason: 'Expected all unique masks');
     });
   });
 

@@ -1,4 +1,5 @@
 import 'package:armv4t/src/decode/arm/condition.dart';
+import 'package:binary/binary.dart';
 
 import 'instruction.dart';
 
@@ -70,6 +71,24 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
   String _s(int sBit) => sBit == 1 ? 'S' : '';
 
   String _i(int iBit, int operand) => iBit == 1 ? '#${operand}' : 'R${operand}';
+
+  String _fieldMask(int bits) {
+    if (bits == 0) return '';
+    final result = StringBuffer('_');
+    if (bits.getBit(3) == 1) {
+      result.write('C');
+    }
+    if (bits.getBit(2) == 1) {
+      result.write('X');
+    }
+    if (bits.getBit(1) == 1) {
+      result.write('S');
+    }
+    if (bits.getBit(0) == 1) {
+      result.write('F');
+    }
+    return result.toString();
+  }
 
   @override
   String visitB(
@@ -157,14 +176,18 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
     MRS i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'MRS${_cond(i)} '
+      'R${i.destinationRegister}, '
+      '${i.sourcePSR == 0 ? 'CPSR' : 'SPSR'}';
 
   @override
   String visitMSR(
     MSR i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'MSR${_cond(i)} '
+      '${i.destinationPSR == 0 ? 'CPSR' : 'SPSR'}${_fieldMask(i.fieldMask)}, '
+      '${_i(i.immediateOperand, i.sourceOperand)}';
 
   @override
   String visitMVN(

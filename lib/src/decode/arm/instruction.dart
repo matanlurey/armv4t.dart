@@ -1,4 +1,5 @@
 import 'package:armv4t/src/utils.dart';
+import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
 import 'format.dart';
@@ -80,7 +81,21 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     DataProcessingOrPSRTransfer set, [
     void _,
   ]) {
-    // TODO: Implement PSR parsers.
+    // Note that TEQ, TST, CMN, and CMP are a PSR Transfer if S = 0.
+    //
+    // DATA: CCCC_00IP_PPPS_NNNN_DDDD_OOOO_OOOO_OOOO
+    // MRS:  CCCC_0001_0S00_1111_DDDD_0000_0000_0000
+    //               ^ ^^^
+    //               1 000 (TST)
+    //               1 010 (CMP)
+    // MSR:  CCCC_0001_0D10_1001_1111_0000_0000_MMMM [-> PSR]
+    //               ^ ^^^
+    //               1 001 (TEQ)
+    //               1 011 (CMN)
+    // MSR:  CCCC_00I1_0D10_1000_1111_OOOO_OOOO_OOOO [-> PSR Flag Bits Only]
+    //               ^ ^^^
+    //               1 001 (TEQ)
+    //               1 011 (CMN)
     switch (set.opcode) {
       case 0x0:
         return AND(
@@ -155,37 +170,99 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
           shifterOperand: set.operand2,
         );
       case 0x8:
-        return TST(
-          condition: set.condition,
-          i: set.i,
-          sourceRegister: set.registerN,
-          destinationRegister: set.registerD,
-          shifterOperand: set.operand2,
-        );
+        if (set.s == 0) {
+          // Interpret as MRS.
+          //
+          // DATA: CCCC_00IP_PPPS_NNNN_DDDD_OOOO_OOOO_OOOO
+          // MRS:  CCCC_0001_0S00_1111_DDDD_0000_0000_0000
+          assert(set.opcode.getBit(1) == 0);
+          return MRS(
+            condition: set.condition,
+            sourcePSR: 0,
+            destinationRegister: set.registerD,
+          );
+        } else if (set.s == 1) {
+          return TST(
+            condition: set.condition,
+            i: set.i,
+            sourceRegister: set.registerN,
+            destinationRegister: set.registerD,
+            shifterOperand: set.operand2,
+          );
+        }
+        throw StateError('Unexpected S: ${set.s}');
       case 0x9:
-        return TEQ(
-          condition: set.condition,
-          i: set.i,
-          sourceRegister: set.registerN,
-          destinationRegister: set.registerD,
-          shifterOperand: set.operand2,
-        );
+        if (set.s == 0) {
+          // Interpret as MSR.
+          //
+          // DATA: CCCC_00IP_PPPS_NNNN_DDDD_OOOO_OOOO_OOOO
+          // MSR:  CCCC_0001_0D10_MMMM_1111_0000_0000_MMMM
+          //       CCCC_00I1_0D10_MMMM_1111_OOOO_OOOO_OOOO
+          assert(set.opcode.getBit(1) == 0);
+          return MSR(
+            condition: set.condition,
+            immediateOperand: set.i,
+            destinationPSR: 0,
+            fieldMask: set.registerN,
+            sourceOperand: set.operand2,
+          );
+        } else if (set.s == 1) {
+          return TEQ(
+            condition: set.condition,
+            i: set.i,
+            sourceRegister: set.registerN,
+            destinationRegister: set.registerD,
+            shifterOperand: set.operand2,
+          );
+        }
+        throw StateError('Unexpected S: ${set.s}');
       case 0xA:
-        return CMP(
-          condition: set.condition,
-          i: set.i,
-          sourceRegister: set.registerN,
-          destinationRegister: set.registerD,
-          shifterOperand: set.operand2,
-        );
+        if (set.s == 0) {
+          // Interpret as MRS.
+          //
+          // DATA: CCCC_00IP_PPPS_NNNN_DDDD_OOOO_OOOO_OOOO
+          // MRS:  CCCC_0001_0S00_1111_DDDD_0000_0000_0000
+          assert(set.opcode.getBit(1) == 1);
+          return MRS(
+            condition: set.condition,
+            sourcePSR: 1,
+            destinationRegister: set.registerD,
+          );
+        } else if (set.s == 1) {
+          return CMP(
+            condition: set.condition,
+            i: set.i,
+            sourceRegister: set.registerN,
+            destinationRegister: set.registerD,
+            shifterOperand: set.operand2,
+          );
+        }
+        throw StateError('Unexpected S: ${set.s}');
       case 0xB:
-        return CMN(
-          condition: set.condition,
-          i: set.i,
-          sourceRegister: set.registerN,
-          destinationRegister: set.registerD,
-          shifterOperand: set.operand2,
-        );
+        if (set.s == 0) {
+          // Interpret as MSR.
+          //
+          // DATA: CCCC_00IP_PPPS_NNNN_DDDD_OOOO_OOOO_OOOO
+          // MSR:  CCCC_0001_0D10_MMMM_1111_0000_0000_MMMM
+          //       CCCC_00I1_0D10_MMMM_1111_OOOO_OOOO_OOOO
+          assert(set.opcode.getBit(1) == 1);
+          return MSR(
+            condition: set.condition,
+            immediateOperand: set.i,
+            destinationPSR: 1,
+            fieldMask: set.registerN,
+            sourceOperand: set.operand2,
+          );
+        } else if (set.s == 1) {
+          return CMN(
+            condition: set.condition,
+            i: set.i,
+            sourceRegister: set.registerN,
+            destinationRegister: set.registerD,
+            shifterOperand: set.operand2,
+          );
+        }
+        throw StateError('Unexpected S: ${set.s}');
       case 0xC:
         return ORR(
           condition: set.condition,

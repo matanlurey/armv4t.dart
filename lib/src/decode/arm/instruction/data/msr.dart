@@ -5,17 +5,6 @@ part of '../../instruction.dart';
 /// Moves the value of a regsiter or immediate operand into the `CPSR` or the
 /// current `SPSR`. This instruction is typically used by supervisory mode code.
 ///
-/// The [fieldMask] indicates which fields of the CPSR/SPSR be written to should
-/// be allowed to be changed. This limits any changes to just the fields
-/// intended by the programmer. The allowed fields are:
-///
-/// - `c` - Sets the control field mask bit (bit 16).
-/// - `x` - Sets the extension field mask bit (bit 17).
-/// - `s` - Sets the status field mask bit (bit 18).
-/// - `f` - Sets the flags field mask bit (bit 19).
-///
-/// One or more fields may be specified.
-///
 /// ## Syntax
 /// `MRS{<cond>} CPSR|SPSR_<fields>, <Rm>|#<immediate>`
 ///
@@ -25,23 +14,24 @@ part of '../../instruction.dart';
 ///   CPSR/SPSR <- immediate/register value
 /// ```
 class MSR extends ArmInstruction {
-  final int r;
+  /// `0` = [sourceOperand] is a register, `1` = immediate unsigned 8-bit value.
+  final int immediateOperand;
 
+  /// `0` = CPSR, `1` = SPSR_<current mode>.
+  final int destinationPSR;
+
+  /// Determines what fields of the CPSR/SPSR should be allowed to be changed.
   final int fieldMask;
 
-  final int sb0;
-
-  final int rorateImmOrSbZ;
-
-  final int immediateOrRegister;
+  /// See [immediateOperand] for details.
+  final int sourceOperand;
 
   const MSR({
     @required int condition,
-    @required this.r,
+    @required this.immediateOperand,
+    @required this.destinationPSR,
     @required this.fieldMask,
-    @required this.sb0,
-    @required this.rorateImmOrSbZ,
-    @required this.immediateOrRegister,
+    @required this.sourceOperand,
   }) : super._(condition);
 
   @override
