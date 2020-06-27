@@ -440,33 +440,55 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
     CDP i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'CDP${_cond(i)} '
+      'P#${i.coprocessorNumber}, '
+      '${i.coprocessorOpCode}, '
+      'C${i.coprocessorDestinationRegister}, '
+      'C${i.coprocessorOperandRegister1}, '
+      'C${i.coprocessorOperandRegister2}, '
+      '${i.coprocessorInformation}';
 
   @override
   String visitLDC(
     LDC i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'LDP${_cond(i)}${i.n == 1 ? 'L' : ''} '
+      'P#${i.coprocessorNumber}, '
+      'C${i.coprocessorSourceOrDestinationRegister}, '
+      '${i.unsigned8BitImmediateOffset}';
 
   @override
   String visitSTC(
     STC i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'STC${_cond(i)}${i.n == 1 ? 'L' : ''} '
+      'P#${i.coprocessorNumber}, '
+      'C${i.coprocessorSourceOrDestinationRegister}, '
+      '[R${i.baseRegister}, #${i.unsigned8BitImmediateOffset}]';
 
   @override
   String visitMCR(
     MCR i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'MCR${_cond(i)} '
+      'P${i.coprocessorNumber}, '
+      '${i.coprocessorOperationCode}, '
+      'R${i.sourceRegister}, '
+      'C${i.coprocessorDestinationRegister}, '
+      'C${i.coprocessorOperandRegister}';
 
   @override
   String visitMRC(
     MRC i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'MRC${_cond(i)} '
+      'P${i.coprocessorNumber}, '
+      '${i.coprocessorOperationCode}, '
+      'R${i.destinationRegister}, '
+      'C${i.coprocessorSourceRegister}, '
+      'C${i.coprocessorOperandRegister}';
 }

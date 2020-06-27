@@ -233,15 +233,85 @@ void main() {
   });
 
   group('Coprocessor data transfer: should decode', () {
-    // TODO: Test.
+    // CCCC_110P_UNWL_MMMM_DDDD_KKKK_OOOO_OOOO
+    int encode(int p, int u, int n, int w, int l, int m, int d, int k, int o) {
+      return [
+        Condition.AL.index.toBinaryPadded(4),
+        '110$p',
+        '$u$n$w$l',
+        m.toBinaryPadded(4),
+        d.toBinaryPadded(4),
+        k.toBinaryPadded(4),
+        o.toBinaryPadded(8),
+      ].join('').parseBits();
+    }
+
+    test('STC', () {
+      expect(
+        decode(encode(0, 0, 0, 0, 0, 6, 8, 10, 12)),
+        _matchesASM('STC P#10, C8, [R6, #12]'),
+      );
+    });
+
+    test('LDP', () {
+      expect(
+        decode(encode(0, 0, 0, 0, 1, 6, 8, 10, 12)),
+        _matchesASM('LDP P#10, C8, 12'),
+      );
+    });
   });
 
   group('Coprocessor data operation: should decode', () {
-    // TODO: Test.
+    // CCCC_1110_OOOO_NNNN_DDDD_PPPP_VVV0_MMMM
+    int encode(int o, int n, int d, int p, int v, int m) {
+      return [
+        Condition.AL.index.toBinaryPadded(4),
+        '1110',
+        o.toBinaryPadded(4),
+        n.toBinaryPadded(4),
+        d.toBinaryPadded(4),
+        p.toBinaryPadded(4),
+        v.toBinaryPadded(3) + '0',
+        m.toBinaryPadded(4),
+      ].join('').parseBits();
+    }
+
+    test('CDP', () {
+      expect(
+        decode(encode(8, 16, 6, 8, 4, 6)),
+        _matchesASM('CDP P#8, 8, C6, C0, C6, 4'),
+      );
+    });
   });
 
-  group('Coprocessor regsiter transfer: should decode', () {
-    // TODO: Test.
+  group('Coprocessor register transfer: should decode', () {
+    /// CCCC_1110_OOOL_NNNN_DDDD_PPPP_VVV1_MMMM
+    int encode(int o, int l, int n, int d, int p, int v, int m) {
+      return [
+        Condition.AL.index.toBinaryPadded(4),
+        '1110',
+        o.toBinaryPadded(3) + l.toBinaryPadded(1),
+        n.toBinaryPadded(4),
+        d.toBinaryPadded(4),
+        p.toBinaryPadded(4),
+        v.toBinaryPadded(3) + '1',
+        m.toBinaryPadded(4),
+      ].join('').parseBits();
+    }
+
+    test('MCR', () {
+      expect(
+        decode(encode(8, 0, 4, 6, 8, 10, 12)),
+        _matchesASM('MCR P8, 0, R6, C4, C12'),
+      );
+    });
+
+    test('MRC', () {
+      expect(
+        decode(encode(8, 1, 4, 6, 8, 10, 12)),
+        _matchesASM('MRC P8, 0, R6, C4, C12'),
+      );
+    });
   });
 
   group('Software interrupt: should decode', () {
