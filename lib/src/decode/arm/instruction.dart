@@ -276,7 +276,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
           operandRegister: set.registerM,
         );
       }
-    } else if (set.s == 1) {
+    } else if (set.u == 1) {
       if (set.a == 0) {
         return UMULL(
           condition: set.condition,
@@ -432,7 +432,33 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     CoprocessorDataTransfer set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    if (set.l == 0) {
+      return STC(
+        condition: set.condition,
+        p: set.p,
+        u: set.u,
+        n: set.n,
+        w: set.w,
+        baseRegister: set.registerN,
+        coprocessorSourceOrDestinationRegister: set.cpRegisterD,
+        coprocessorNumber: set.cpNumber,
+        unsigned8BitImmediateOffset: set.offset,
+      );
+    } else if (set.l == 1) {
+      return LDC(
+        condition: set.condition,
+        p: set.p,
+        u: set.u,
+        n: set.n,
+        w: set.w,
+        baseRegister: set.registerN,
+        coprocessorSourceOrDestinationRegister: set.cpRegisterD,
+        coprocessorNumber: set.cpNumber,
+        unsigned8BitImmediateOffset: set.offset,
+      );
+    } else {
+      throw StateError('Unexpected L: ${set.l}');
+    }
   }
 
   @override
@@ -440,7 +466,15 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     CoprocessorDataOperation set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    return CDP(
+      condition: set.condition,
+      coprocessorOpCode: set.cpOpCode,
+      coprocessorOperandRegister1: set.cpOperandRegister1,
+      coprocessorDestinationRegister: set.cpDestinationRegister,
+      coprocessorNumber: set.cpNumber,
+      coprocessorInformation: set.cpInformation,
+      coprocessorOperandRegister2: set.cpOperandRegister2,
+    );
   }
 
   @override
@@ -448,7 +482,29 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     CoprocessorRegisterTransfer set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    if (set.l == 0) {
+      return MCR(
+        condition: set.condition,
+        coprocessorOperationCode: set.cpOpCode,
+        coprocessorDestinationRegister: set.cpRegisterN,
+        sourceRegister: set.registerD,
+        coprocessorNumber: set.cpNumber,
+        coprocessorInformation: set.cpInformation,
+        coprocessorOperandRegister: set.cpRegisterM,
+      );
+    } else if (set.l == 1) {
+      return MRC(
+        condition: set.condition,
+        coprocessorOperationCode: set.cpOpCode,
+        coprocessorSourceRegister: set.cpRegisterN,
+        destinationRegister: set.registerD,
+        coprocessorNumber: set.cpNumber,
+        coprocessorInformation: set.cpInformation,
+        coprocessorOperandRegister: set.cpRegisterM,
+      );
+    } else {
+      throw StateError('Unexpected L: ${set.l}');
+    }
   }
 
   @override

@@ -48,7 +48,7 @@ class ArmConditionPrinter implements ArmConditionVisitor<String, void> {
   String visitLE([void _]) => 'LE';
 
   @override
-  String visitAL([void _]) => 'AL';
+  String visitAL([void _]) => '';
 
   @override
   String visitNV([void _]) => 'NV';
@@ -436,8 +436,8 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'SWI${_cond(i)} #${i.immediate24}';
 
   @override
-  String visitLDC(
-    LDC i, [
+  String visitCDP(
+    CDP i, [
     void _,
   ]) =>
       throw UnimplementedError();
@@ -452,6 +452,20 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
   @override
   String visitSTC(
     STC i, [
+    void _,
+  ]) =>
+      throw UnimplementedError();
+
+  @override
+  String visitMCR(
+    MCR i, [
+    void _,
+  ]) =>
+      throw UnimplementedError();
+
+  @override
+  String visitMRC(
+    MRC i, [
     void _,
   ]) =>
       throw UnimplementedError();
