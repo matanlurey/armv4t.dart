@@ -8,7 +8,6 @@ class LDC extends ArmInstruction {
   final int u;
   final int n;
   final int w;
-  final int l;
   final int baseRegister;
   final int coprocessorSourceOrDestinationRegister;
   final int coprocessorNumber;
@@ -20,7 +19,6 @@ class LDC extends ArmInstruction {
     @required this.u,
     @required this.n,
     @required this.w,
-    @required this.l,
     @required this.baseRegister,
     @required this.coprocessorSourceOrDestinationRegister,
     @required this.coprocessorNumber,

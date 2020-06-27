@@ -434,4 +434,25 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
     void _,
   ]) =>
       'SWI${_cond(i)} #${i.immediate24}';
+
+  @override
+  String visitLDC(
+    LDC i, [
+    void _,
+  ]) =>
+      throw UnimplementedError();
+
+  @override
+  String visitLDC(
+    LDC i, [
+    void _,
+  ]) =>
+      throw UnimplementedError();
+
+  @override
+  String visitSTC(
+    STC i, [
+    void _,
+  ]) =>
+      throw UnimplementedError();
 }
