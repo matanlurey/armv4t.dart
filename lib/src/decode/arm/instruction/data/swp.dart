@@ -21,15 +21,12 @@ class SWP extends ArmInstruction {
 
   final int destinationRegister;
 
-  final int sbZ;
-
   final int sourceRegister2;
 
   const SWP({
     @required int condition,
     @required this.sourceRegister1,
     @required this.destinationRegister,
-    @required this.sbZ,
     @required this.sourceRegister2,
   }) : super._(condition);
 

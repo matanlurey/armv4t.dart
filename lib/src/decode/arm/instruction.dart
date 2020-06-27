@@ -388,8 +388,6 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
         sourceRegister1: set.registerN,
         sourceRegister2: set.registerM,
         destinationRegister: set.registerD,
-        // TODO: Do we need this?
-        sbZ: 0,
       );
     } else if (set.b == 1) {
       return SWPB(
@@ -397,8 +395,6 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
         sourceRegister1: set.registerN,
         sourceRegister2: set.registerM,
         destinationRegister: set.registerD,
-        // TODO: Do we need this?
-        sbZ: 0,
       );
     } else {
       throw StateError('Unexpected B: ${set.b}');
