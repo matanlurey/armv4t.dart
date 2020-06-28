@@ -185,77 +185,77 @@ class ArmInstructionSetDecoder<T extends ArmInstructionSet> {
 /// Implement to in order to visit known sub-types of [ArmInstructionSet].
 abstract class ArmSetVisitor<R, C> {
   R visitDataProcessingOrPSRTransfer(
-    DataProcessingOrPSRTransfer instruction, [
+    DataProcessingOrPSRTransfer set, [
     C context,
   ]);
 
   R visitMultiplyAndMutiplyAccumulate(
-    MultiplyAndMutiplyAccumulate instruction, [
+    MultiplyAndMutiplyAccumulate set, [
     C context,
   ]);
 
   R visitMultiplyLongAndMutiplyAccumulateLong(
-    MultiplyLongAndMutiplyAccumulateLong instruction, [
+    MultiplyLongAndMutiplyAccumulateLong set, [
     C context,
   ]);
 
   R visitSingleDataSwap(
-    SingleDataSwap instruction, [
+    SingleDataSwap set, [
     C context,
   ]);
 
   R visitBranchAndExchange(
-    BranchAndExchange instruction, [
+    BranchAndExchange set, [
     C context,
   ]);
 
   R visitHalfWordAndSignedDataTransferRegisterOffset(
-    HalfWordAndSignedDataTransferRegisterOffset instruction, [
+    HalfWordAndSignedDataTransferRegisterOffset set, [
     C context,
   ]);
 
   R visitHalfWordAndSignedDataTransferImmediateOffset(
-    HalfWordAndSignedDataTransferImmediateOffset instruction, [
+    HalfWordAndSignedDataTransferImmediateOffset set, [
     C context,
   ]);
 
   R visitSingleDataTransfer(
-    SingleDataTransfer instruction, [
+    SingleDataTransfer set, [
     C context,
   ]);
 
   R visitUndefined(
-    Undefined instruction, [
+    Undefined set, [
     C context,
   ]);
 
   R visitBlockDataTransfer(
-    BlockDataTransfer instruction, [
+    BlockDataTransfer set, [
     C context,
   ]);
 
   R visitBranch(
-    Branch instruction, [
+    Branch set, [
     C context,
   ]);
 
   R visitCoprocessorDataTransfer(
-    CoprocessorDataTransfer instruction, [
+    CoprocessorDataTransfer set, [
     C context,
   ]);
 
   R visitCoprocessorDataOperation(
-    CoprocessorDataOperation instruction, [
+    CoprocessorDataOperation set, [
     C context,
   ]);
 
   R visitCoprocessorRegisterTransfer(
-    CoprocessorRegisterTransfer instruction, [
+    CoprocessorRegisterTransfer set, [
     C context,
   ]);
 
   R visitSoftwareInterrupt(
-    SoftwareInterrupt instruction, [
+    SoftwareInterrupt set, [
     C context,
   ]);
 }

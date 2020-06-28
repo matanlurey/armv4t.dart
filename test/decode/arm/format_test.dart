@@ -5,12 +5,12 @@ import 'package:test/test.dart';
 void main() {
   test('should decode 01:DATA_PROCESSING_OR_PSR_TRANSFER', () {
     //               CCCC   00IP   PPPS   NNNN   DDDD   OOOO   OOOO   OOOO
-    final string = ('0000' '0010' '1010' '1010' '1010' '1010' '1010' '1010');
+    final string = ('1101' '0010' '1010' '1010' '1010' '1010' '1010' '1010');
     final input = string.parseBits();
     final format = ArmInstructionSet.$01$dataProcessingOrPsrTransfer;
     final coded = Map.fromIterables(format.names, format.capture(input));
     expect(coded, {
-      'C': '0000'.parseBits(),
+      'C': '1101'.parseBits(),
       'I': '1'.parseBits(),
       'P': '0101'.parseBits(),
       'S': '0'.parseBits(),
