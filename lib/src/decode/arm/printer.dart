@@ -128,7 +128,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
   ]) =>
       'LDR${_cond(i)} '
       'R${i.destinationRegister}, '
-      '[${i.addressingMode}]';
+      '[${_i(i.i, i.addressingMode)}]';
 
   @override
   String visitLDRB(
@@ -137,7 +137,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
   ]) =>
       'LDRB${_cond(i)} '
       'R${i.destinationRegister}, '
-      '[${i.addressingMode}]';
+      '[${_i(i.i, i.addressingMode)}]';
 
   @override
   String visitLDRH(
@@ -209,15 +209,21 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
   String visitSTR(
     STR i, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    // The output of STR is quite complicated.
+    var output = 'STR${_cond(i)}';
+
+    return output;
+  }
 
   @override
   String visitSTRB(
     STRB i, [
     void _,
   ]) =>
-      throw UnimplementedError();
+      'STR${_cond(i)}B '
+      'R${i.destinationRegister}, '
+      '${_i(i.i, i.addressingMode)}';
 
   @override
   String visitSTRH(
@@ -231,20 +237,20 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
     SWP i, [
     void _,
   ]) =>
-      'SWP${_cond(i)}, '
-      'R${i.destinationRegister}, '
+      'SWP${_cond(i)} '
       'R${i.sourceRegister1}, '
-      '[R${i.destinationRegister}]';
+      'R${i.destinationRegister}, '
+      '[R${i.sourceRegister2}]';
 
   @override
   String visitSWPB(
     SWPB i, [
     void _,
   ]) =>
-      'SWPB${_cond(i)}, '
-      'R${i.destinationRegister}, '
+      'SWPB${_cond(i)} '
       'R${i.sourceRegister1}, '
-      '[R${i.destinationRegister}]';
+      'R${i.destinationRegister}, '
+      '[R${i.sourceRegister2}]';
 
   @override
   String visitAND(

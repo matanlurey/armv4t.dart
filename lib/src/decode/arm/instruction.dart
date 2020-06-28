@@ -435,13 +435,57 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     SingleDataTransfer set, [
     void _,
   ]) {
+    // TODO: Determine how P, U, W are assembled.
     if (set.l == 0) {
-      throw UnimplementedError();
+      if (set.b == 0) {
+        return STR(
+          condition: set.condition,
+          i: set.i,
+          p: set.p,
+          u: set.u,
+          w: set.w,
+          destinationRegister: set.registerD,
+          sourceRegister: set.registerN,
+          addressingMode: set.offset,
+        );
+      } else if (set.b == 1) {
+        return STRB(
+          condition: set.condition,
+          i: set.i,
+          p: set.p,
+          u: set.u,
+          w: set.w,
+          destinationRegister: set.registerD,
+          sourceRegister: set.registerN,
+          addressingMode: set.offset,
+        );
+      }
     } else if (set.l == 1) {
-      throw UnimplementedError();
-    } else {
-      throw StateError('Unexpected L: ${set.l}');
+      if (set.b == 0) {
+        return LDR(
+          condition: set.condition,
+          i: set.i,
+          p: set.p,
+          u: set.u,
+          w: set.w,
+          destinationRegister: set.registerD,
+          sourceRegister: set.registerN,
+          addressingMode: set.offset,
+        );
+      } else if (set.b == 1) {
+        return LDRB(
+          condition: set.condition,
+          i: set.i,
+          p: set.p,
+          u: set.u,
+          w: set.w,
+          destinationRegister: set.registerD,
+          sourceRegister: set.registerN,
+          addressingMode: set.offset,
+        );
+      }
     }
+    throw StateError('Unexpected L or B: ${set.l}, ${set.b}');
   }
 
   @override
@@ -449,7 +493,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     Undefined set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    throw UnimplementedError('TODO: Implement UND instruction.');
   }
 
   @override

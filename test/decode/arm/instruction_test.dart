@@ -207,7 +207,33 @@ void main() {
   });
 
   group('Single data swap: should decode', () {
-    // TODO: Test.
+    // CCCC_0001_0B00_NNNN_DDDD_0000_1001_MMMM
+    int encode(int b, int n, int d, int m) {
+      return [
+        Condition.AL.index.toBinaryPadded(4),
+        '0001',
+        '0${b}00',
+        n.toBinaryPadded(4),
+        d.toBinaryPadded(4),
+        '0000',
+        '1001',
+        m.toBinaryPadded(4),
+      ].join('').parseBits();
+    }
+
+    test('SWP', () {
+      expect(
+        decode(encode(0, 2, 4, 6)),
+        _matchesASM('SWP R2, R4, [R6]'),
+      );
+    });
+
+    test('SWPB', () {
+      expect(
+        decode(encode(1, 2, 4, 6)),
+        _matchesASM('SWPB R2, R4, [R6]'),
+      );
+    });
   });
 
   group('Branch and exchange: should decode', () {
@@ -242,7 +268,45 @@ void main() {
   });
 
   group('Single data transfer: should decode', () {
-    // TODO: Test.
+    // CCCC_01IP_UBWL_NNNN_DDDD_OOOO_OOOO_OOOO
+    int encode(int i, int p, int u, int b, int w, int l, int n, int d, int o) {
+      return [
+        Condition.AL.index.toBinaryPadded(4),
+        '01$i$p',
+        '$u$b$w$l',
+        n.toBinaryPadded(4),
+        d.toBinaryPadded(4),
+        o.toBinaryPadded(12),
+      ].join('').parseBits();
+    }
+
+    test('LDR <Register>', () {
+      expect(
+        decode(encode(0, 0, 0, 0, 0, 1, 4, 8, 8)),
+        _matchesASM('LDR R8, [R8]'),
+      );
+    });
+
+    test('LDR <Immediate>', () {
+      expect(
+        decode(encode(1, 0, 0, 0, 0, 1, 4, 8, 32)),
+        _matchesASM('LDR R8, [#32]'),
+      );
+    });
+
+    test('STR <Register>', () {
+      expect(
+        decode(encode(0, 0, 0, 0, 0, 0, 4, 8, 8)),
+        _matchesASM('STR R8, [R8]'),
+      );
+    });
+
+    test('STR <Immediate>', () {
+      expect(
+        decode(encode(1, 0, 0, 0, 0, 0, 4, 8, 32)),
+        _matchesASM('STR R8, [#32]'),
+      );
+    });
   });
 
   group('Block data transfer: should decode', () {
@@ -327,7 +391,7 @@ void main() {
   });
 
   group('Coprocessor register transfer: should decode', () {
-    /// CCCC_1110_OOOL_NNNN_DDDD_PPPP_VVV1_MMMM
+    // CCCC_1110_OOOL_NNNN_DDDD_PPPP_VVV1_MMMM
     int encode(int o, int l, int n, int d, int p, int v, int m) {
       return [
         Condition.AL.index.toBinaryPadded(4),
@@ -357,7 +421,21 @@ void main() {
   });
 
   group('Software interrupt: should decode', () {
-    // TODO: Test.
+    // CCCC_1111_XXXX_XXXX_XXXX_XXXX_XXXX_XXXX
+    int encode(int x) {
+      return [
+        Condition.AL.index.toBinaryPadded(4),
+        '1111',
+        x.toBinaryPadded(32 - 8),
+      ].join('').parseBits();
+    }
+
+    test('SWI', () {
+      expect(
+        decode(encode(8)),
+        _matchesASM('SWI #8'),
+      );
+    });
   });
 }
 

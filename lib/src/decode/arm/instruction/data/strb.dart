@@ -16,6 +16,8 @@ part of '../../instruction.dart';
 ///     Rn <- end_address
 /// ```
 class STRB extends ArmInstruction {
+  final int i;
+
   final int p;
 
   final int u;
@@ -30,6 +32,7 @@ class STRB extends ArmInstruction {
 
   const STRB({
     @required int condition,
+    @required this.i,
     @required this.p,
     @required this.u,
     @required this.w,

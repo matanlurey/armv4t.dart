@@ -16,6 +16,8 @@ part of '../../instruction.dart';
 ///     Rn <- end_address
 /// ```
 class LDRB extends ArmInstruction {
+  final int i;
+
   final int p;
 
   final int u;
@@ -30,6 +32,7 @@ class LDRB extends ArmInstruction {
 
   const LDRB({
     @required int condition,
+    @required this.i,
     @required this.p,
     @required this.u,
     @required this.w,
