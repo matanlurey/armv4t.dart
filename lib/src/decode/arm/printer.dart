@@ -126,18 +126,14 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
     LDR i, [
     void _,
   ]) =>
-      'LDR${_cond(i)} '
-      'R${i.destinationRegister}, '
-      '[${_i(i.i, i.addressingMode)}]';
+      throw UnimplementedError();
 
   @override
   String visitLDRB(
     LDRB i, [
     void _,
   ]) =>
-      'LDRB${_cond(i)} '
-      'R${i.destinationRegister}, '
-      '[${_i(i.i, i.addressingMode)}]';
+      throw UnimplementedError();
 
   @override
   String visitLDRH(
@@ -209,21 +205,15 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
   String visitSTR(
     STR i, [
     void _,
-  ]) {
-    // The output of STR is quite complicated.
-    var output = 'STR${_cond(i)}';
-
-    return output;
-  }
+  ]) =>
+      throw UnimplementedError();
 
   @override
   String visitSTRB(
     STRB i, [
     void _,
   ]) =>
-      'STR${_cond(i)}B '
-      'R${i.destinationRegister}, '
-      '${_i(i.i, i.addressingMode)}';
+      throw UnimplementedError();
 
   @override
   String visitSTRH(
