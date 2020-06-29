@@ -72,7 +72,17 @@ void main() {
     expect(decodeImmediate(encode(7, 1)), _matchesASM('R1, LSR #7'));
   });
 
-  test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_REGISTER', () {});
+  test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_REGISTER', () {
+    int encode(int s, int m) {
+      return [
+        s.toBinaryPadded(4),
+        '0011',
+        m.toBinaryPadded(4),
+      ].join('').parseBits();
+    }
+
+    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, LSL R1'));
+  });
 
   test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_REGISTER', () {});
 
