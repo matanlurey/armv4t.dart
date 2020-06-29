@@ -21,7 +21,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    // TODO: Test. This seems to conflict with the other formats.
+    expect(decodeImmediate(encode(2, 16)), _matchesASM('#256'));
   });
 
   test('REGISTER_OPERAND', () {
@@ -52,12 +52,12 @@ void main() {
     int encode(int s, int m) {
       return [
         s.toBinaryPadded(4),
-        '0001',
+        '0000',
         m.toBinaryPadded(4),
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(1, 2)), _matchesASM('R1, LSL R2'));
+    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, LSL R1'));
   });
 
   test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_IMMEDIATE', () {
@@ -69,7 +69,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeImmediate(encode(7, 1)), _matchesASM('R1, LSL #7'));
+    expect(decodeImmediate(encode(7, 1)), _matchesASM('R1, LSR #7'));
   });
 
   test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_REGISTER', () {});

@@ -31,19 +31,13 @@ class ShifterOperandDecoder {
     RegisterOperandLogicalShiftRightByImmediate._pattern,
     RegisterOperandArithmeticShiftRightByImmediate._pattern,
     RegisterOperandRotateRightByImmediate._pattern,
-    RegisterOperandRotateRightWithExtend._pattern,
   ].toGroup();
 
   static final _registerPatterns = [
-    ImmediateOperand._pattern,
     RegisterOperand._pattern,
-    RegisterOperandLogicalShiftLeftByImmediate._pattern,
     RegisterOperandLogicalShiftLeftByRegister._pattern,
-    RegisterOperandLogicalShiftRightByImmediate._pattern,
     RegisterOperandLogicalShiftRightByRegister._pattern,
-    RegisterOperandArithmeticShiftRightByImmediate._pattern,
     RegisterOperandArithmeticShiftRightByRegister._pattern,
-    RegisterOperandRotateRightByImmediate._pattern,
     RegisterOperandRotateRightByRegister._pattern,
     RegisterOperandRotateRightWithExtend._pattern,
   ].toGroup();
@@ -98,7 +92,7 @@ class ShifterOperandDecoder {
 
   /// Decodes [bits] into an [ArmShifterOperand].
   ArmShifterOperand decodeRegister(int bits) {
-    final p = _immediatePatterns.match(bits);
+    final p = _registerPatterns.match(bits);
     if (p == null) {
       _couldNotDecode(bits);
     }
