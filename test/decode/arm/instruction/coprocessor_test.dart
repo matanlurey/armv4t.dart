@@ -84,7 +84,25 @@ void main() {
   });
 
   // CCCC_1110_OOOO_NNNN_DDDD_PPPP_VVV0_MMMM
-  group('COPROCESSOR_DATA_OPERATION', () {});
+  group('COPROCESSOR_DATA_OPERATION', () {
+    int build(int o, int n, int d, int c, int p, int m) {
+      return encode([
+        '1110',
+        o.toBinaryPadded(4),
+        n.toBinaryPadded(4),
+        d.toBinaryPadded(4),
+        c.toBinaryPadded(4),
+        p.toBinaryPadded(3),
+        '0',
+        m.toBinaryPadded(4)
+      ]);
+    }
+
+    test('CDP', () {
+      final instruction = build(1, 2, 3, 4, 5, 6);
+      expect(decode(instruction), matchesASM(''));
+    });
+  });
 
   // CCCC_1110_OOOL_NNNN_DDDD_PPPP_VVV1_MMMM
   group('COPROCESSOR_REGISTER_TRANSFER', () {});
