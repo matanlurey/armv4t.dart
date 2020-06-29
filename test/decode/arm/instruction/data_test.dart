@@ -1,5 +1,6 @@
 import 'package:armv4t/src/decode/arm/printer.dart';
 import 'package:binary/binary.dart';
+import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 import '_common.dart';
@@ -403,47 +404,217 @@ void _testSingleDataTransfer() {
     );
   });
 
-  group('<Addressing Mode 2>', () {
+  group('STR <Addressing Mode 2>', () {
+    int build2({
+      int i = 0,
+      int p = 0,
+      int u = 0,
+      int b = 0,
+      int w = 0,
+      int l = 0,
+      @required int rN,
+      @required int rD,
+      @required int offset,
+    }) =>
+        build(
+          i,
+          p,
+          u,
+          b,
+          w,
+          l,
+          rN,
+          rD,
+          offset,
+        );
+
     group('<Immdiate Offset>', () {
-      test('', () {});
+      test('', () {
+        // [Rn, #+/-12bit_Offset]
+        expect(
+          decode(build2(
+            // Pre-index.
+            p: 1,
+            // No write-back.
+            w: 0,
+            // Immediate value.
+            i: 0,
+            // Other elements.
+            rD: 2,
+            rN: 4,
+            // Stored as an 8-bit value with a leading 4-bit rotation code.
+            // RRRR_IIII_IIII
+            offset: ('0000' '0111' '1010').parseBits(),
+          )),
+          matchesASM('STR R2, [R4, -#122]'),
+        );
+      });
 
-      test('Register offset', () {});
+      test('Register offset', () {
+        // [Rn, +/-Rm]
+        expect(
+          decode(build2(
+            // Pre-index.
+            p: 1,
+            // No write-back.
+            w: 0,
+            // Register value.
+            i: 1,
+            // Other elements.
+            rD: 2,
+            rN: 4,
+            // Stored as an 8-bit value with a leading 4-bit rotation code.
+            // RRRR_IIII_IIII
+            offset: ('0000' '0000' '1010').parseBits(),
+          )),
+          matchesASM('STR R2, [R4, -R10]'),
+        );
+      });
 
-      test('Scaled register offset', () {});
+      test('Scaled register offset', () {
+        // [Rn, +/-Rm, LSL #5bit_shift_imm] or [Rn, +/-Rm, RRX]
+        expect(
+          decode(build2(
+            // Pre-index.
+            p: 1,
+            // No write-back.
+            w: 0,
+            // Register value.
+            i: 1,
+            // Other elements.
+            rD: 2,
+            rN: 4,
+            // Stored as an 8-bit value with a leading 4-bit rotation code.
+            // RRRR_IIII_IIII
+            offset: ('1100' '0000' '1010').parseBits(),
+          )),
+          matchesASM('STR R2, [R4, -R10, LSL R12]'),
+        );
+      });
     });
 
     group('Pre-indexed offset', () {
-      test('Immediate', () {});
+      test('Immediate', () {
+        // [Rn, #+/-12bit_Offset]!
+        expect(
+          decode(build2(
+            // Pre-index.
+            p: 1,
+            // Write-back.
+            w: 1,
+            // Immediate value.
+            i: 0,
+            // Other elements.
+            rD: 2,
+            rN: 4,
+            // Stored as an 8-bit value with a leading 4-bit rotation code.
+            // RRRR_IIII_IIII
+            offset: ('0000' '0111' '1010').parseBits(),
+          )),
+          matchesASM('STR R2, [R4, -#122]!'),
+        );
+      });
 
-      test('Regsiter', () {});
+      test('Register', () {
+        // [Rn, +/-Rm]!
+        expect(
+          decode(build2(
+            // Pre-index.
+            p: 1,
+            // Write-back.
+            w: 1,
+            // Register value.
+            i: 1,
+            // Other elements.
+            rD: 2,
+            rN: 4,
+            // Stored as an 8-bit value with a leading 4-bit rotation code.
+            // RRRR_IIII_IIII
+            offset: ('0000' '0000' '1010').parseBits(),
+          )),
+          matchesASM('STR R2, [R4, -R10]!'),
+        );
+      });
 
-      test('Scaled regsiter', () {});
+      test('Scaled register', () {
+        // [Rn, +/-Rm, LSL #5bit_shift_imm] or [Rn, +/-Rm, RRX]!
+        expect(
+          decode(build2(
+            // Pre-index.
+            p: 1,
+            // Write-back.
+            w: 1,
+            // Register value.
+            i: 1,
+            // Other elements.
+            rD: 2,
+            rN: 4,
+            // Stored as an 8-bit value with a leading 4-bit rotation code.
+            // RRRR_IIII_IIII
+            offset: ('1100' '0000' '1010').parseBits(),
+          )),
+          matchesASM('STR R2, [R4, -R10, LSL R12]!'),
+        );
+      });
     });
 
     group('Post-indexed offset', () {
-      test('Immediate', () {});
+      test('Immediate', () {
+        // [Rn], #+/-12bit_Offset
+        expect(
+          decode(build2(
+            // Post-index.
+            p: 0,
+            // Immediate value.
+            i: 0,
+            // Other elements.
+            rD: 2,
+            rN: 4,
+            // Stored as an 8-bit value with a leading 4-bit rotation code.
+            // RRRR_IIII_IIII
+            offset: ('0000' '0111' '1010').parseBits(),
+          )),
+          matchesASM('STR R2, [R4], -#122'),
+        );
+      });
 
-      test('Regsiter', () {});
+      test('Register', () {
+        // [Rn], +/-Rm
+        expect(
+          decode(build2(
+            // Post-index.
+            p: 0,
+            // Register value.
+            i: 1,
+            // Other elements.
+            rD: 2,
+            rN: 4,
+            // Stored as an 8-bit value with a leading 4-bit rotation code.
+            // RRRR_IIII_IIII
+            offset: ('0000' '0000' '1010').parseBits(),
+          )),
+          matchesASM('STR R2, [R4], -R10'),
+        );
+      });
 
-      test('Scaled regsiter', () {});
-    });
-  });
-
-  group('<Addressing Mode 2P>', () {
-    group('<Immdiate Offset>', () {
-      test('', () {});
-
-      test('Register offset', () {});
-
-      test('Scaled register offset', () {});
-    });
-
-    group('Post-indexed offset', () {
-      test('Immediate', () {});
-
-      test('Regsiter', () {});
-
-      test('Scaled regsiter', () {});
+      test('Scaled register', () {
+        // [Rn], +/-Rm, LSL #5bit_shift_imm or [Rn, +/-Rm, RRX].
+        expect(
+          decode(build2(
+            // Post-index.
+            p: 0,
+            // Register value.
+            i: 1,
+            // Other elements.
+            rD: 2,
+            rN: 4,
+            // Stored as an 8-bit value with a leading 4-bit rotation code.
+            // RRRR_IIII_IIII
+            offset: ('1100' '0000' '1010').parseBits(),
+          )),
+          matchesASM('STR R2, [R4], -R10, LSL R12'),
+        );
+      });
     });
   });
 }

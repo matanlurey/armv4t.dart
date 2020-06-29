@@ -649,7 +649,7 @@ mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
     } else {
       result = '$result+';
     }
-    return '$result$_shifterOperand(immediateOffset, offset)]';
+    return '$result${_shifterOperand(immediateOffset, offset)}]';
   }
 
   String _addressingMode2$PreIndexedOffset(
