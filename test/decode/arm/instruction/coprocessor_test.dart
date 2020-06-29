@@ -100,10 +100,32 @@ void main() {
 
     test('CDP', () {
       final instruction = build(1, 2, 3, 4, 5, 6);
-      expect(decode(instruction), matchesASM(''));
+      expect(decode(instruction), matchesASM('CDP P4, 1, C3, C2, C6, 5'));
     });
   });
 
   // CCCC_1110_OOOL_NNNN_DDDD_PPPP_VVV1_MMMM
-  group('COPROCESSOR_REGISTER_TRANSFER', () {});
+  group('COPROCESSOR_REGISTER_TRANSFER', () {
+    int build(int o, int l, int n, int d, int p, int v, int m) {
+      return encode([
+        '1110',
+        o.toBinaryPadded(3) + l.toBinaryPadded(1),
+        n.toBinaryPadded(4),
+        d.toBinaryPadded(4),
+        p.toBinaryPadded(4),
+        v.toBinaryPadded(3) + '1',
+        m.toBinaryPadded(4),
+      ]);
+    }
+
+    test('MCR', () {
+      final instruction = build(1, 0, 3, 4, 5, 6, 7);
+      expect(decode(instruction), matchesASM('MCR P5, 1, R4, C3, C7'));
+    });
+
+    test('MRC', () {
+      final instruction = build(1, 1, 3, 4, 5, 6, 7);
+      expect(decode(instruction), matchesASM('MRC P5, 1, R4, C3, C7'));
+    });
+  });
 }
