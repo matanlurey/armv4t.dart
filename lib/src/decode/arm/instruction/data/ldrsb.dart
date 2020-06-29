@@ -21,25 +21,28 @@ class LDRSB extends ArmInstruction {
 
   final int u;
 
+  final int i;
+
   final int w;
+
+  final int baseRegister;
 
   final int sourceRegister;
 
-  final int destinationRegister;
+  final int addressingMode2HighNibble;
 
-  final int addressingMode1;
-
-  final int addressingMode2;
+  final int addressingMode2LowNibble;
 
   const LDRSB({
     @required int condition,
     @required this.p,
     @required this.u,
+    @required this.i,
     @required this.w,
+    @required this.baseRegister,
     @required this.sourceRegister,
-    @required this.destinationRegister,
-    @required this.addressingMode1,
-    @required this.addressingMode2,
+    @required this.addressingMode2HighNibble,
+    @required this.addressingMode2LowNibble,
   }) : super._(condition);
 
   @override

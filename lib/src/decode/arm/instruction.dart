@@ -67,7 +67,7 @@ abstract class ArmInstruction {
   @override
   String toString() {
     if (assertionsEnabled) {
-      return accept(const ArmInstructionPrinter());
+      return accept(ArmInstructionPrinter());
     } else {
       return super.toString();
     }
@@ -76,6 +76,8 @@ abstract class ArmInstruction {
 
 /// Further decodes an [ArmInstructionSet] into an [ArmInstruction].
 class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
+  const ArmDecoder();
+
   @override
   ArmInstruction visitDataProcessingOrPSRTransfer(
     DataProcessingOrPSRTransfer set, [
@@ -267,6 +269,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
         return ORR(
           condition: set.condition,
           i: set.i,
+          s: set.s,
           sourceRegister: set.registerN,
           destinationRegister: set.registerD,
           shifterOperand: set.operand2,
@@ -418,7 +421,67 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     void _,
   ]) {
     // LDRH, STRH, LDSRB, LDSRSH.
-    throw UnimplementedError();
+    if (set.l == 0) {
+      return STRH(
+        condition: set.condition,
+        p: set.p,
+        u: set.u,
+        i: 0,
+        w: set.w,
+        baseRegister: set.registerN,
+        destinationRegister: set.registerD,
+        addressingMode2HighNibble: 0,
+        addressingMode2LowNibble: set.registerM,
+      );
+    } else if (set.l == 1) {
+      // LDRH, LDSRB, LDSRSH
+      if (set.h == 0) {
+        // LDRSB
+        return LDRSB(
+          condition: set.condition,
+          p: set.p,
+          u: set.u,
+          i: 0,
+          w: set.w,
+          baseRegister: set.registerN,
+          sourceRegister: set.registerD,
+          addressingMode2HighNibble: 0,
+          addressingMode2LowNibble: set.registerM,
+        );
+      } else if (set.h == 1) {
+        // LDRH, LDSRSH
+        if (set.s == 0) {
+          // LDRH
+          return LDRH(
+            condition: set.condition,
+            p: set.p,
+            u: set.u,
+            i: 0,
+            w: set.w,
+            baseRegister: set.registerN,
+            sourceRegister: set.registerD,
+            addressingMode2HighNibble: 0,
+            addressingMode2LowNibble: set.registerM,
+          );
+        } else if (set.s == 1) {
+          // LDSRSH
+          return LDRSH(
+            condition: set.condition,
+            p: set.p,
+            u: set.u,
+            i: 0,
+            w: set.w,
+            baseRegister: set.registerN,
+            sourceRegister: set.registerD,
+            addressingMode2HighNibble: 0,
+            addressingMode2LowNibble: set.registerM,
+          );
+        }
+      }
+    }
+    throw StateError(
+      'Could not decode (L, H, S): ${set.l}, ${set.h}, ${set.s}',
+    );
   }
 
   @override
@@ -427,7 +490,67 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     void _,
   ]) {
     // LDRH, STRH, LDSRB, LDSRSH.
-    throw UnimplementedError();
+    if (set.l == 0) {
+      return STRH(
+        condition: set.condition,
+        p: set.p,
+        u: set.u,
+        i: 1,
+        w: set.w,
+        baseRegister: set.registerN,
+        destinationRegister: set.registerD,
+        addressingMode2HighNibble: set.offsetHighNibble,
+        addressingMode2LowNibble: set.offsetLowNibble,
+      );
+    } else if (set.l == 1) {
+      // LDRH, LDSRB, LDSRSH
+      if (set.h == 0) {
+        // LDRSB
+        return LDRSB(
+          condition: set.condition,
+          p: set.p,
+          u: set.u,
+          i: 1,
+          w: set.w,
+          baseRegister: set.registerN,
+          sourceRegister: set.registerD,
+          addressingMode2HighNibble: set.offsetHighNibble,
+          addressingMode2LowNibble: set.offsetLowNibble,
+        );
+      } else if (set.h == 1) {
+        // LDRH, LDSRSH
+        if (set.s == 0) {
+          // LDRH
+          return LDRH(
+            condition: set.condition,
+            p: set.p,
+            u: set.u,
+            i: 1,
+            w: set.w,
+            baseRegister: set.registerN,
+            sourceRegister: set.registerD,
+            addressingMode2HighNibble: set.offsetHighNibble,
+            addressingMode2LowNibble: set.offsetLowNibble,
+          );
+        } else if (set.s == 1) {
+          // LDSRSH
+          return LDRSH(
+            condition: set.condition,
+            p: set.p,
+            u: set.u,
+            i: 1,
+            w: set.w,
+            baseRegister: set.registerN,
+            sourceRegister: set.registerD,
+            addressingMode2HighNibble: set.offsetHighNibble,
+            addressingMode2LowNibble: set.offsetLowNibble,
+          );
+        }
+      }
+    }
+    throw StateError(
+      'Could not decode (L, H, S): ${set.l}, ${set.h}, ${set.s}',
+    );
   }
 
   @override
@@ -436,12 +559,55 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     void _,
   ]) {
     if (set.l == 0) {
-      throw UnimplementedError();
+      if (set.b == 0) {
+        return STR(
+          condition: set.condition,
+          i: set.i,
+          p: set.p,
+          u: set.u,
+          w: set.w,
+          destinationRegister: set.registerD,
+          sourceRegister: set.registerN,
+          addressingMode2Offset: set.offset,
+        );
+      } else if (set.b == 1) {
+        return STRB(
+          condition: set.condition,
+          i: set.i,
+          p: set.p,
+          u: set.u,
+          w: set.w,
+          destinationRegister: set.registerD,
+          sourceRegister: set.registerN,
+          addressingMode2Offset: set.offset,
+        );
+      }
     } else if (set.l == 1) {
-      throw UnimplementedError();
-    } else {
-      throw StateError('Unexpected L: ${set.l}');
+      if (set.b == 0) {
+        return LDR(
+          condition: set.condition,
+          i: set.i,
+          p: set.p,
+          u: set.u,
+          w: set.w,
+          destinationRegister: set.registerD,
+          sourceRegister: set.registerN,
+          addressingMode2Offset: set.offset,
+        );
+      } else if (set.b == 1) {
+        return LDRB(
+          condition: set.condition,
+          i: set.i,
+          p: set.p,
+          u: set.u,
+          w: set.w,
+          destinationRegister: set.registerD,
+          sourceRegister: set.registerN,
+          addressingMode2Offset: set.offset,
+        );
+      }
     }
+    throw StateError('Unexpected L or B: ${set.l}, ${set.b}');
   }
 
   @override
@@ -449,7 +615,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     Undefined set, [
     void _,
   ]) {
-    throw UnimplementedError();
+    throw UnimplementedError('TODO: Implement UND instruction.');
   }
 
   @override
@@ -463,7 +629,8 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
         p: set.p,
         u: set.u,
         w: set.w,
-        sourceRegister: set.registerN,
+        s: set.s,
+        baseRegister: set.registerN,
         registerList: set.regsiterList,
       );
     } else if (set.l == 1) {
@@ -472,7 +639,8 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
         p: set.p,
         u: set.u,
         w: set.w,
-        sourceRegister: set.registerN,
+        s: set.s,
+        baseRegister: set.registerN,
         registerList: set.regsiterList,
       );
     } else {
