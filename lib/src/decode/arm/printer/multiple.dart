@@ -20,22 +20,26 @@ mixin ArmLoadAndStoreMultiplePrintHelper {
     @required int upDownBit,
   }) {
     if (prePostIndexingBit == 0) {
-      // P = 0 (POST)
+      // P = 0
       if (upDownBit == 0) {
-        // U = 0 (DOWN)
-        return _incrementBefore;
+        // U = 0
+        // DA
+        return _decrementAfter;
       } else {
-        // U = 1 (UP)
+        // U = 1
+        // IA
         return _incrementAfter;
       }
     } else {
-      // P = 1 (PRE)
+      // P = 1
       if (upDownBit == 0) {
-        // U = 0 (DOWN)
+        // U = 0
+        // DB
         return _decrementBefore;
       } else {
-        // U = 1 (UP)
-        return _decrementAfter;
+        // U = 1
+        // IB
+        return _incrementBefore;
       }
     }
   }

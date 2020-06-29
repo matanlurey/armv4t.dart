@@ -93,7 +93,7 @@ void _testCPSRorSPSR() {
     final results = <String>[];
     for (int i = 0; i < 16; i++) {
       results.add(decode(build(1, 0x9, i, 0, 6)).accept(
-        const ArmInstructionPrinter(),
+        ArmInstructionPrinter(),
       ));
     }
     expect(results.toSet(), hasLength(16));
@@ -620,19 +620,146 @@ void _testSingleDataTransfer() {
 }
 
 void _testBlockDataTransfer() {
-  group('STM', () {
-    test('IB (Increment Before)', () {});
+  const increment = 1;
+  const decrement = 0;
+  const after = 0;
+  const before = 1;
 
-    test('IA (Increment After)', () {});
+  // CCCC_100P_USWL_NNNN_RRRR_RRRR_RRRR_RRRR
+  int build({
+    int p = 0,
+    int u = 0,
+    int s = 0,
+    int w = 0,
+    int l = 0,
+    @required int n,
+    @required int r,
+  }) {
+    return encode([
+      '100$p',
+      '$u$s$w$l',
+      n.toBinaryPadded(4),
+      r.toBinaryPadded(16),
+    ]);
+  }
 
-    test('DB (Decrement Before)', () {});
+  group('LDM', () {
+    test('IB (Increment Before)', () {
+      expect(
+        decode(build(
+          // Increment.
+          u: increment,
 
-    test('DA (Decrement After)', () {});
+          // Before.
+          p: before,
 
-    test('Stack operation', () {});
+          // Register.
+          n: 4,
 
-    test('Stack operation with user registers', () {});
+          // Register list.
+          r: '1000' '0000'.parseBits(),
+        )),
+        matchesASM('LDMIB R4, {R7}'),
+      );
+    });
+
+    test('IA (Increment After)', () {
+      expect(
+        decode(build(
+          // Increment.
+          u: increment,
+
+          // After.
+          p: after,
+
+          // Register.
+          n: 4,
+
+          // Register list.
+          r: '1000' '0000'.parseBits(),
+        )),
+        matchesASM('LDMIA R4, {R7}'),
+      );
+    });
+
+    test('DB (Decrement Before)', () {
+      expect(
+        decode(build(
+          // Decrement.
+          u: decrement,
+
+          // Before.
+          p: before,
+
+          // Register.
+          n: 4,
+
+          // Register list.
+          r: '1000' '0000'.parseBits(),
+        )),
+        matchesASM('LDMDB R4, {R7}'),
+      );
+    });
+
+    test('DA (Decrement After)', () {
+      expect(
+        decode(build(
+          // Decrement.
+          u: decrement,
+
+          // After.
+          p: after,
+
+          // Register.
+          n: 4,
+
+          // Register list.
+          r: '1000' '0000'.parseBits(),
+        )),
+        matchesASM('LDMDA R4, {R7}'),
+      );
+    });
+
+    test('... with user registers', () {
+      // LDM{cond}<a_mode4L> Rd{!}, <reglist>^
+      expect(
+        decode(build(
+          // Register.
+          n: 4,
+
+          // Save SPSR.
+          s: 1,
+
+          // Write-back.
+          w: 1,
+
+          // Register list.
+          r: '1000' '0000'.parseBits(),
+        )),
+        matchesASM('LDMDA R4!, {R7}^'),
+      );
+    });
   });
 
-  group('LDM', () {});
+  test('STM', () {
+    expect(
+      decode(build(
+        // Increment.
+        u: increment,
+
+        // Before.
+        p: before,
+
+        // Store
+        l: 1,
+
+        // Register.
+        n: 4,
+
+        // Register list.
+        r: '1000' '0000'.parseBits(),
+      )),
+      matchesASM('STMIB R4, {R7}'),
+    );
+  });
 }

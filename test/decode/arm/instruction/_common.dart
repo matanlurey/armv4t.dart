@@ -38,7 +38,7 @@ class _ArmAssemblyMatcher extends Matcher {
   bool matches(Object describe, Map<Object, Object> matchState) {
     if (describe is ArmInstruction) {
       final matcher = equals(_assembly);
-      final result = describe.accept(const ArmInstructionPrinter());
+      final result = describe.accept(ArmInstructionPrinter());
       return matcher.matches(result, matchState);
     } else {
       return false;

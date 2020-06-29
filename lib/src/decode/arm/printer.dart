@@ -32,7 +32,7 @@ class ArmInstructionPrinter
   final ShifterOperandDecoder _operandDecoder;
   final ShifterOperandPrinter _operandPrinter;
 
-  const ArmInstructionPrinter([
+  ArmInstructionPrinter([
     this._conditionDecoder = const ArmConditionDecoder(),
     this._conditionPrinter = const ArmConditionPrinter(),
     this._operandDecoder = const ShifterOperandDecoder(),
@@ -120,7 +120,7 @@ class ArmInstructionPrinter
     return ''
         'LDM${_cond(i)}$addressingMode '
         'R${i.baseRegister}${i.w == 1 ? '!' : ''}, '
-        '${describeRegisterList(i.registerList)}${i.s == 1 ? '^' : ''}';
+        '{${describeRegisterList(i.registerList)}}${i.s == 1 ? '^' : ''}';
   }
 
   @override
@@ -143,7 +143,7 @@ class ArmInstructionPrinter
     return ''
         'STM${_cond(i)}$addressingMode '
         'R${i.baseRegister}${i.w == 1 ? '!' : ''}, '
-        '${describeRegisterList(i.registerList)}${i.s == 1 ? '^' : ''}';
+        '{${describeRegisterList(i.registerList)}}${i.s == 1 ? '^' : ''}';
   }
 
   @override

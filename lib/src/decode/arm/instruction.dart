@@ -67,7 +67,7 @@ abstract class ArmInstruction {
   @override
   String toString() {
     if (assertionsEnabled) {
-      return accept(const ArmInstructionPrinter());
+      return accept(ArmInstructionPrinter());
     } else {
       return super.toString();
     }
