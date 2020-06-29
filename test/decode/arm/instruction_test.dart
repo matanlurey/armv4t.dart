@@ -85,7 +85,7 @@ void main() {
           decode(encode(1, 0, 0, 2, 4, 6)),
           _matchesASM('AND R4, R2, #6'),
         );
-      });
+      }, solo: true);
     });
 
     test('MRS <CPSR>', () {

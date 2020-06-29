@@ -76,6 +76,8 @@ abstract class ArmInstruction {
 
 /// Further decodes an [ArmInstructionSet] into an [ArmInstruction].
 class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
+  const ArmDecoder();
+
   @override
   ArmInstruction visitDataProcessingOrPSRTransfer(
     DataProcessingOrPSRTransfer set, [

@@ -1,8 +1,11 @@
 import 'package:armv4t/src/decode/arm/condition.dart';
+import 'package:armv4t/src/decode/arm/operands.dart';
 import 'package:binary/binary.dart';
+import 'package:meta/meta.dart';
 
 import 'instruction.dart';
 
+/// Converts a [Condition] instance into its assembly-based [String] equivalent.
 class ArmConditionPrinter implements ArmConditionVisitor<String, void> {
   const ArmConditionPrinter();
 
@@ -55,13 +58,20 @@ class ArmConditionPrinter implements ArmConditionVisitor<String, void> {
   String visitNV([void _]) => 'NV';
 }
 
-class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
+/// Converts an [ArmInstruction] into its assembly-based [String] equivalent.
+class ArmInstructionPrinter
+    with ArmLoadAndStoreCoprocessorPrintHelper
+    implements ArmInstructionVisitor<String, void> {
   final ArmConditionDecoder _conditionDecoder;
   final ArmConditionPrinter _conditionPrinter;
+  final ShifterOperandDecoder _operandDecoder;
+  final ShifterOperandPrinter _operandPrinter;
 
   const ArmInstructionPrinter([
     this._conditionDecoder = const ArmConditionDecoder(),
     this._conditionPrinter = const ArmConditionPrinter(),
+    this._operandDecoder = const ShifterOperandDecoder(),
+    this._operandPrinter = const ShifterOperandPrinter(),
   ]);
 
   String _cond(ArmInstruction i) {
@@ -88,6 +98,16 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       result.write('F');
     }
     return result.toString();
+  }
+
+  String _operand(int immediate, int bits) {
+    ArmShifterOperand operand;
+    if (immediate == 0) {
+      operand = _operandDecoder.decodeImmediate(bits);
+    } else {
+      operand = _operandDecoder.decodeRegister(bits);
+    }
+    return operand.accept(_operandPrinter);
   }
 
   @override
@@ -165,7 +185,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
   ]) =>
       'MOV${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitMRS(
@@ -192,7 +212,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
   ]) =>
       'MVN${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitSTM(
@@ -250,7 +270,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'AND${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitBIC(
@@ -260,7 +280,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'BIC${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitCMN(
@@ -270,7 +290,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'CMN${_cond(i)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitCMP(
@@ -280,7 +300,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'CMP${_cond(i)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitEOR(
@@ -290,7 +310,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'EOR${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitORR(
@@ -300,7 +320,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'ORR${_cond(i)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitTEQ(
@@ -310,7 +330,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'TEQ${_cond(i)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitTST(
@@ -320,7 +340,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'TST${_cond(i)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitADC(
@@ -330,7 +350,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'ADC${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitADD(
@@ -340,7 +360,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'ADD${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitMLA(
@@ -371,7 +391,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'RSB${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitRSC(
@@ -381,7 +401,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'RSC${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitSBC(
@@ -391,7 +411,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'SBC${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitSUB(
@@ -401,7 +421,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'SUB${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_i(i.i, i.shifterOperand)}';
+      '${_operand(i.i, i.shifterOperand)}';
 
   @override
   String visitSMLAL(
@@ -460,7 +480,7 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
     void _,
   ]) =>
       'CDP${_cond(i)} '
-      'P#${i.coprocessorNumber}, '
+      'P${i.coprocessorNumber}, '
       '${i.coprocessorOpCode}, '
       'C${i.coprocessorDestinationRegister}, '
       'C${i.coprocessorOperandRegister1}, '
@@ -472,10 +492,16 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
     LDC i, [
     void _,
   ]) =>
-      'LDP${_cond(i)}${i.n == 1 ? 'L' : ''} '
-      'P#${i.coprocessorNumber}, '
+      'LDC${_cond(i)}${i.n == 1 ? 'L' : ''} '
+      'P${i.coprocessorNumber}, '
       'C${i.coprocessorSourceOrDestinationRegister}, '
-      '${i.unsigned8BitImmediateOffset}';
+      '${_addressingMode5(
+        i.unsigned8BitImmediateOffset,
+        i.baseRegister,
+        prePostIndexingBit: i.p,
+        upDownBit: i.u,
+        writeBackBit: i.w,
+      )}';
 
   @override
   String visitSTC(
@@ -483,9 +509,15 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
     void _,
   ]) =>
       'STC${_cond(i)}${i.n == 1 ? 'L' : ''} '
-      'P#${i.coprocessorNumber}, '
+      'P${i.coprocessorNumber}, '
       'C${i.coprocessorSourceOrDestinationRegister}, '
-      '[R${i.baseRegister}, #${i.unsigned8BitImmediateOffset}]';
+      '${_addressingMode5(
+        i.unsigned8BitImmediateOffset,
+        i.baseRegister,
+        prePostIndexingBit: i.p,
+        upDownBit: i.u,
+        writeBackBit: i.w,
+      )}';
 
   @override
   String visitMCR(
@@ -510,4 +542,56 @@ class ArmInstructionPrinter implements ArmInstructionVisitor<String, void> {
       'R${i.destinationRegister}, '
       'C${i.coprocessorSourceRegister}, '
       'C${i.coprocessorOperandRegister}';
+}
+
+/// Encapsulates code to print coprocessor data transfers (`LDC`, `STC`).
+mixin ArmLoadAndStoreCoprocessorPrintHelper {
+  /// Converts an [offset] into an assembler string.
+  ///
+  /// [offset], or _addressing mode 5_ as specified in ARM, can be:
+  ///
+  /// 1. An expression which generates an address: `<expression>`.
+  ///    The assembler will attempt to generate an instruction using the program
+  ///    counter (`PC`) as a base and a corrected immediate offset to address
+  ///    the location by evaluating the expression. This will be a PC-relative,
+  ///    pre-indexed address. If the address is out of range, and error will be
+  ///    generated.
+  ///
+  ///    Format: `[Rn, #+/-(8bit_Offset*4)]`
+  ///
+  /// 2. A pre-indexed addressing specification:
+  ///    - `[Rn]`: Offset of zero.
+  ///    - `[Rn, <#expression>]{!}`: Offset of `<expression>` bytes.
+  ///
+  ///    Format: `[Rn, #+/-(8bit_Offset*4)]!`
+  ///
+  /// 3. A post-indexed addressing specification:
+  ///   - `[Rn], <#expression>`: Offset of `<expression>` bytes.
+  ///
+  ///   Format: `[Rn], #+/-(8bit_Offset*4)`
+  ///
+  /// > NOTE: If `Rn` is `R15`, the assembler will subtract 8 from the offset
+  /// > value to allow for ARM7TDI pipelining.
+  String _addressingMode5(
+    int offset,
+    int register, {
+    @required int prePostIndexingBit,
+    @required int upDownBit,
+    @required int writeBackBit,
+  }) {
+    final prefix = '#${upDownBit == 0 ? '-' : '+'}';
+    if (prePostIndexingBit == 0) {
+      if (writeBackBit == 0) {
+        // 1: [Rn, #+/-(Offset)]
+        return '[R$register, $prefix$offset]';
+      } else {
+        // 2: [Rn, #+/-(8bit_Offset*4)]!
+        return '[R$register, $prefix$offset]!';
+      }
+    } else {
+      // 3: [Rn], #+/-(8bit_Offset*4)
+      assert(writeBackBit == 0);
+      return '[R$register], $prefix$offset';
+    }
+  }
 }
