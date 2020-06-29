@@ -20,22 +20,28 @@ class STRH extends ArmInstruction {
 
   final int u;
 
+  final int i;
+
   final int w;
 
-  final int sourceRegister;
+  final int baseRegister;
 
   final int destinationRegister;
 
-  final int addressingMode;
+  final int addressingMode2HighNibble;
+
+  final int addressingMode2LowNibble;
 
   const STRH({
     @required int condition,
     @required this.p,
     @required this.u,
+    @required this.i,
     @required this.w,
-    @required this.sourceRegister,
+    @required this.baseRegister,
     @required this.destinationRegister,
-    @required this.addressingMode,
+    @required this.addressingMode2HighNibble,
+    @required this.addressingMode2LowNibble,
   }) : super._(condition);
 
   @override

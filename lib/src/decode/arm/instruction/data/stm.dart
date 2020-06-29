@@ -57,13 +57,19 @@ part of '../../instruction.dart';
 /// > them is for use in conjunction with exception processing, and is not
 /// > described here.
 class STM extends ArmInstruction {
+  /// Pre/Post indexing bit.
   final int p;
 
+  /// Up/Down bit.
   final int u;
 
+  /// Write-back bit.
   final int w;
 
-  final int sourceRegister;
+  /// PSR & force user bit.
+  final int s;
+
+  final int baseRegister;
 
   final int registerList;
 
@@ -72,7 +78,8 @@ class STM extends ArmInstruction {
     @required this.p,
     @required this.u,
     @required this.w,
-    @required this.sourceRegister,
+    @required this.s,
+    @required this.baseRegister,
     @required this.registerList,
   }) : super._(condition);
 
