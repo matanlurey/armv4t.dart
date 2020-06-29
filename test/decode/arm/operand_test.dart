@@ -81,16 +81,56 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, LSL R1'));
+    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, LSR R1'));
   });
 
-  test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_REGISTER', () {});
+  test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_REGISTER', () {
+    int encode(int s, int m) {
+      return [
+        s.toBinaryPadded(4),
+        '0101',
+        m.toBinaryPadded(4),
+      ].join('').parseBits();
+    }
 
-  test('REGISTER_OPERAND_ROTATE_RIGHT_BY_IMMEDIATE', () {});
+    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, ASR R1'));
+  });
 
-  test('REGISTER_OPERAND_ROTATE_RIGHT_BY_REGISTER', () {});
+  test('REGISTER_OPERAND_ROTATE_RIGHT_BY_IMMEDIATE', () {
+    int encode(int s, int m) {
+      return [
+        s.toBinaryPadded(5),
+        '110',
+        m.toBinaryPadded(4),
+      ].join('').parseBits();
+    }
 
-  test('REGISTER_OPERAND_ROTATE_RIGHT_WITH_EXTEND', () {});
+    expect(decodeImmediate(encode(7, 1)), _matchesASM('R1, ROR #7'));
+  });
+
+  test('REGISTER_OPERAND_ROTATE_RIGHT_BY_REGISTER', () {
+    int encode(int s, int m) {
+      return [
+        s.toBinaryPadded(4),
+        '0111',
+        m.toBinaryPadded(4),
+      ].join('').parseBits();
+    }
+
+    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, ROR R1'));
+  });
+
+  test('REGISTER_OPERAND_ROTATE_RIGHT_WITH_EXTEND', () {
+    int encode(int m) {
+      return [
+        '0000',
+        '0110',
+        m.toBinaryPadded(4),
+      ].join('').parseBits();
+    }
+
+    expect(decodeRegister(encode(2)), _matchesASM('R2, RRX'));
+  });
 }
 
 const _printer = ShifterOperandPrinter();
