@@ -509,7 +509,8 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
         p: set.p,
         u: set.u,
         w: set.w,
-        sourceRegister: set.registerN,
+        s: set.s,
+        baseRegister: set.registerN,
         registerList: set.regsiterList,
       );
     } else if (set.l == 1) {
@@ -518,7 +519,8 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
         p: set.p,
         u: set.u,
         w: set.w,
-        sourceRegister: set.registerN,
+        s: set.s,
+        baseRegister: set.registerN,
         registerList: set.regsiterList,
       );
     } else {

@@ -620,5 +620,19 @@ void _testSingleDataTransfer() {
 }
 
 void _testBlockDataTransfer() {
-  // TODO: Test.
+  group('STM', () {
+    test('IB (Increment Before)', () {});
+
+    test('IA (Increment After)', () {});
+
+    test('DB (Decrement Before)', () {});
+
+    test('DA (Decrement After)', () {});
+
+    test('Stack operation', () {});
+
+    test('Stack operation with user registers', () {});
+  });
+
+  group('LDM', () {});
 }

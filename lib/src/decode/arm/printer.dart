@@ -1,3 +1,4 @@
+import 'package:armv4t/src/decode/common.dart' as common;
 import 'package:armv4t/src/decode/arm/condition.dart';
 import 'package:armv4t/src/decode/arm/operands.dart';
 import 'package:binary/binary.dart';
@@ -5,65 +6,27 @@ import 'package:meta/meta.dart';
 
 import 'instruction.dart';
 
-/// Converts a [Condition] instance into its assembly-based [String] equivalent.
-class ArmConditionPrinter implements ArmConditionVisitor<String, void> {
-  const ArmConditionPrinter();
-
-  @override
-  String visitEQ([void _]) => 'EQ';
-
-  @override
-  String visitNE([void _]) => 'NE';
-
-  @override
-  String visitCS$HS([void _]) => 'CS';
-
-  @override
-  String visitCC$LO([void _]) => 'CC';
-
-  @override
-  String visitMI([void _]) => 'MI';
-
-  @override
-  String visitPL([void _]) => 'PL';
-
-  @override
-  String visitVS([void _]) => 'VS';
-
-  @override
-  String visitVC([void _]) => 'VC';
-
-  @override
-  String visitHI([void _]) => 'HI';
-
-  @override
-  String visitLS([void _]) => 'LS';
-
-  @override
-  String visitGE([void _]) => 'GE';
-
-  @override
-  String visitLT([void _]) => 'LT';
-
-  @override
-  String visitGT([void _]) => 'GT';
-
-  @override
-  String visitLE([void _]) => 'LE';
-
-  @override
-  String visitAL([void _]) => '';
-
-  @override
-  String visitNV([void _]) => 'NV';
-}
+part 'printer/condition.dart';
+part 'printer/coprocessor.dart';
+part 'printer/multiple.dart';
+part 'printer/word_or_unsigned_byte.dart';
 
 /// Converts an [ArmInstruction] into its assembly-based [String] equivalent.
 class ArmInstructionPrinter
     with
         ArmLoadAndStoreWordOrUnsignedBytePrintHelper,
+        ArmLoadAndStoreMultiplePrintHelper,
         ArmLoadAndStoreCoprocessorPrintHelper
     implements ArmInstructionVisitor<String, void> {
+  @visibleForTesting
+  static String describeRegisterList(int registerList, [String suffix]) {
+    return common.describeRegisterList(
+      registerList,
+      length: 16,
+      suffix: suffix,
+    );
+  }
+
   final ArmConditionDecoder _conditionDecoder;
   final ArmConditionPrinter _conditionPrinter;
   final ShifterOperandDecoder _operandDecoder;
@@ -141,8 +104,47 @@ class ArmInstructionPrinter
   String visitLDM(
     LDM i, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    // <LDM|STM>{cond}<FD|ED|FA|EA|IA|IB|DA|DB> Rn{!},<Rlist>{^}
+    //
+    // The mneumonics of the stack operators instead of the normal operators are
+    // apparently optional (aliases in ARM assembly) and there does not appear
+    // to be a way to determine whether this instruction is intended to be a
+    // stack operation or not (at least not based on a bit value).
+    //
+    // If there is, we should update this code to be dynamic.
+    final addressingMode = _addressingMode4L(
+      prePostIndexingBit: i.p,
+      upDownBit: i.u,
+    );
+    return ''
+        'LDM${_cond(i)}$addressingMode '
+        'R${i.baseRegister}${i.w == 1 ? '!' : ''}, '
+        '${describeRegisterList(i.registerList)}${i.s == 1 ? '^' : ''}';
+  }
+
+  @override
+  String visitSTM(
+    STM i, [
+    void _,
+  ]) {
+    // <LDM|STM>{cond}<FD|ED|FA|EA|IA|IB|DA|DB> Rn{!},<Rlist>{^}
+    //
+    // The mneumonics of the stack operators instead of the normal operators are
+    // apparently optional (aliases in ARM assembly) and there does not appear
+    // to be a way to determine whether this instruction is intended to be a
+    // stack operation or not (at least not based on a bit value).
+    //
+    // If there is, we should update this code to be dynamic.
+    final addressingMode = _addressingMode4L(
+      prePostIndexingBit: i.p,
+      upDownBit: i.u,
+    );
+    return ''
+        'STM${_cond(i)}$addressingMode '
+        'R${i.baseRegister}${i.w == 1 ? '!' : ''}, '
+        '${describeRegisterList(i.registerList)}${i.s == 1 ? '^' : ''}';
+  }
 
   @override
   String visitSTR(
@@ -278,13 +280,6 @@ class ArmInstructionPrinter
       'MVN${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       '${_shifterOperand(i.i, i.shifterOperand)}';
-
-  @override
-  String visitSTM(
-    STM i, [
-    void _,
-  ]) =>
-      throw UnimplementedError();
 
   @override
   String visitSTRH(
@@ -593,162 +588,4 @@ class ArmInstructionPrinter
       'R${i.destinationRegister}, '
       'C${i.coprocessorSourceRegister}, '
       'C${i.coprocessorOperandRegister}';
-}
-
-/// Encapsulates code to print instructions that use addressing mode 2.
-mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
-  /// Provide a way to encode a shifter operand.
-  @visibleForOverriding
-  String _shifterOperand(int immediate, int bits);
-
-  /// Converst and [offset] into an assembler string.
-  String _addressingMode2(
-    int offset,
-    int register, {
-    @required int immediateOffset,
-    @required int prePostIndexingBit,
-    @required int upDownBit,
-    @required int writeBackBit,
-  }) {
-    if (prePostIndexingBit == 0) {
-      return _addressingMode2$PostIndexedOffset(
-        offset,
-        register,
-        immediateOffset: immediateOffset,
-        upDownBit: upDownBit,
-      );
-    } else {
-      // PRE.
-      if (writeBackBit == 0) {
-        return _addressingMode2$ImmediateOffset(
-          offset,
-          register,
-          immediateOffset: immediateOffset,
-          upDownBit: upDownBit,
-        );
-      } else {
-        return _addressingMode2$PreIndexedOffset(
-          offset,
-          register,
-          immediateOffset: immediateOffset,
-          upDownBit: upDownBit,
-        );
-      }
-    }
-  }
-
-  String _addressingMode2$ImmediateOffset(
-    int offset,
-    int register, {
-    @required int immediateOffset,
-    @required int upDownBit,
-  }) {
-    var result = '[R$register, ';
-    if (upDownBit == 0) {
-      result = '$result-';
-    } else {
-      result = '$result+';
-    }
-    return '$result${_shifterOperand(immediateOffset, offset)}]';
-  }
-
-  String _addressingMode2$PreIndexedOffset(
-    int offset,
-    int register, {
-    @required int immediateOffset,
-    @required int upDownBit,
-  }) {
-    final result = _addressingMode2$ImmediateOffset(
-      offset,
-      register,
-      immediateOffset: immediateOffset,
-      upDownBit: upDownBit,
-    );
-    return '$result!';
-  }
-
-  String _addressingMode2$PostIndexedOffset(
-    int offset,
-    int register, {
-    @required int immediateOffset,
-    @required int upDownBit,
-  }) {
-    final op = _shifterOperand(immediateOffset, offset);
-    if (op.endsWith('RRX')) {
-      return _addressingMode2$PostIndexedOffset$RRX(
-        register,
-        op,
-        upDownBit: upDownBit,
-      );
-    } else {
-      var result = '[R$register], ';
-      if (upDownBit == 0) {
-        result = '$result-';
-      } else {
-        result = '$result+';
-      }
-      return '$result$op';
-    }
-  }
-
-  String _addressingMode2$PostIndexedOffset$RRX(
-    int register,
-    String offset, {
-    @required int upDownBit,
-  }) {
-    final prefix = upDownBit == 0 ? '-' : '+';
-    return '[R$register, $prefix$offset]';
-  }
-}
-
-/// Encapsulates code to print coprocessor data transfers (`LDC`, `STC`).
-mixin ArmLoadAndStoreCoprocessorPrintHelper {
-  /// Converts an [offset] into an assembler string.
-  ///
-  /// [offset], or _addressing mode 5_ as specified in ARM, can be:
-  ///
-  /// 1. An expression which generates an address: `<expression>`.
-  ///    The assembler will attempt to generate an instruction using the program
-  ///    counter (`PC`) as a base and a corrected immediate offset to address
-  ///    the location by evaluating the expression. This will be a PC-relative,
-  ///    pre-indexed address. If the address is out of range, and error will be
-  ///    generated.
-  ///
-  ///    Format: `[Rn, #+/-(8bit_Offset*4)]`
-  ///
-  /// 2. A pre-indexed addressing specification:
-  ///    - `[Rn]`: Offset of zero.
-  ///    - `[Rn, <#expression>]{!}`: Offset of `<expression>` bytes.
-  ///
-  ///    Format: `[Rn, #+/-(8bit_Offset*4)]!`
-  ///
-  /// 3. A post-indexed addressing specification:
-  ///   - `[Rn], <#expression>`: Offset of `<expression>` bytes.
-  ///
-  ///   Format: `[Rn], #+/-(8bit_Offset*4)`
-  ///
-  /// > NOTE: If `Rn` is `R15`, the assembler will subtract 8 from the offset
-  /// > value to allow for ARM7TDI pipelining.
-  String _addressingMode5(
-    int offset,
-    int register, {
-    @required int prePostIndexingBit,
-    @required int upDownBit,
-    @required int writeBackBit,
-  }) {
-    final prefix = '#${upDownBit == 0 ? '-' : '+'}';
-    if (prePostIndexingBit == 0) {
-      if (writeBackBit == 0) {
-        // 1: [Rn, #+/-(Offset)]
-        return '[R$register, $prefix$offset]';
-      } else {
-        // 2: [Rn, #+/-(8bit_Offset*4)]!
-        return '[R$register, $prefix$offset]!';
-      }
-    } else {
-      // 3: [Rn], #+/-(8bit_Offset*4)
-      assert(writeBackBit == 0);
-      return '[R$register], $prefix$offset';
-    }
-  }
 }
