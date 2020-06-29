@@ -269,6 +269,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
         return ORR(
           condition: set.condition,
           i: set.i,
+          s: set.s,
           sourceRegister: set.registerN,
           destinationRegister: set.registerD,
           shifterOperand: set.operand2,

@@ -317,7 +317,7 @@ class ArmInstructionPrinter
     ORR i, [
     void _,
   ]) =>
-      'ORR${_cond(i)} '
+      'ORR${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_operand(i.i, i.shifterOperand)}';
