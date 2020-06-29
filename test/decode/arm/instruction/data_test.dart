@@ -26,6 +26,11 @@ enum _OpCode {
 void main() {
   _testCPSRorSPSR();
   _testLogicAndMath();
+  _testSingleDataSwap();
+  _testHalfwordDataTransferRegisterOffset();
+  _testHalfwordDataTransferImmediateOffset();
+  _testSingleDataTransfer();
+  _testBlockDataTransfer();
 }
 
 void _testCPSRorSPSR() {
@@ -319,4 +324,130 @@ void _testLogicAndMath() {
       );
     });
   });
+}
+
+void _testSingleDataSwap() {
+  // CCCC_0001_0B00_NNNN_DDDD_0000_1001_MMMM
+  int build(int b, int n, int d, int m) {
+    return encode([
+      '0001',
+      '0${b}00',
+      n.toBinaryPadded(4),
+      d.toBinaryPadded(4),
+      '0000',
+      '1001',
+      m.toBinaryPadded(4),
+    ]);
+  }
+
+  test('SWP', () {
+    expect(
+      decode(build(0, 2, 4, 6)),
+      matchesASM('SWP R2, R4, [R6]'),
+    );
+  });
+
+  test('SWPB', () {
+    expect(
+      decode(build(1, 2, 4, 6)),
+      matchesASM('SWPB R2, R4, [R6]'),
+    );
+  });
+}
+
+void _testHalfwordDataTransferRegisterOffset() {
+  // TODO: Test.
+}
+
+void _testHalfwordDataTransferImmediateOffset() {
+  // TODO: Test.
+}
+
+void _testSingleDataTransfer() {
+  // CCCC_01IP_UBWL_NNNN_DDDD_OOOO_OOOO_OOOO
+  int build(int i, int p, int u, int b, int w, int l, int n, int d, int o) {
+    return encode([
+      '01$i$p',
+      '$u$b$w$l',
+      n.toBinaryPadded(4),
+      d.toBinaryPadded(4),
+      o.toBinaryPadded(12),
+    ]);
+  }
+
+  test('STR', () {
+    expect(
+      decode(build(0, 0, 0, 0, 0, 0, 2, 4, 6)),
+      matchesASM('STR R4, [R2], -R6, LSL #0'),
+    );
+  });
+
+  test('STRB', () {
+    expect(
+      decode(build(0, 0, 0, 1, 0, 0, 2, 4, 6)),
+      matchesASM('STRB R4, [R2], -R6, LSL #0'),
+    );
+  });
+
+  test('LDR', () {
+    expect(
+      decode(build(0, 0, 0, 0, 0, 1, 2, 4, 6)),
+      matchesASM('LDR R4, [R2], -R6, LSL #0'),
+    );
+  });
+
+  test('LDRB', () {
+    expect(
+      decode(build(0, 0, 0, 1, 0, 1, 2, 4, 6)),
+      matchesASM('LDRB R4, [R2], -R6, LSL #0'),
+    );
+  });
+
+  group('<Addressing Mode 2>', () {
+    group('<Immdiate Offset>', () {
+      test('', () {});
+
+      test('Register offset', () {});
+
+      test('Scaled register offset', () {});
+    });
+
+    group('Pre-indexed offset', () {
+      test('Immediate', () {});
+
+      test('Regsiter', () {});
+
+      test('Scaled regsiter', () {});
+    });
+
+    group('Post-indexed offset', () {
+      test('Immediate', () {});
+
+      test('Regsiter', () {});
+
+      test('Scaled regsiter', () {});
+    });
+  });
+
+  group('<Addressing Mode 2P>', () {
+    group('<Immdiate Offset>', () {
+      test('', () {});
+
+      test('Register offset', () {});
+
+      test('Scaled register offset', () {});
+    });
+
+    group('Post-indexed offset', () {
+      test('Immediate', () {});
+
+      test('Regsiter', () {});
+
+      test('Scaled regsiter', () {});
+    });
+  });
+}
+
+void _testBlockDataTransfer() {
+  // TODO: Test.
 }

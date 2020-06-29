@@ -19,19 +19,24 @@ part of '../../instruction.dart';
 ///     Rn <- end_address
 /// ```
 class LDR extends ArmInstruction {
+  /// Immediate offset.
   final int i;
 
+  /// Pre/Post indexing bit.
   final int p;
 
+  /// Up/Down bit.
   final int u;
 
+  /// Write-back bit.
   final int w;
 
   final int sourceRegister;
 
   final int destinationRegister;
 
-  final int addressingMode;
+  /// Addressing mode "2" offset.
+  final int addressingMode2Offset;
 
   const LDR({
     @required int condition,
@@ -41,7 +46,7 @@ class LDR extends ArmInstruction {
     @required this.w,
     @required this.sourceRegister,
     @required this.destinationRegister,
-    @required this.addressingMode,
+    @required this.addressingMode2Offset,
   }) : super._(condition);
 
   @override

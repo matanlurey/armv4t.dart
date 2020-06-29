@@ -438,7 +438,6 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     SingleDataTransfer set, [
     void _,
   ]) {
-    // TODO: Determine how P, U, W are assembled.
     if (set.l == 0) {
       if (set.b == 0) {
         return STR(
@@ -449,7 +448,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
           w: set.w,
           destinationRegister: set.registerD,
           sourceRegister: set.registerN,
-          addressingMode: set.offset,
+          addressingMode2Offset: set.offset,
         );
       } else if (set.b == 1) {
         return STRB(
@@ -460,7 +459,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
           w: set.w,
           destinationRegister: set.registerD,
           sourceRegister: set.registerN,
-          addressingMode: set.offset,
+          addressingMode2Offset: set.offset,
         );
       }
     } else if (set.l == 1) {
@@ -473,7 +472,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
           w: set.w,
           destinationRegister: set.registerD,
           sourceRegister: set.registerN,
-          addressingMode: set.offset,
+          addressingMode2Offset: set.offset,
         );
       } else if (set.b == 1) {
         return LDRB(
@@ -484,7 +483,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
           w: set.w,
           destinationRegister: set.registerD,
           sourceRegister: set.registerN,
-          addressingMode: set.offset,
+          addressingMode2Offset: set.offset,
         );
       }
     }
