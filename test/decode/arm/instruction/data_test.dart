@@ -117,28 +117,28 @@ void _testLogicAndMath() {
   group('[S = 1]', () {
     test('TST', () {
       expect(
-        decode(build(1, _OpCode.TST.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.TST.index, 1, 2, 4, 6)),
         matchesASM('TST R4, R2, R6'),
       );
     });
 
     test('TEQ', () {
       expect(
-        decode(build(1, _OpCode.TEQ.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.TEQ.index, 1, 2, 4, 6)),
         matchesASM('TEQ R4, R2, R6'),
       );
     });
 
     test('CMP', () {
       expect(
-        decode(build(1, _OpCode.CMP.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.CMP.index, 1, 2, 4, 6)),
         matchesASM('CMP R4, R2, R6'),
       );
     });
 
     test('CMN', () {
       expect(
-        decode(build(1, _OpCode.CMN.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.CMN.index, 1, 2, 4, 6)),
         matchesASM('CMN R4, R2, R6'),
       );
     });
@@ -147,84 +147,84 @@ void _testLogicAndMath() {
   group('[S = 0]', () {
     test('AND', () {
       expect(
-        decode(build(1, _OpCode.AND.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.AND.index, 0, 2, 4, 6)),
         matchesASM('AND R4, R2, R6'),
       );
     });
 
     test('EOR', () {
       expect(
-        decode(build(1, _OpCode.EOR.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.EOR.index, 0, 2, 4, 6)),
         matchesASM('EOR R4, R2, R6'),
       );
     });
 
     test('SUB', () {
       expect(
-        decode(build(1, _OpCode.SUB.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.SUB.index, 0, 2, 4, 6)),
         matchesASM('SUB R4, R2, R6'),
       );
     });
 
     test('RSB', () {
       expect(
-        decode(build(1, _OpCode.RSB.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.RSB.index, 0, 2, 4, 6)),
         matchesASM('RSB R4, R2, R6'),
       );
     });
 
     test('ADD', () {
       expect(
-        decode(build(1, _OpCode.ADD.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.ADD.index, 0, 2, 4, 6)),
         matchesASM('ADD R4, R2, R6'),
       );
     });
 
     test('ADC', () {
       expect(
-        decode(build(1, _OpCode.ADC.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.ADC.index, 0, 2, 4, 6)),
         matchesASM('ADC R4, R2, R6'),
       );
     });
 
     test('SBC', () {
       expect(
-        decode(build(1, _OpCode.SBC.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.SBC.index, 0, 2, 4, 6)),
         matchesASM('SBC R4, R2, R6'),
       );
     });
 
     test('RSC', () {
       expect(
-        decode(build(1, _OpCode.RSC.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.RSC.index, 0, 2, 4, 6)),
         matchesASM('RSC R4, R2, R6'),
       );
     });
 
     test('ORR', () {
       expect(
-        decode(build(1, _OpCode.ORR.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.ORR.index, 0, 2, 4, 6)),
         matchesASM('ORR R4, R2, R6'),
       );
     });
 
     test('MOV', () {
       expect(
-        decode(build(1, _OpCode.MOV.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.MOV.index, 0, 2, 4, 6)),
         matchesASM('MOV R4, R6'),
       );
     });
 
     test('BIC', () {
       expect(
-        decode(build(1, _OpCode.BIC.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.BIC.index, 0, 2, 4, 6)),
         matchesASM('BIC R4, R2, R6'),
       );
     });
 
     test('MVN', () {
       expect(
-        decode(build(1, _OpCode.MVN.index, 0, 2, 4, 6)),
+        decode(build(0, _OpCode.MVN.index, 0, 2, 4, 6)),
         matchesASM('MVN R4, R6'),
       );
     });
@@ -233,95 +233,95 @@ void _testLogicAndMath() {
   group('[S = 1]', () {
     test('ANDS', () {
       expect(
-        decode(build(1, _OpCode.AND.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.AND.index, 1, 2, 4, 6)),
         matchesASM('ANDS R4, R2, R6'),
       );
     });
 
     test('EORS', () {
       expect(
-        decode(build(1, _OpCode.EOR.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.EOR.index, 1, 2, 4, 6)),
         matchesASM('EORS R4, R2, R6'),
       );
     });
 
     test('SUBS', () {
       expect(
-        decode(build(1, _OpCode.SUB.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.SUB.index, 1, 2, 4, 6)),
         matchesASM('SUBS R4, R2, R6'),
       );
     });
 
     test('RSBS', () {
       expect(
-        decode(build(1, _OpCode.RSB.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.RSB.index, 1, 2, 4, 6)),
         matchesASM('RSBS R4, R2, R6'),
       );
     });
 
     test('ADDS', () {
       expect(
-        decode(build(1, _OpCode.ADD.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.ADD.index, 1, 2, 4, 6)),
         matchesASM('ADDS R4, R2, R6'),
       );
     });
 
     test('ADCS', () {
       expect(
-        decode(build(1, _OpCode.ADC.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.ADC.index, 1, 2, 4, 6)),
         matchesASM('ADCS R4, R2, R6'),
       );
     });
 
     test('SBCS', () {
       expect(
-        decode(build(1, _OpCode.SBC.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.SBC.index, 1, 2, 4, 6)),
         matchesASM('SBCS R4, R2, R6'),
       );
     });
 
     test('RSCS', () {
       expect(
-        decode(build(1, _OpCode.RSC.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.RSC.index, 1, 2, 4, 6)),
         matchesASM('RSCS R4, R2, R6'),
       );
     });
 
     test('ORRS', () {
       expect(
-        decode(build(1, _OpCode.ORR.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.ORR.index, 1, 2, 4, 6)),
         matchesASM('ORRS R4, R2, R6'),
       );
     });
 
     test('MOVS', () {
       expect(
-        decode(build(1, _OpCode.MOV.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.MOV.index, 1, 2, 4, 6)),
         matchesASM('MOVS R4, R6'),
       );
     });
 
     test('BICS', () {
       expect(
-        decode(build(1, _OpCode.BIC.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.BIC.index, 1, 2, 4, 6)),
         matchesASM('BICS R4, R2, R6'),
       );
     });
 
     test('MVN', () {
       expect(
-        decode(build(1, _OpCode.MVN.index, 1, 2, 4, 6)),
+        decode(build(0, _OpCode.MVN.index, 1, 2, 4, 6)),
         matchesASM('MVNS R4, R6'),
       );
     });
   });
 
   // See ../operand_test.dart for an exhaustive test suite.
-  group('[I = 0]', () {
+  group('[I = 1]', () {
     test('AND', () {
       expect(
-        decode(build(0, _OpCode.AND.index, 0, 2, 4, 6)),
-        matchesASM('AND R4, R2, R6, LSL #0'),
+        decode(build(1, _OpCode.AND.index, 0, 2, 4, 6)),
+        matchesASM('AND R4, R2, #6'),
       );
     });
   });
@@ -482,28 +482,28 @@ void _testSingleDataTransfer() {
   test('STR', () {
     expect(
       decode(build(0, 0, 0, 0, 0, 0, 2, 4, 6)),
-      matchesASM('STR R4, [R2], -R6, LSL #0'),
+      matchesASM('STR R4, [R2], -#6'),
     );
   });
 
   test('STRB', () {
     expect(
       decode(build(0, 0, 0, 1, 0, 0, 2, 4, 6)),
-      matchesASM('STRB R4, [R2], -R6, LSL #0'),
+      matchesASM('STRB R4, [R2], -#6'),
     );
   });
 
   test('LDR', () {
     expect(
       decode(build(0, 0, 0, 0, 0, 1, 2, 4, 6)),
-      matchesASM('LDR R4, [R2], -R6, LSL #0'),
+      matchesASM('LDR R4, [R2], -#6'),
     );
   });
 
   test('LDRB', () {
     expect(
       decode(build(0, 0, 0, 1, 0, 1, 2, 4, 6)),
-      matchesASM('LDRB R4, [R2], -R6, LSL #0'),
+      matchesASM('LDRB R4, [R2], -#6'),
     );
   });
 

@@ -4,7 +4,7 @@ part of '../printer.dart';
 mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
   /// Provide a way to encode a shifter operand.
   @visibleForOverriding
-  String _shifterOperand(int immediate, int bits);
+  String _shifterOperand(bool treatAsImmediate, int bits);
 
   /// Converts and [offset] into an assembler string.
   String _addressingMode2(
@@ -54,7 +54,7 @@ mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
     } else {
       result = '$result+';
     }
-    return '$result${_shifterOperand(immediateOffset, offset)}]';
+    return '$result${_shifterOperand(immediateOffset == 0, offset)}]';
   }
 
   String _addressingMode2$PreIndexedOffset(
@@ -78,7 +78,7 @@ mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
     @required int immediateOffset,
     @required int upDownBit,
   }) {
-    final op = _shifterOperand(immediateOffset, offset);
+    final op = _shifterOperand(immediateOffset == 0, offset);
     if (op.endsWith('RRX')) {
       return _addressingMode2$PostIndexedOffset$RRX(
         register,
