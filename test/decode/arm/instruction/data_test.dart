@@ -357,11 +357,114 @@ void _testSingleDataSwap() {
 }
 
 void _testHalfwordDataTransferRegisterOffset() {
-  // TODO: Test.
+  // CCCC_000P_U0WL_NNNN_DDDD_0000_1SH1_MMMM
+  int build({
+    int p = 0,
+    int u = 0,
+    int w = 0,
+    int l = 0,
+    @required int n,
+    @required int d,
+    int s = 0,
+    int h = 0,
+    @required int m,
+  }) {
+    return encode([
+      '000$p',
+      '${u}0$w$l',
+      n.toBinaryPadded(4),
+      d.toBinaryPadded(4),
+      '0000',
+      '1$s${h}1',
+      m.toBinaryPadded(4),
+    ]);
+  }
+
+  test('LDRH', () {
+    // LDR{cond}H Rd, <a_mode3>
+    expect(
+      decode(build(
+        n: 2,
+        d: 4,
+        l: 1,
+        m: 6,
+        s: 0,
+        h: 1,
+      )),
+      matchesASM('LDRH R4, [R2], #-6'),
+    );
+  });
+
+  test('STRH', () {
+    // STR{cond}H Rd, <a_mode3>
+    expect(
+      decode(build(
+        n: 2,
+        d: 4,
+        l: 0,
+        m: 6,
+        s: 0,
+        h: 1,
+      )),
+      matchesASM('STRH R4, [R2], #-6'),
+    );
+  });
+
+  test('LDRSB', () {
+    // LDR{cond}SB Rd, <a_mode3>
+    expect(
+      decode(build(
+        n: 2,
+        d: 4,
+        l: 1,
+        m: 6,
+        s: 1,
+        h: 0,
+      )),
+      matchesASM('LDRSB R4, [R2], #-6'),
+    );
+  });
+
+  test('LDRSH', () {
+    // LDR{cond}SH Rd, <a_mode3>
+    expect(
+      decode(build(
+        n: 2,
+        d: 4,
+        l: 1,
+        m: 6,
+        s: 1,
+        h: 1,
+      )),
+      matchesASM('LDRSH R4, [R2], #-6'),
+    );
+  });
 }
 
 void _testHalfwordDataTransferImmediateOffset() {
-  // TODO: Test.
+  // CCCC_000P_U1WL_NNNN_DDDD_OOOO_1SH1_KKKK
+  int build({
+    int p = 0,
+    int u = 0,
+    int w = 0,
+    int l = 0,
+    @required int n,
+    @required int d,
+    @required int offsetHigh,
+    int s = 0,
+    int h = 0,
+    @required int offsetLow,
+  }) {
+    return encode([
+      '000$p',
+      '${u}1$w$l',
+      n.toBinaryPadded(4),
+      d.toBinaryPadded(4),
+      offsetHigh.toBinaryPadded(4),
+      '1$s${h}1',
+      offsetLow.toBinaryPadded(4),
+    ]);
+  }
 }
 
 void _testSingleDataTransfer() {

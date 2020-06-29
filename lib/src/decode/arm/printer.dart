@@ -8,6 +8,7 @@ import 'instruction.dart';
 
 part 'printer/condition.dart';
 part 'printer/coprocessor.dart';
+part 'printer/half_word_or_signed_byte.dart';
 part 'printer/multiple.dart';
 part 'printer/word_or_unsigned_byte.dart';
 
@@ -15,6 +16,7 @@ part 'printer/word_or_unsigned_byte.dart';
 class ArmInstructionPrinter
     with
         ArmLoadAndStoreWordOrUnsignedBytePrintHelper,
+        ArmLoadAndStoreHalfWordOrLoadSignedByte,
         ArmLoadAndStoreMultiplePrintHelper,
         ArmLoadAndStoreCoprocessorPrintHelper
     implements ArmInstructionVisitor<String, void> {
@@ -226,24 +228,77 @@ class ArmInstructionPrinter
   String visitLDRH(
     LDRH i, [
     void _,
-  ]) =>
-      'LDRH${_cond(i)} '
-      'R${i.destinationRegister}, '
-      '[${i.addressingMode}]';
+  ]) {
+    // <LDR|STR>{cond}<H|SH|SB> Rd,<address>
+    final highNibbleShifted = i.addressingMode2HighNibble << 4;
+    final combinedAddress = highNibbleShifted | i.addressingMode2LowNibble;
+    final addressMode3 = _addressingMode3(
+      combinedAddress,
+      i.baseRegister,
+      immediateOffset: i.i,
+      prePostIndexingBit: i.p,
+      upDownBit: i.u,
+      writeBackBit: i.w,
+    );
+    return 'LDR${_cond(i)}H R${i.sourceRegister}, $addressMode3';
+  }
+
+  @override
+  String visitSTRH(
+    STRH i, [
+    void _,
+  ]) {
+    // <LDR|STR>{cond}<H|SH|SB> Rd,<address>
+    final highNibbleShifted = i.addressingMode2HighNibble << 4;
+    final combinedAddress = highNibbleShifted | i.addressingMode2LowNibble;
+    final addressMode3 = _addressingMode3(
+      combinedAddress,
+      i.baseRegister,
+      immediateOffset: i.i,
+      prePostIndexingBit: i.p,
+      upDownBit: i.u,
+      writeBackBit: i.w,
+    );
+    return 'STR${_cond(i)}H R${i.destinationRegister}, $addressMode3';
+  }
 
   @override
   String visitLDRSB(
     LDRSB i, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    // <LDR|STR>{cond}<H|SH|SB> Rd,<address>
+    final highNibbleShifted = i.addressingMode2HighNibble << 4;
+    final combinedAddress = highNibbleShifted | i.addressingMode2LowNibble;
+    final addressMode3 = _addressingMode3(
+      combinedAddress,
+      i.baseRegister,
+      immediateOffset: i.i,
+      prePostIndexingBit: i.p,
+      upDownBit: i.u,
+      writeBackBit: i.w,
+    );
+    return 'LDR${_cond(i)}SB R${i.sourceRegister}, $addressMode3';
+  }
 
   @override
   String visitLDRSH(
     LDRSH i, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    // <LDR|STR>{cond}<H|SH|SB> Rd,<address>
+    final highNibbleShifted = i.addressingMode2HighNibble << 4;
+    final combinedAddress = highNibbleShifted | i.addressingMode2LowNibble;
+    final addressMode3 = _addressingMode3(
+      combinedAddress,
+      i.baseRegister,
+      immediateOffset: i.i,
+      prePostIndexingBit: i.p,
+      upDownBit: i.u,
+      writeBackBit: i.w,
+    );
+    return 'LDR${_cond(i)}SH R${i.sourceRegister}, $addressMode3';
+  }
 
   @override
   String visitMOV(
@@ -280,13 +335,6 @@ class ArmInstructionPrinter
       'MVN${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       '${_shifterOperand(i.i, i.shifterOperand)}';
-
-  @override
-  String visitSTRH(
-    STRH i, [
-    void _,
-  ]) =>
-      throw UnimplementedError();
 
   @override
   String visitSWP(

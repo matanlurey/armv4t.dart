@@ -6,7 +6,7 @@ mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
   @visibleForOverriding
   String _shifterOperand(int immediate, int bits);
 
-  /// Converst and [offset] into an assembler string.
+  /// Converts and [offset] into an assembler string.
   String _addressingMode2(
     int offset,
     int register, {

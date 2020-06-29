@@ -421,7 +421,67 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     void _,
   ]) {
     // LDRH, STRH, LDSRB, LDSRSH.
-    throw UnimplementedError();
+    if (set.l == 0) {
+      return STRH(
+        condition: set.condition,
+        p: set.p,
+        u: set.u,
+        i: 0,
+        w: set.w,
+        baseRegister: set.registerN,
+        destinationRegister: set.registerD,
+        addressingMode2HighNibble: 0,
+        addressingMode2LowNibble: set.registerM,
+      );
+    } else if (set.l == 1) {
+      // LDRH, LDSRB, LDSRSH
+      if (set.h == 0) {
+        // LDRSB
+        return LDRSB(
+          condition: set.condition,
+          p: set.p,
+          u: set.u,
+          i: 0,
+          w: set.w,
+          baseRegister: set.registerN,
+          sourceRegister: set.registerD,
+          addressingMode2HighNibble: 0,
+          addressingMode2LowNibble: set.registerM,
+        );
+      } else if (set.h == 1) {
+        // LDRH, LDSRSH
+        if (set.s == 0) {
+          // LDRH
+          return LDRH(
+            condition: set.condition,
+            p: set.p,
+            u: set.u,
+            i: 0,
+            w: set.w,
+            baseRegister: set.registerN,
+            sourceRegister: set.registerD,
+            addressingMode2HighNibble: 0,
+            addressingMode2LowNibble: set.registerM,
+          );
+        } else if (set.s == 1) {
+          // LDSRSH
+          return LDRSH(
+            condition: set.condition,
+            p: set.p,
+            u: set.u,
+            i: 0,
+            w: set.w,
+            baseRegister: set.registerN,
+            sourceRegister: set.registerD,
+            addressingMode2HighNibble: 0,
+            addressingMode2LowNibble: set.registerM,
+          );
+        }
+      }
+    }
+    throw StateError(
+      'Could not decode (L, H, S): ${set.l}, ${set.h}, ${set.s}',
+    );
   }
 
   @override
@@ -430,7 +490,67 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
     void _,
   ]) {
     // LDRH, STRH, LDSRB, LDSRSH.
-    throw UnimplementedError();
+    if (set.l == 0) {
+      return STRH(
+        condition: set.condition,
+        p: set.p,
+        u: set.u,
+        i: 1,
+        w: set.w,
+        baseRegister: set.registerN,
+        destinationRegister: set.registerD,
+        addressingMode2HighNibble: set.offsetHighNibble,
+        addressingMode2LowNibble: set.offsetLowNibble,
+      );
+    } else if (set.l == 1) {
+      // LDRH, LDSRB, LDSRSH
+      if (set.h == 0) {
+        // LDRSB
+        return LDRSB(
+          condition: set.condition,
+          p: set.p,
+          u: set.u,
+          i: 1,
+          w: set.w,
+          baseRegister: set.registerN,
+          sourceRegister: set.registerD,
+          addressingMode2HighNibble: set.offsetHighNibble,
+          addressingMode2LowNibble: set.offsetLowNibble,
+        );
+      } else if (set.h == 1) {
+        // LDRH, LDSRSH
+        if (set.s == 0) {
+          // LDRH
+          return LDRH(
+            condition: set.condition,
+            p: set.p,
+            u: set.u,
+            i: 1,
+            w: set.w,
+            baseRegister: set.registerN,
+            sourceRegister: set.registerD,
+            addressingMode2HighNibble: set.offsetHighNibble,
+            addressingMode2LowNibble: set.offsetLowNibble,
+          );
+        } else if (set.s == 1) {
+          // LDSRSH
+          return LDRSH(
+            condition: set.condition,
+            p: set.p,
+            u: set.u,
+            i: 1,
+            w: set.w,
+            baseRegister: set.registerN,
+            sourceRegister: set.registerD,
+            addressingMode2HighNibble: set.offsetHighNibble,
+            addressingMode2LowNibble: set.offsetLowNibble,
+          );
+        }
+      }
+    }
+    throw StateError(
+      'Could not decode (L, H, S): ${set.l}, ${set.h}, ${set.s}',
+    );
   }
 
   @override
