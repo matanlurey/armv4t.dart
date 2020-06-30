@@ -15,5 +15,5 @@ b 16777211                      ; 0xEAFFFFFB
 mov r12, 57                     ; 0xE3A0C039
 mov pc, r14                     ; 0xE1A0F00E
 mov r12, 56                     ; 0xE3A0C038
-b 16777211                      ; 0xEBFFFFFB
+bl 16777211                     ; 0xEBFFFFFB
 mov r12, 0                      ; 0xE3A0C000

@@ -150,7 +150,7 @@ bne 0                           ; 0x1A000000
 b 16777215                      ; 0xEAFFFFFF
 mov r0, 0                       ; 0xE3A00000
 mov r2, r14                     ; 0xE1A0200E
-b 16777215                      ; 0xEBFFFFFF
+bl 16777215                     ; 0xEBFFFFFF
 mov r1, r14                     ; 0xE1A0100E
 mov lr, r2                      ; 0xE1A0E002
 add r0, pc, r0                  ; 0xE08F0000

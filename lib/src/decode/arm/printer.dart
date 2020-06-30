@@ -86,7 +86,7 @@ class ArmInstructionPrinter
     BL i, [
     void _,
   ]) =>
-      'b${_describeCondition(i)} '
+      'bl${_describeCondition(i)} '
       '${i.targetAddress}';
 
   @override
