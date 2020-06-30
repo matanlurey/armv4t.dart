@@ -2,7 +2,7 @@ part of '../../instruction.dart';
 
 /// Branch.
 ///
-/// The [BX] instruction is used to branch to a [targetAddress] stored in a
+/// The [BX] instruction is used to branch to a [targetRegister] stored in a
 /// register, based on an optional [condition]. If bit `0` of the register is
 /// set to `1`, then the processor will switch to `THUMB` execution (bit `0` is
 /// forced to `0` in before the branch address is stored in the program counter
@@ -18,11 +18,11 @@ part of '../../instruction.dart';
 ///   PC <- Rm & 0xFFFFFFFE
 /// ```
 class BX extends ArmInstruction {
-  final int targetAddress;
+  final int targetRegister;
 
   const BX({
     @required int condition,
-    @required this.targetAddress,
+    @required this.targetRegister,
   }) : super._(condition);
 
   @override

@@ -1,6 +1,6 @@
-import 'package:armv4t/src/decode/common.dart' as common;
 import 'package:armv4t/src/decode/arm/condition.dart';
 import 'package:armv4t/src/decode/arm/operands.dart';
+import 'package:armv4t/src/decode/common.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -15,20 +15,12 @@ part 'printer/word_or_unsigned_byte.dart';
 /// Converts an [ArmInstruction] into its assembly-based [String] equivalent.
 class ArmInstructionPrinter
     with
+        InstructionPrintHelper,
         ArmLoadAndStoreWordOrUnsignedBytePrintHelper,
         ArmLoadAndStoreHalfWordOrLoadSignedByte,
         ArmLoadAndStoreMultiplePrintHelper,
         ArmLoadAndStoreCoprocessorPrintHelper
     implements ArmInstructionVisitor<String, void> {
-  @visibleForTesting
-  static String describeRegisterList(int registerList, [String suffix]) {
-    return common.describeRegisterList(
-      registerList,
-      length: 16,
-      suffix: suffix,
-    );
-  }
-
   final ArmConditionDecoder _conditionDecoder;
   final ArmConditionPrinter _conditionPrinter;
   final ShifterOperandDecoder _operandDecoder;
@@ -41,8 +33,11 @@ class ArmInstructionPrinter
     this._operandPrinter = const ShifterOperandPrinter(),
   ]);
 
-  String _cond(ArmInstruction i) {
-    return _conditionDecoder.decodeBits(i.condition).accept(_conditionPrinter);
+  String _describeCondition(ArmInstruction i) {
+    return _conditionDecoder
+        .decodeBits(i.condition)
+        .accept(_conditionPrinter)
+        .toLowerCase();
   }
 
   String _s(int sBit) => sBit == 1 ? 'S' : '';
@@ -83,7 +78,7 @@ class ArmInstructionPrinter
     B i, [
     void _,
   ]) =>
-      'B${_cond(i)} '
+      'b${_describeCondition(i)} '
       '${i.targetAddress}';
 
   @override
@@ -91,7 +86,7 @@ class ArmInstructionPrinter
     BL i, [
     void _,
   ]) =>
-      'BL${_cond(i)} '
+      'b${_describeCondition(i)} '
       '${i.targetAddress}';
 
   @override
@@ -99,8 +94,8 @@ class ArmInstructionPrinter
     BX i, [
     void _,
   ]) =>
-      'BX${_cond(i)} '
-      'R${i.targetAddress}';
+      'bx${_describeCondition(i)} '
+      '${describeRegister(i.targetRegister)}';
 
   @override
   String visitLDM(
@@ -120,9 +115,9 @@ class ArmInstructionPrinter
       upDownBit: i.u,
     );
     return ''
-        'LDM${_cond(i)}$addressingMode '
-        'R${i.baseRegister}${i.w == 1 ? '!' : ''}, '
-        '{${describeRegisterList(i.registerList)}}${i.s == 1 ? '^' : ''}';
+        'ldm${_describeCondition(i)}$addressingMode '
+        '${describeRegister(i.baseRegister)}${i.w == 1 ? '!' : ''}, '
+        '{${describeRegisterList(i.registerList, length: 16)}}${i.s == 1 ? '^' : ''}';
   }
 
   @override
@@ -143,9 +138,9 @@ class ArmInstructionPrinter
       upDownBit: i.u,
     );
     return ''
-        'STM${_cond(i)}$addressingMode '
-        'R${i.baseRegister}${i.w == 1 ? '!' : ''}, '
-        '{${describeRegisterList(i.registerList)}}${i.s == 1 ? '^' : ''}';
+        'stm${_describeCondition(i)}$addressingMode '
+        'r${i.baseRegister}${i.w == 1 ? '!' : ''}, '
+        '{${describeRegisterList(i.registerList, length: 16)}}${i.s == 1 ? '^' : ''}';
   }
 
   @override
@@ -162,8 +157,8 @@ class ArmInstructionPrinter
       writeBackBit: i.w,
     );
     return ''
-        'STR${_cond(i)}${i.w == 1 && i.p == 0 ? 'T' : ''} '
-        'R${i.destinationRegister}, '
+        'str${_describeCondition(i)}${i.w == 1 && i.p == 0 ? 't' : ''} '
+        '${describeRegister(i.destinationRegister)}, '
         '$addressMode2';
   }
 
@@ -181,8 +176,8 @@ class ArmInstructionPrinter
       writeBackBit: i.w,
     );
     return ''
-        'STR${_cond(i)}B${i.w == 1 && i.p == 0 ? 'T' : ''} '
-        'R${i.destinationRegister}, '
+        'str${_describeCondition(i)}b${i.w == 1 && i.p == 0 ? 't' : ''} '
+        '${describeRegister(i.destinationRegister)}, '
         '$addressMode2';
   }
 
@@ -200,8 +195,8 @@ class ArmInstructionPrinter
       writeBackBit: i.w,
     );
     return ''
-        'LDR${_cond(i)}${i.w == 1 && i.p == 0 ? 'T' : ''} '
-        'R${i.destinationRegister}, '
+        'ldr${_describeCondition(i)}${i.w == 1 && i.p == 0 ? 't' : ''} '
+        'r${i.destinationRegister}, '
         '$addressMode2';
   }
 
@@ -219,8 +214,8 @@ class ArmInstructionPrinter
       writeBackBit: i.w,
     );
     return ''
-        'LDR${_cond(i)}B${i.w == 1 && i.p == 0 ? 'T' : ''} '
-        'R${i.destinationRegister}, '
+        'ldr${_describeCondition(i)}b${i.w == 1 && i.p == 0 ? 't' : ''} '
+        'r${i.destinationRegister}, '
         '$addressMode2';
   }
 
@@ -240,7 +235,7 @@ class ArmInstructionPrinter
       upDownBit: i.u,
       writeBackBit: i.w,
     );
-    return 'LDR${_cond(i)}H R${i.sourceRegister}, $addressMode3';
+    return 'LDR${_describeCondition(i)}H R${i.sourceRegister}, $addressMode3';
   }
 
   @override
@@ -259,7 +254,7 @@ class ArmInstructionPrinter
       upDownBit: i.u,
       writeBackBit: i.w,
     );
-    return 'STR${_cond(i)}H R${i.destinationRegister}, $addressMode3';
+    return 'STR${_describeCondition(i)}H R${i.destinationRegister}, $addressMode3';
   }
 
   @override
@@ -278,7 +273,7 @@ class ArmInstructionPrinter
       upDownBit: i.u,
       writeBackBit: i.w,
     );
-    return 'LDR${_cond(i)}SB R${i.sourceRegister}, $addressMode3';
+    return 'LDR${_describeCondition(i)}SB R${i.sourceRegister}, $addressMode3';
   }
 
   @override
@@ -297,7 +292,7 @@ class ArmInstructionPrinter
       upDownBit: i.u,
       writeBackBit: i.w,
     );
-    return 'LDR${_cond(i)}SH R${i.sourceRegister}, $addressMode3';
+    return 'LDR${_describeCondition(i)}SH R${i.sourceRegister}, $addressMode3';
   }
 
   @override
@@ -305,7 +300,7 @@ class ArmInstructionPrinter
     MOV i, [
     void _,
   ]) =>
-      'MOV${_cond(i)}${_s(i.s)} '
+      'MOV${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
@@ -314,7 +309,7 @@ class ArmInstructionPrinter
     MRS i, [
     void _,
   ]) =>
-      'MRS${_cond(i)} '
+      'MRS${_describeCondition(i)} '
       'R${i.destinationRegister}, '
       '${i.sourcePSR == 0 ? 'CPSR' : 'SPSR'}';
 
@@ -323,7 +318,7 @@ class ArmInstructionPrinter
     MSR i, [
     void _,
   ]) =>
-      'MSR${_cond(i)} '
+      'MSR${_describeCondition(i)} '
       '${i.destinationPSR == 0 ? 'CPSR' : 'SPSR'}${_fieldMask(i.fieldMask)}, '
       '${_i(i.immediateOperand, i.sourceOperand)}';
 
@@ -332,7 +327,7 @@ class ArmInstructionPrinter
     MVN i, [
     void _,
   ]) =>
-      'MVN${_cond(i)}${_s(i.s)} '
+      'MVN${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
@@ -341,7 +336,7 @@ class ArmInstructionPrinter
     SWP i, [
     void _,
   ]) =>
-      'SWP${_cond(i)} '
+      'SWP${_describeCondition(i)} '
       'R${i.sourceRegister1}, '
       'R${i.destinationRegister}, '
       '[R${i.sourceRegister2}]';
@@ -351,7 +346,7 @@ class ArmInstructionPrinter
     SWPB i, [
     void _,
   ]) =>
-      'SWPB${_cond(i)} '
+      'SWPB${_describeCondition(i)} '
       'R${i.sourceRegister1}, '
       'R${i.destinationRegister}, '
       '[R${i.sourceRegister2}]';
@@ -361,7 +356,7 @@ class ArmInstructionPrinter
     AND i, [
     void _,
   ]) =>
-      'AND${_cond(i)}${_s(i.s)} '
+      'AND${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -371,7 +366,7 @@ class ArmInstructionPrinter
     BIC i, [
     void _,
   ]) =>
-      'BIC${_cond(i)}${_s(i.s)} '
+      'BIC${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -381,7 +376,7 @@ class ArmInstructionPrinter
     CMN i, [
     void _,
   ]) =>
-      'CMN${_cond(i)} '
+      'CMN${_describeCondition(i)} '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
@@ -390,7 +385,7 @@ class ArmInstructionPrinter
     CMP i, [
     void _,
   ]) =>
-      'CMP${_cond(i)} '
+      'CMP${_describeCondition(i)} '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
@@ -399,7 +394,7 @@ class ArmInstructionPrinter
     EOR i, [
     void _,
   ]) =>
-      'EOR${_cond(i)}${_s(i.s)} '
+      'EOR${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -409,7 +404,7 @@ class ArmInstructionPrinter
     ORR i, [
     void _,
   ]) =>
-      'ORR${_cond(i)}${_s(i.s)} '
+      'ORR${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -419,7 +414,7 @@ class ArmInstructionPrinter
     TEQ i, [
     void _,
   ]) =>
-      'TEQ${_cond(i)} '
+      'TEQ${_describeCondition(i)} '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
@@ -428,7 +423,7 @@ class ArmInstructionPrinter
     TST i, [
     void _,
   ]) =>
-      'TST${_cond(i)} '
+      'TST${_describeCondition(i)} '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
@@ -437,7 +432,7 @@ class ArmInstructionPrinter
     ADC i, [
     void _,
   ]) =>
-      'ADC${_cond(i)}${_s(i.s)} '
+      'ADC${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -447,7 +442,7 @@ class ArmInstructionPrinter
     ADD i, [
     void _,
   ]) =>
-      'ADD${_cond(i)}${_s(i.s)} '
+      'ADD${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -457,7 +452,7 @@ class ArmInstructionPrinter
     MLA i, [
     void _,
   ]) =>
-      'MLA${_cond(i)}${_s(i.s)} '
+      'MLA${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       'R${i.operandRegister1}, '
@@ -468,7 +463,7 @@ class ArmInstructionPrinter
     MUL i, [
     void _,
   ]) =>
-      'MUL${_cond(i)}${_s(i.s)} '
+      'MUL${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.operandRegister}, '
       'R${i.sourceRegister}';
@@ -478,7 +473,7 @@ class ArmInstructionPrinter
     RSB i, [
     void _,
   ]) =>
-      'RSB${_cond(i)}${_s(i.s)} '
+      'RSB${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -488,7 +483,7 @@ class ArmInstructionPrinter
     RSC i, [
     void _,
   ]) =>
-      'RSC${_cond(i)}${_s(i.s)} '
+      'RSC${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -498,7 +493,7 @@ class ArmInstructionPrinter
     SBC i, [
     void _,
   ]) =>
-      'SBC${_cond(i)}${_s(i.s)} '
+      'SBC${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -508,7 +503,7 @@ class ArmInstructionPrinter
     SUB i, [
     void _,
   ]) =>
-      'SUB${_cond(i)}${_s(i.s)} '
+      'SUB${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
@@ -518,7 +513,7 @@ class ArmInstructionPrinter
     SMLAL i, [
     void _,
   ]) =>
-      'SMLAL${_cond(i)}${_s(i.s)} '
+      'SMLAL${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegisterLSW}, '
       'R${i.destinationRegisterMSW}, '
       'R${i.sourceRegister}, '
@@ -529,7 +524,7 @@ class ArmInstructionPrinter
     SMULL i, [
     void _,
   ]) =>
-      'SMULL${_cond(i)}${_s(i.s)} '
+      'SMULL${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegisterLSW}, '
       'R${i.destinationRegisterMSW}, '
       'R${i.sourceRegister}, '
@@ -540,7 +535,7 @@ class ArmInstructionPrinter
     UMLAL i, [
     void _,
   ]) =>
-      'UMLAL${_cond(i)}${_s(i.s)} '
+      'UMLAL${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegisterLSW}, '
       'R${i.destinationRegisterMSW}, '
       'R${i.sourceRegister}, '
@@ -551,7 +546,7 @@ class ArmInstructionPrinter
     UMULL i, [
     void _,
   ]) =>
-      'UMULL${_cond(i)}${_s(i.s)} '
+      'UMULL${_describeCondition(i)}${_s(i.s)} '
       'R${i.destinationRegisterLSW}, '
       'R${i.destinationRegisterMSW}, '
       'R${i.sourceRegister}, '
@@ -562,14 +557,14 @@ class ArmInstructionPrinter
     SWI i, [
     void _,
   ]) =>
-      'SWI${_cond(i)} #${i.immediate24}';
+      'SWI${_describeCondition(i)} #${i.immediate24}';
 
   @override
   String visitCDP(
     CDP i, [
     void _,
   ]) =>
-      'CDP${_cond(i)} '
+      'CDP${_describeCondition(i)} '
       'P${i.coprocessorNumber}, '
       '${i.coprocessorOpCode}, '
       'C${i.coprocessorDestinationRegister}, '
@@ -582,7 +577,7 @@ class ArmInstructionPrinter
     LDC i, [
     void _,
   ]) =>
-      'LDC${_cond(i)}${i.n == 1 ? 'L' : ''} '
+      'LDC${_describeCondition(i)}${i.n == 1 ? 'L' : ''} '
       'P${i.coprocessorNumber}, '
       'C${i.coprocessorSourceOrDestinationRegister}, '
       '${_addressingMode5(
@@ -598,7 +593,7 @@ class ArmInstructionPrinter
     STC i, [
     void _,
   ]) =>
-      'STC${_cond(i)}${i.n == 1 ? 'L' : ''} '
+      'STC${_describeCondition(i)}${i.n == 1 ? 'L' : ''} '
       'P${i.coprocessorNumber}, '
       'C${i.coprocessorSourceOrDestinationRegister}, '
       '${_addressingMode5(
@@ -614,7 +609,7 @@ class ArmInstructionPrinter
     MCR i, [
     void _,
   ]) =>
-      'MCR${_cond(i)} '
+      'MCR${_describeCondition(i)} '
       'P${i.coprocessorNumber}, '
       '${i.coprocessorOperationCode}, '
       'R${i.sourceRegister}, '
@@ -626,7 +621,7 @@ class ArmInstructionPrinter
     MRC i, [
     void _,
   ]) =>
-      'MRC${_cond(i)} '
+      'MRC${_describeCondition(i)} '
       'P${i.coprocessorNumber}, '
       '${i.coprocessorOperationCode}, '
       'R${i.destinationRegister}, '
