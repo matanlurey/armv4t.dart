@@ -12,17 +12,20 @@ import 'package:test/test.dart';
 // For every `.bin` file in this directory, we decode (dissasemble) the file
 // into a .d.asm file. This test verifies that the ouput .d.asm files match what
 // would be output (a sort of golden-file).
-void main() async {
-  final asmDir = Directory(path.join('test', 'decode', 'e2e', 'asm'));
-  if (!await asmDir.exists()) {
-    fail('Could not find ${asmDir.path}.');
-  }
+void main() {
+  group('E2E', () {
+    final asmDir = Directory(path.join('test', 'decode', 'e2e', 'asm'));
 
-  await for (final file in asmDir.list()) {
-    if (file is File && file.path.endsWith('.bin')) {
-      await _testBin(file);
+    if (!asmDir.existsSync()) {
+      fail('Could not find ${asmDir.path}.');
     }
-  }
+
+    for (final file in asmDir.listSync()) {
+      if (file is File && file.path.endsWith('.bin')) {
+        _testBin(file);
+      }
+    }
+  });
 }
 
 Future<void> _testBin(File file) async {
