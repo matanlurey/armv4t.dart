@@ -68,9 +68,9 @@ class ArmInstructionPrinter
   }
 
   @override
-  String _shifterOperand(int immediate, int bits) {
+  String _shifterOperand(bool treatAsImmediate, int bits) {
     ArmShifterOperand operand;
-    if (immediate == 0) {
+    if (treatAsImmediate) {
       operand = _operandDecoder.decodeImmediate(bits);
     } else {
       operand = _operandDecoder.decodeRegister(bits);
@@ -307,7 +307,7 @@ class ArmInstructionPrinter
   ]) =>
       'MOV${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitMRS(
@@ -334,7 +334,7 @@ class ArmInstructionPrinter
   ]) =>
       'MVN${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitSWP(
@@ -364,7 +364,7 @@ class ArmInstructionPrinter
       'AND${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitBIC(
@@ -374,7 +374,7 @@ class ArmInstructionPrinter
       'BIC${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitCMN(
@@ -382,9 +382,8 @@ class ArmInstructionPrinter
     void _,
   ]) =>
       'CMN${_cond(i)} '
-      'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitCMP(
@@ -392,9 +391,8 @@ class ArmInstructionPrinter
     void _,
   ]) =>
       'CMP${_cond(i)} '
-      'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitEOR(
@@ -404,7 +402,7 @@ class ArmInstructionPrinter
       'EOR${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitORR(
@@ -414,7 +412,7 @@ class ArmInstructionPrinter
       'ORR${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitTEQ(
@@ -422,9 +420,8 @@ class ArmInstructionPrinter
     void _,
   ]) =>
       'TEQ${_cond(i)} '
-      'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitTST(
@@ -432,9 +429,8 @@ class ArmInstructionPrinter
     void _,
   ]) =>
       'TST${_cond(i)} '
-      'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitADC(
@@ -444,7 +440,7 @@ class ArmInstructionPrinter
       'ADC${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitADD(
@@ -454,7 +450,7 @@ class ArmInstructionPrinter
       'ADD${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitMLA(
@@ -485,7 +481,7 @@ class ArmInstructionPrinter
       'RSB${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitRSC(
@@ -495,7 +491,7 @@ class ArmInstructionPrinter
       'RSC${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitSBC(
@@ -505,7 +501,7 @@ class ArmInstructionPrinter
       'SBC${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitSUB(
@@ -515,7 +511,7 @@ class ArmInstructionPrinter
       'SUB${_cond(i)}${_s(i.s)} '
       'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i, i.shifterOperand)}';
+      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitSMLAL(
