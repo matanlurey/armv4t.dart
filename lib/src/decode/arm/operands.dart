@@ -200,7 +200,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
     final code = operand.rotateImmediate * 2;
     final bits = operand.immediate8;
     final undo = bits << code;
-    return '#$undo';
+    return '$undo';
   }
 
   @override
@@ -211,7 +211,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
     // <Rm>
     //
     // The register value is used directly.
-    return 'R${operand.register}';
+    return 'r${operand.register}';
   }
 
   @override
@@ -221,7 +221,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
   ]) {
     // <Rm>, LSL #<immediate>
     // The register value is shifted left by an immedaite value in range 0-31.
-    return 'R${operand.register}, LSL #${operand.shiftImmediate}';
+    return 'r${operand.register}, lsl ${operand.shiftImmediate}';
   }
 
   @override
@@ -231,7 +231,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
   ]) {
     // <Rm>, LSL <Rs>
     // The register value is shifted left by a value contained in a register.
-    return 'R${operand.register}, LSL R${operand.shiftRegister}';
+    return 'r${operand.register}, lsl r${operand.shiftRegister}';
   }
 
   @override
@@ -240,7 +240,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
     void _,
   ]) {
     // <Rm>, LSR #<immediate>.
-    return 'R${operand.register}, LSR #${operand.shiftImmediate}';
+    return 'r${operand.register}, lsr ${operand.shiftImmediate}';
   }
 
   @override
@@ -249,7 +249,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
     void _,
   ]) {
     // <Rm>, LSR <Rs>
-    return 'R${operand.register}, LSR R${operand.shiftRegister}';
+    return 'r${operand.register}, lsr r${operand.shiftRegister}';
   }
 
   @override
@@ -258,7 +258,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
     void _,
   ]) {
     // <Rm>, ASR #<immediate>
-    return 'R${operand.register}, ASR #${operand.shiftImmediate}';
+    return 'r${operand.register}, asr ${operand.shiftImmediate}';
   }
 
   @override
@@ -267,7 +267,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
     void _,
   ]) {
     // <Rm>, ASR <Rs>
-    return 'R${operand.register}, ASR R${operand.shiftRegister}';
+    return 'r${operand.register}, asr r${operand.shiftRegister}';
   }
 
   @override
@@ -276,7 +276,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
     void _,
   ]) {
     // <Rm>, ROR #<immediate>
-    return 'R${operand.register}, ROR #${operand.shiftImmediate}';
+    return 'r${operand.register}, ror ${operand.shiftImmediate}';
   }
 
   @override
@@ -285,7 +285,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
     void _,
   ]) {
     // <Rm>, ROR <Rs>
-    return 'R${operand.register}, ROR R${operand.shiftRegister}';
+    return 'r${operand.register}, ror r${operand.shiftRegister}';
   }
 
   @override
@@ -294,7 +294,7 @@ class ShifterOperandPrinter implements ShifterOperandVisitor<String, void> {
     void _,
   ]) {
     // <Rm>, RRX
-    return 'R${operand.register}, RRX';
+    return 'r${operand.register}, rrx';
   }
 }
 

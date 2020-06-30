@@ -10,7 +10,7 @@ void main() {
       '1010',
       32.toBinaryPadded(32 - 8),
     ]);
-    expect(decode(instruction), matchesASM('B 32'));
+    expect(decode(instruction), matchesASM('b 32'));
   });
 
   // CCCC_101L_OOOO_OOOO_OOOO_OOOO_OOOO_OOOO
@@ -19,7 +19,7 @@ void main() {
       '1011',
       32.toBinaryPadded(32 - 8),
     ]);
-    expect(decode(instruction), matchesASM('BL 32'));
+    expect(decode(instruction), matchesASM('bl 32'));
   });
 
   // CCCC_0001_0010_1111_1111_1111_0001_NNNN
@@ -33,6 +33,6 @@ void main() {
       '0001',
       12.toBinaryPadded(4),
     ]);
-    expect(decode(instruction), matchesASM('BX R12'));
+    expect(decode(instruction), matchesASM('bx r12'));
   });
 }

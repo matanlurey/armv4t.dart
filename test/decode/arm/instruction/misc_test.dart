@@ -17,6 +17,6 @@ void _testSoftwareInterrupt() {
   }
 
   test('SWI', () {
-    expect(decode(build(8)), matchesASM('SWI #8'));
+    expect(decode(build(8)), matchesASM('swi 8'));
   });
 }

@@ -411,7 +411,7 @@ class ArmDecoder implements ArmSetVisitor<ArmInstruction, void> {
   ]) {
     return BX(
       condition: set.condition,
-      targetAddress: set.registerN,
+      targetRegister: set.registerN,
     );
   }
 

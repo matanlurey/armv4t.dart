@@ -21,7 +21,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeImmediate(encode(2, 16)), _matchesASM('#256'));
+    expect(decodeImmediate(encode(2, 16)), _matchesASM('256'));
   });
 
   test('REGISTER_OPERAND', () {
@@ -33,7 +33,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(1)), _matchesASM('R1'));
+    expect(decodeRegister(encode(1)), _matchesASM('r1'));
   });
 
   test('REGISTER_OPERAND_LOGICAL_SHIFT_LEFT_BY_IMMEDIATE', () {
@@ -45,7 +45,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(7, 1)), _matchesASM('R1, LSL #7'));
+    expect(decodeRegister(encode(7, 1)), _matchesASM('r1, lsl 7'));
   });
 
   test('REGISTER_OPERAND_LOGICAL_SHIFT_LEFT_BY_REGISTER', () {
@@ -57,7 +57,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, LSL R1'));
+    expect(decodeRegister(encode(1, 2)), _matchesASM('r2, lsl r1'));
   });
 
   test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_IMMEDIATE', () {
@@ -69,7 +69,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(7, 1)), _matchesASM('R1, LSR #7'));
+    expect(decodeRegister(encode(7, 1)), _matchesASM('r1, lsr 7'));
   });
 
   test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_REGISTER', () {
@@ -81,7 +81,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, LSR R1'));
+    expect(decodeRegister(encode(1, 2)), _matchesASM('r2, lsr r1'));
   });
 
   test('REGISTER_OPERAND_LOGICAL_SHIFT_RIGHT_BY_REGISTER', () {
@@ -93,7 +93,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, ASR R1'));
+    expect(decodeRegister(encode(1, 2)), _matchesASM('r2, asr r1'));
   });
 
   test('REGISTER_OPERAND_ROTATE_RIGHT_BY_IMMEDIATE', () {
@@ -105,7 +105,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(7, 1)), _matchesASM('R1, ROR #7'));
+    expect(decodeRegister(encode(7, 1)), _matchesASM('r1, ror 7'));
   });
 
   test('REGISTER_OPERAND_ROTATE_RIGHT_BY_REGISTER', () {
@@ -117,7 +117,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(1, 2)), _matchesASM('R2, ROR R1'));
+    expect(decodeRegister(encode(1, 2)), _matchesASM('r2, ror r1'));
   });
 
   test('REGISTER_OPERAND_ROTATE_RIGHT_WITH_EXTEND', () {
@@ -129,7 +129,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decodeRegister(encode(2)), _matchesASM('R2, RRX'));
+    expect(decodeRegister(encode(2)), _matchesASM('r2, rrx'));
   });
 }
 

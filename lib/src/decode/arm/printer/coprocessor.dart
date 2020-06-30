@@ -35,19 +35,19 @@ mixin ArmLoadAndStoreCoprocessorPrintHelper {
     @required int upDownBit,
     @required int writeBackBit,
   }) {
-    final prefix = '#${upDownBit == 0 ? '-' : '+'}';
+    final prefix = '${upDownBit == 0 ? '-' : '+'}';
     if (prePostIndexingBit == 0) {
       if (writeBackBit == 0) {
         // 1: [Rn, #+/-(Offset)]
-        return '[R$register, $prefix$offset]';
+        return '[r$register, $prefix$offset]';
       } else {
         // 2: [Rn, #+/-(8bit_Offset*4)]!
-        return '[R$register, $prefix$offset]!';
+        return '[r$register, $prefix$offset]!';
       }
     } else {
       // 3: [Rn], #+/-(8bit_Offset*4)
       assert(writeBackBit == 0);
-      return '[R$register], $prefix$offset';
+      return '[r$register], $prefix$offset';
     }
   }
 }

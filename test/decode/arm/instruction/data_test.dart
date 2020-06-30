@@ -50,42 +50,42 @@ void _testCPSRorSPSR() {
   test('MRS (SPSR -> Register)', () {
     expect(
       decode(build(0, 0xA, 2, 4, 6)),
-      matchesASM('MRS R4, SPSR'),
+      matchesASM('mrs r4, spsr'),
     );
   });
 
   test('MRS (CPSR -> Register', () {
     expect(
       decode(build(0, 0x8, 2, 4, 6)),
-      matchesASM('MRS R4, CPSR'),
+      matchesASM('mrs r4, cpsr'),
     );
   });
 
   test('MSR (Register -> SPSR)', () {
     expect(
       decode(build(0, 0xB, 0, 0, 6)),
-      matchesASM('MSR SPSR, R6'),
+      matchesASM('msr spsr, r6'),
     );
   });
 
   test('MSR (Register -> CPSR)', () {
     expect(
       decode(build(0, 0x9, 0, 0, 6)),
-      matchesASM('MSR CPSR, R6'),
+      matchesASM('msr cpsr, r6'),
     );
   });
 
   test('MSR (Immediate -> SPSR Flags)', () {
     expect(
       decode(build(1, 0xB, 0, 0, 6)),
-      matchesASM('MSR SPSR, #6'),
+      matchesASM('msr spsr, 6'),
     );
   });
 
   test('MSR (Immediate -> CPSR Flags)', () {
     expect(
       decode(build(1, 0x9, 0, 0, 6)),
-      matchesASM('MSR CPSR, #6'),
+      matchesASM('msr cpsr, 6'),
     );
   });
 
@@ -118,28 +118,28 @@ void _testLogicAndMath() {
     test('TST', () {
       expect(
         decode(build(0, _OpCode.TST.index, 1, 2, 0, 6)),
-        matchesASM('TST R2, R6'),
+        matchesASM('tst r2, r6'),
       );
     });
 
     test('TEQ', () {
       expect(
         decode(build(0, _OpCode.TEQ.index, 1, 2, 0, 6)),
-        matchesASM('TEQ R2, R6'),
+        matchesASM('teq r2, r6'),
       );
     });
 
     test('CMP', () {
       expect(
         decode(build(0, _OpCode.CMP.index, 1, 2, 0, 6)),
-        matchesASM('CMP R2, R6'),
+        matchesASM('cmp r2, r6'),
       );
     });
 
     test('CMN', () {
       expect(
         decode(build(0, _OpCode.CMN.index, 1, 2, 0, 6)),
-        matchesASM('CMN R2, R6'),
+        matchesASM('cmn r2, r6'),
       );
     });
   });
@@ -148,84 +148,84 @@ void _testLogicAndMath() {
     test('AND', () {
       expect(
         decode(build(0, _OpCode.AND.index, 0, 2, 4, 6)),
-        matchesASM('AND R4, R2, R6'),
+        matchesASM('and r4, r2, r6'),
       );
     });
 
     test('EOR', () {
       expect(
         decode(build(0, _OpCode.EOR.index, 0, 2, 4, 6)),
-        matchesASM('EOR R4, R2, R6'),
+        matchesASM('eor r4, r2, r6'),
       );
     });
 
     test('SUB', () {
       expect(
         decode(build(0, _OpCode.SUB.index, 0, 2, 4, 6)),
-        matchesASM('SUB R4, R2, R6'),
+        matchesASM('sub r4, r2, r6'),
       );
     });
 
     test('RSB', () {
       expect(
         decode(build(0, _OpCode.RSB.index, 0, 2, 4, 6)),
-        matchesASM('RSB R4, R2, R6'),
+        matchesASM('rsb r4, r2, r6'),
       );
     });
 
     test('ADD', () {
       expect(
         decode(build(0, _OpCode.ADD.index, 0, 2, 4, 6)),
-        matchesASM('ADD R4, R2, R6'),
+        matchesASM('add r4, r2, r6'),
       );
     });
 
     test('ADC', () {
       expect(
         decode(build(0, _OpCode.ADC.index, 0, 2, 4, 6)),
-        matchesASM('ADC R4, R2, R6'),
+        matchesASM('adc r4, r2, r6'),
       );
     });
 
     test('SBC', () {
       expect(
         decode(build(0, _OpCode.SBC.index, 0, 2, 4, 6)),
-        matchesASM('SBC R4, R2, R6'),
+        matchesASM('sbc r4, r2, r6'),
       );
     });
 
     test('RSC', () {
       expect(
         decode(build(0, _OpCode.RSC.index, 0, 2, 4, 6)),
-        matchesASM('RSC R4, R2, R6'),
+        matchesASM('rsc r4, r2, r6'),
       );
     });
 
     test('ORR', () {
       expect(
         decode(build(0, _OpCode.ORR.index, 0, 2, 4, 6)),
-        matchesASM('ORR R4, R2, R6'),
+        matchesASM('orr r4, r2, r6'),
       );
     });
 
     test('MOV', () {
       expect(
         decode(build(0, _OpCode.MOV.index, 0, 2, 4, 6)),
-        matchesASM('MOV R4, R6'),
+        matchesASM('mov r4, r6'),
       );
     });
 
     test('BIC', () {
       expect(
         decode(build(0, _OpCode.BIC.index, 0, 2, 4, 6)),
-        matchesASM('BIC R4, R2, R6'),
+        matchesASM('bic r4, r2, r6'),
       );
     });
 
     test('MVN', () {
       expect(
         decode(build(0, _OpCode.MVN.index, 0, 2, 4, 6)),
-        matchesASM('MVN R4, R6'),
+        matchesASM('mvn r4, r6'),
       );
     });
   });
@@ -234,84 +234,84 @@ void _testLogicAndMath() {
     test('ANDS', () {
       expect(
         decode(build(0, _OpCode.AND.index, 1, 2, 4, 6)),
-        matchesASM('ANDS R4, R2, R6'),
+        matchesASM('ands r4, r2, r6'),
       );
     });
 
     test('EORS', () {
       expect(
         decode(build(0, _OpCode.EOR.index, 1, 2, 4, 6)),
-        matchesASM('EORS R4, R2, R6'),
+        matchesASM('eors r4, r2, r6'),
       );
     });
 
     test('SUBS', () {
       expect(
         decode(build(0, _OpCode.SUB.index, 1, 2, 4, 6)),
-        matchesASM('SUBS R4, R2, R6'),
+        matchesASM('subs r4, r2, r6'),
       );
     });
 
     test('RSBS', () {
       expect(
         decode(build(0, _OpCode.RSB.index, 1, 2, 4, 6)),
-        matchesASM('RSBS R4, R2, R6'),
+        matchesASM('rsbs r4, r2, r6'),
       );
     });
 
     test('ADDS', () {
       expect(
         decode(build(0, _OpCode.ADD.index, 1, 2, 4, 6)),
-        matchesASM('ADDS R4, R2, R6'),
+        matchesASM('adds r4, r2, r6'),
       );
     });
 
     test('ADCS', () {
       expect(
         decode(build(0, _OpCode.ADC.index, 1, 2, 4, 6)),
-        matchesASM('ADCS R4, R2, R6'),
+        matchesASM('adcs r4, r2, r6'),
       );
     });
 
     test('SBCS', () {
       expect(
         decode(build(0, _OpCode.SBC.index, 1, 2, 4, 6)),
-        matchesASM('SBCS R4, R2, R6'),
+        matchesASM('sbcs r4, r2, r6'),
       );
     });
 
     test('RSCS', () {
       expect(
         decode(build(0, _OpCode.RSC.index, 1, 2, 4, 6)),
-        matchesASM('RSCS R4, R2, R6'),
+        matchesASM('rscs r4, r2, r6'),
       );
     });
 
     test('ORRS', () {
       expect(
         decode(build(0, _OpCode.ORR.index, 1, 2, 4, 6)),
-        matchesASM('ORRS R4, R2, R6'),
+        matchesASM('orrs r4, r2, r6'),
       );
     });
 
     test('MOVS', () {
       expect(
         decode(build(0, _OpCode.MOV.index, 1, 2, 4, 6)),
-        matchesASM('MOVS R4, R6'),
+        matchesASM('movs r4, r6'),
       );
     });
 
     test('BICS', () {
       expect(
         decode(build(0, _OpCode.BIC.index, 1, 2, 4, 6)),
-        matchesASM('BICS R4, R2, R6'),
+        matchesASM('bics r4, r2, r6'),
       );
     });
 
     test('MVN', () {
       expect(
         decode(build(0, _OpCode.MVN.index, 1, 2, 4, 6)),
-        matchesASM('MVNS R4, R6'),
+        matchesASM('mvns r4, r6'),
       );
     });
   });
@@ -321,7 +321,7 @@ void _testLogicAndMath() {
     test('AND', () {
       expect(
         decode(build(1, _OpCode.AND.index, 0, 2, 4, 6)),
-        matchesASM('AND R4, R2, #6'),
+        matchesASM('and r4, r2, 6'),
       );
     });
   });
@@ -344,14 +344,14 @@ void _testSingleDataSwap() {
   test('SWP', () {
     expect(
       decode(build(0, 2, 4, 6)),
-      matchesASM('SWP R2, R4, [R6]'),
+      matchesASM('swp r2, r4, [r6]'),
     );
   });
 
   test('SWPB', () {
     expect(
       decode(build(1, 2, 4, 6)),
-      matchesASM('SWPB R2, R4, [R6]'),
+      matchesASM('swpb r2, r4, [r6]'),
     );
   });
 }
@@ -391,7 +391,7 @@ void _testHalfwordDataTransferRegisterOffset() {
         s: 0,
         h: 1,
       )),
-      matchesASM('LDRH R4, [R2], #-6'),
+      matchesASM('ldrh r4, [r2], -6'),
     );
   });
 
@@ -406,7 +406,7 @@ void _testHalfwordDataTransferRegisterOffset() {
         s: 0,
         h: 1,
       )),
-      matchesASM('STRH R4, [R2], #-6'),
+      matchesASM('strh r4, [r2], -6'),
     );
   });
 
@@ -421,7 +421,7 @@ void _testHalfwordDataTransferRegisterOffset() {
         s: 1,
         h: 0,
       )),
-      matchesASM('LDRSB R4, [R2], #-6'),
+      matchesASM('ldrsb r4, [r2], -6'),
     );
   });
 
@@ -436,13 +436,14 @@ void _testHalfwordDataTransferRegisterOffset() {
         s: 1,
         h: 1,
       )),
-      matchesASM('LDRSH R4, [R2], #-6'),
+      matchesASM('ldrsh r4, [r2], -6'),
     );
   });
 }
 
 void _testHalfwordDataTransferImmediateOffset() {
   // CCCC_000P_U1WL_NNNN_DDDD_OOOO_1SH1_KKKK
+  // ignore: unused_element
   int build({
     int p = 0,
     int u = 0,
@@ -482,28 +483,28 @@ void _testSingleDataTransfer() {
   test('STR', () {
     expect(
       decode(build(0, 0, 0, 0, 0, 0, 2, 4, 6)),
-      matchesASM('STR R4, [R2], -#6'),
+      matchesASM('str r4, [r2], -6'),
     );
   });
 
   test('STRB', () {
     expect(
       decode(build(0, 0, 0, 1, 0, 0, 2, 4, 6)),
-      matchesASM('STRB R4, [R2], -#6'),
+      matchesASM('strb r4, [r2], -6'),
     );
   });
 
   test('LDR', () {
     expect(
       decode(build(0, 0, 0, 0, 0, 1, 2, 4, 6)),
-      matchesASM('LDR R4, [R2], -#6'),
+      matchesASM('ldr r4, [r2], -6'),
     );
   });
 
   test('LDRB', () {
     expect(
       decode(build(0, 0, 0, 1, 0, 1, 2, 4, 6)),
-      matchesASM('LDRB R4, [R2], -#6'),
+      matchesASM('ldrb r4, [r2], -6'),
     );
   });
 
@@ -549,7 +550,7 @@ void _testSingleDataTransfer() {
             // RRRR_IIII_IIII
             offset: ('0000' '0111' '1010').parseBits(),
           )),
-          matchesASM('STR R2, [R4, -#122]'),
+          matchesASM('str r2, [r4, -122]'),
         );
       });
 
@@ -570,7 +571,7 @@ void _testSingleDataTransfer() {
             // RRRR_IIII_IIII
             offset: ('0000' '0000' '1010').parseBits(),
           )),
-          matchesASM('STR R2, [R4, -R10]'),
+          matchesASM('str r2, [r4, -r10]'),
         );
       });
 
@@ -591,7 +592,7 @@ void _testSingleDataTransfer() {
             // RRRR_IIII_IIII
             offset: ('1100' '0000' '1010').parseBits(),
           )),
-          matchesASM('STR R2, [R4, -R10, LSL R12]'),
+          matchesASM('str r2, [r4, -r10, lsl r12]'),
         );
       });
     });
@@ -614,7 +615,7 @@ void _testSingleDataTransfer() {
             // RRRR_IIII_IIII
             offset: ('0000' '0111' '1010').parseBits(),
           )),
-          matchesASM('STR R2, [R4, -#122]!'),
+          matchesASM('str r2, [r4, -122]!'),
         );
       });
 
@@ -635,7 +636,7 @@ void _testSingleDataTransfer() {
             // RRRR_IIII_IIII
             offset: ('0000' '0000' '1010').parseBits(),
           )),
-          matchesASM('STR R2, [R4, -R10]!'),
+          matchesASM('str r2, [r4, -r10]!'),
         );
       });
 
@@ -656,7 +657,7 @@ void _testSingleDataTransfer() {
             // RRRR_IIII_IIII
             offset: ('1100' '0000' '1010').parseBits(),
           )),
-          matchesASM('STR R2, [R4, -R10, LSL R12]!'),
+          matchesASM('str r2, [r4, -r10, lsl r12]!'),
         );
       });
     });
@@ -677,7 +678,7 @@ void _testSingleDataTransfer() {
             // RRRR_IIII_IIII
             offset: ('0000' '0111' '1010').parseBits(),
           )),
-          matchesASM('STR R2, [R4], -#122'),
+          matchesASM('str r2, [r4], -122'),
         );
       });
 
@@ -696,7 +697,7 @@ void _testSingleDataTransfer() {
             // RRRR_IIII_IIII
             offset: ('0000' '0000' '1010').parseBits(),
           )),
-          matchesASM('STR R2, [R4], -R10'),
+          matchesASM('str r2, [r4], -r10'),
         );
       });
 
@@ -715,7 +716,7 @@ void _testSingleDataTransfer() {
             // RRRR_IIII_IIII
             offset: ('1100' '0000' '1010').parseBits(),
           )),
-          matchesASM('STR R2, [R4], -R10, LSL R12'),
+          matchesASM('str r2, [r4], -r10, lsl r12'),
         );
       });
     });
@@ -762,7 +763,7 @@ void _testBlockDataTransfer() {
           // Register list.
           r: '1000' '0000'.parseBits(),
         )),
-        matchesASM('LDMIB R4, {R7}'),
+        matchesASM('ldmib r4, {r7}'),
       );
     });
 
@@ -781,7 +782,7 @@ void _testBlockDataTransfer() {
           // Register list.
           r: '1000' '0000'.parseBits(),
         )),
-        matchesASM('LDMIA R4, {R7}'),
+        matchesASM('ldmia r4, {r7}'),
       );
     });
 
@@ -800,7 +801,7 @@ void _testBlockDataTransfer() {
           // Register list.
           r: '1000' '0000'.parseBits(),
         )),
-        matchesASM('LDMDB R4, {R7}'),
+        matchesASM('ldmdb r4, {r7}'),
       );
     });
 
@@ -819,7 +820,7 @@ void _testBlockDataTransfer() {
           // Register list.
           r: '1000' '0000'.parseBits(),
         )),
-        matchesASM('LDMDA R4, {R7}'),
+        matchesASM('ldmda r4, {r7}'),
       );
     });
 
@@ -839,7 +840,7 @@ void _testBlockDataTransfer() {
           // Register list.
           r: '1000' '0000'.parseBits(),
         )),
-        matchesASM('LDMDA R4!, {R7}^'),
+        matchesASM('ldmda r4!, {r7}^'),
       );
     });
   });
@@ -862,7 +863,7 @@ void _testBlockDataTransfer() {
         // Register list.
         r: '1000' '0000'.parseBits(),
       )),
-      matchesASM('STMIB R4, {R7}'),
+      matchesASM('stmib r4, {r7}'),
     );
   });
 }

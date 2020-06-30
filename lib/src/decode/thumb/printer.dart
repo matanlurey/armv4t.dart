@@ -1,17 +1,9 @@
-import 'package:armv4t/src/decode/common.dart' as common;
+import 'package:armv4t/src/decode/common.dart';
 import 'package:armv4t/src/decode/thumb/instruction.dart';
-import 'package:meta/meta.dart';
 
-class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
-  @visibleForTesting
-  static String describeRegisterList(int registerList, [String suffix]) {
-    return common.describeRegisterList(
-      registerList,
-      length: 8,
-      suffix: suffix,
-    );
-  }
-
+class ThumbInstructionPrinter
+    with InstructionPrintHelper
+    implements ThumbInstructionVisitor<String, void> {
   const ThumbInstructionPrinter();
 
   @override
@@ -19,595 +11,595 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     LSL$MoveShiftedRegister i, [
     void _,
   ]) =>
-      'LSL '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '#${i.immediateValue}';
+      'lsl '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${i.immediateValue}';
 
   @override
   String visitLSR$MoveShiftedRegister(
     LSR$MoveShiftedRegister i, [
     void _,
   ]) =>
-      'LSR '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '#${i.immediateValue}';
+      'lsr '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${i.immediateValue}';
 
   @override
   String visitASR$MoveShiftedRegister(
     ASR$MoveShiftedRegister i, [
     void _,
   ]) =>
-      'ASR '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '#${i.immediateValue}';
+      'asr '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${i.immediateValue}';
 
   @override
   String visitADD$AddSubtract$Register(
     ADD$AddSubtract$Register i, [
     void _,
   ]) =>
-      'ADD '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      'R${i.otherRegister}';
+      'add '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeRegister(i.otherRegister)}';
 
   @override
   String visitADD$AddSubtract$Offset3(
     ADD$AddSubtract$Offset3 i, [
     void _,
   ]) =>
-      'ADD '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '#${i.immediateValue}';
+      'add '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${i.immediateValue}';
 
   @override
   String visitSUB$AddSubtract$Register(
     SUB$AddSubtract$Register i, [
     void _,
   ]) =>
-      'SUB '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      'R${i.otherRegister}';
+      'sub '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeRegister(i.otherRegister)}';
 
   @override
   String visitSUB$AddSubtract$Offset3(
     SUB$AddSubtract$Offset3 i, [
     void _,
   ]) =>
-      'SUB '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '#${i.immediateValue}';
+      'sub '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${i.immediateValue}';
 
   @override
   String visitMOV$MoveCompareAddSubtractImmediate(
     MOV$MoveCompareAddSubtractImmediate i, [
     void _,
   ]) =>
-      'MOV '
-      'R${i.destinationRegister}, '
-      '#${i.immediateValue}';
+      'mov '
+      '${describeRegister(i.destinationRegister)}, '
+      '${i.immediateValue}';
 
   @override
   String visitCMP$MoveCompareAddSubtractImmediate(
     CMP$MoveCompareAddSubtractImmediate i, [
     void _,
   ]) =>
-      'CMP '
-      'R${i.destinationRegister}, '
-      '#${i.immediateValue}';
+      'cmp '
+      '${describeRegister(i.destinationRegister)}, '
+      '${i.immediateValue}';
 
   @override
   String visitADD$MoveCompareAddSubtractImmediate(
     ADD$MoveCompareAddSubtractImmediate i, [
     void _,
   ]) =>
-      'ADD '
-      'R${i.destinationRegister}, '
-      '#${i.immediateValue}';
+      'add '
+      '${describeRegister(i.destinationRegister)}, '
+      '${i.immediateValue}';
 
   @override
   String visitSUB$MoveCompareAddSubtractImmediate(
     SUB$MoveCompareAddSubtractImmediate i, [
     void _,
   ]) =>
-      'SUB '
-      'R${i.destinationRegister}, '
-      '#${i.immediateValue}';
+      'sub '
+      '${describeRegister(i.destinationRegister)}, '
+      '${i.immediateValue}';
 
   @override
   String visitAND(
     AND i, [
     void _,
   ]) =>
-      'AND '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'and '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitEOR(
     EOR i, [
     void _,
   ]) =>
-      'EOR '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'eor '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitLSL$ALU(
     LSL$ALU i, [
     void _,
   ]) =>
-      'LSL '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'lsl '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitLSR$ALU(
     LSR$ALU i, [
     void _,
   ]) =>
-      'LSR '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'lsr '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitASR$ALU(
     ASR$ALU i, [
     void _,
   ]) =>
-      'ASR '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'asr '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitADC(
     ADC i, [
     void _,
   ]) =>
-      'ADC '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'adc '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitSBC(
     SBC i, [
     void _,
   ]) =>
-      'SBC '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'sbc '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitROR(
     ROR i, [
     void _,
   ]) =>
-      'ROR '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'ror '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitTST(
     TST i, [
     void _,
   ]) =>
-      'TST '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'tst '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitNEG(
     NEG i, [
     void _,
   ]) =>
-      'NEG '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'neg '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitCMP$ALU(
     CMP$ALU i, [
     void _,
   ]) =>
-      'CMP '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'cmp '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitCMN(
     CMN i, [
     void _,
   ]) =>
-      'CMN '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'cmn '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitORR(
     ORR i, [
     void _,
   ]) =>
-      'ORR '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'orr '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitMUL(
     MUL i, [
     void _,
   ]) =>
-      'MUL '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'mul '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitBIC(
     BIC i, [
     void _,
   ]) =>
-      'BIC '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'bic '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitMVN(
     MVN i, [
     void _,
   ]) =>
-      'MVN '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'mvn '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitADD$HiToLo(
     ADD$HiToLo i, [
     void _,
   ]) =>
-      'ADD '
-      'R${i.destinationRegister}, '
-      'H${i.sourceRegister}';
+      'add '
+      '${describeRegister(i.destinationRegister)}, '
+      'h${i.sourceRegister}';
 
   @override
   String visitADD$LoToHi(
     ADD$LoToHi i, [
     void _,
   ]) =>
-      'ADD '
-      'H${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'add '
+      'h${i.destinationRegister}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitADD$HiToHi(
     ADD$HiToHi i, [
     void _,
   ]) =>
-      'ADD '
-      'H${i.destinationRegister}, '
-      'H${i.sourceRegister}';
+      'add '
+      'h${i.destinationRegister}, '
+      'h${i.sourceRegister}';
 
   @override
   String visitCMP$HiToLo(
     CMP$HiToLo i, [
     void _,
   ]) =>
-      'CMP '
-      'R${i.destinationRegister}, '
-      'H${i.sourceRegister}';
+      'cmp '
+      '${describeRegister(i.destinationRegister)}, '
+      'h${i.sourceRegister}';
 
   @override
   String visitCMP$LoToHi(
     CMP$LoToHi i, [
     void _,
   ]) =>
-      'CMP '
-      'H${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'cmp '
+      'h${i.destinationRegister}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitCMP$HiToHi(
     CMP$HiToHi i, [
     void _,
   ]) =>
-      'CMP '
-      'H${i.destinationRegister}, '
-      'H${i.sourceRegister}';
+      'cmp '
+      'h${i.destinationRegister}, '
+      'h${i.sourceRegister}';
 
   @override
   String visitMOV$HiToLo(
     MOV$HiToLo i, [
     void _,
   ]) =>
-      'MOV '
-      'R${i.destinationRegister}, '
-      'H${i.sourceRegister}';
+      'mov '
+      '${describeRegister(i.destinationRegister)}, '
+      'h${i.sourceRegister}';
 
   @override
   String visitMOV$LoToHi(
     MOV$LoToHi i, [
     void _,
   ]) =>
-      'MOV '
-      'H${i.destinationRegister}, '
-      'R${i.sourceRegister}';
+      'mov '
+      'h${i.destinationRegister}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitMOV$HiToHi(
     MOV$HiToHi i, [
     void _,
   ]) =>
-      'MOV '
-      'H${i.destinationRegister}, '
-      'H${i.sourceRegister}';
+      'mov '
+      'h${i.destinationRegister}, '
+      'h${i.sourceRegister}';
 
   @override
   String visitBX$Lo(
     BX$Lo i, [
     void _,
   ]) =>
-      'BX '
-      'R${i.sourceRegister}';
+      'bx '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitBX$Hi(
     BX$Hi i, [
     void _,
   ]) =>
-      'BX '
-      'H${i.sourceRegister}';
+      'bx '
+      'h${i.sourceRegister}';
 
   @override
   String visitLDR$PCRelative(
     LDR$PCRelative i, [
     void _,
   ]) =>
-      'LDR '
-      'R${i.destinationRegister}, '
-      '[PC, #${i.immediateValue}]';
+      'ldr '
+      '${describeRegister(i.destinationRegister)}, '
+      '[pc, ${i.immediateValue}]';
 
   @override
   String visitSTR$RelativeOffset(
     STR$RelativeOffset i, [
     void _,
   ]) =>
-      'STR '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, R${i.offsetRegister}]';
+      'str '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${describeRegister(i.offsetRegister)}]';
 
   @override
   String visitSTRB$RelativeOffset(
     STRB$RelativeOffset i, [
     void _,
   ]) =>
-      'STRB '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, R${i.offsetRegister}]';
+      'strb '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${describeRegister(i.offsetRegister)}]';
 
   @override
   String visitLDR$RelativeOffset(
     LDR$RelativeOffset i, [
     void _,
   ]) =>
-      'LDR '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, R${i.offsetRegister}]';
+      'ldr '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${describeRegister(i.offsetRegister)}]';
 
   @override
   String visitLDRB$RelativeOffset(
     LDRB$RelativeOffset i, [
     void _,
   ]) =>
-      'LDRB '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, R${i.offsetRegister}]';
+      'ldrb '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${describeRegister(i.offsetRegister)}]';
 
   @override
   String visitSTRH$SignExtendedByteOrHalfWord(
     STRH$SignExtendedByteOrHalfWord i, [
     void _,
   ]) =>
-      'STRH '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, R${i.offsetRegister}]';
+      'strh '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${describeRegister(i.offsetRegister)}]';
 
   @override
   String visitLDRH$SignExtendedByteOrHalfWord(
     LDRH$SignExtendedByteOrHalfWord i, [
     void _,
   ]) =>
-      'LDRH '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, R${i.offsetRegister}]';
+      'ldrh '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${describeRegister(i.offsetRegister)}]';
 
   @override
   String visitLDSB(
     LDSB i, [
     void _,
   ]) =>
-      'LDSB '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, R${i.offsetRegister}]';
+      'ldsb '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${describeRegister(i.offsetRegister)}]';
 
   @override
   String visitLDSH(
     LDSH i, [
     void _,
   ]) =>
-      'LDSH '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, R${i.offsetRegister}]';
+      'ldsh '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${describeRegister(i.offsetRegister)}]';
 
   @override
   String visitSTR$ImmediateOffset(
     STR$ImmediateOffset i, [
     void _,
   ]) =>
-      'STR '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, #${i.immediateValue}]';
+      'str '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitLDR$ImmediateOffset(
     LDR$ImmediateOffset i, [
     void _,
   ]) =>
-      'LDR '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, #${i.immediateValue}]';
+      'ldr '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitSTRB$ImmediateOffset(
     STRB$ImmediateOffset i, [
     void _,
   ]) =>
-      'STRB '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, #${i.immediateValue}]';
+      'strb '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitLDRB$ImmediateOffset(
     LDRB$ImmediateOffset i, [
     void _,
   ]) =>
-      'LDRB '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, #${i.immediateValue}]';
+      'ldrb '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitSTRH$HalfWord(
     STRH$HalfWord i, [
     void _,
   ]) =>
-      'STRH '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, #${i.immediateValue}]';
+      'strh '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitLDRH$HalfWord(
     LDRH$HalfWord i, [
     void _,
   ]) =>
-      'LDRH '
-      'R${i.destinationRegister}, '
-      '[R${i.baseRegister}, #${i.immediateValue}]';
+      'ldrh '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitSTR$SPRelative(
     STR$SPRelative i, [
     void _,
   ]) =>
-      'STR '
-      'R${i.destinationRegister}, '
-      '[SP, #${i.immediateValue}]';
+      'str '
+      '${describeRegister(i.destinationRegister)}, '
+      '[sp, ${i.immediateValue}]';
 
   @override
   String visitLDR$SPRelative(
     LDR$SPRelative i, [
     void _,
   ]) =>
-      'LDR '
-      'R${i.destinationRegister}, '
-      '[SP, #${i.immediateValue}]';
+      'ldr '
+      '${describeRegister(i.destinationRegister)}, '
+      '[sp, ${i.immediateValue}]';
 
   @override
   String visitADD$LoadAddress$PC(
     ADD$LoadAddress$PC i, [
     void _,
   ]) =>
-      'ADD '
-      'R${i.destinationRegister}, '
-      'PC, '
-      '#${i.immediateValue}';
+      'add '
+      '${describeRegister(i.destinationRegister)}, '
+      'pc, '
+      '${i.immediateValue}';
 
   @override
   String visitADD$LoadAddress$SP(
     ADD$LoadAddress$SP i, [
     void _,
   ]) =>
-      'ADD '
-      'R${i.destinationRegister}, '
-      'SP, '
-      '#${i.immediateValue}';
+      'add '
+      '${describeRegister(i.destinationRegister)}, '
+      'sp, '
+      '${i.immediateValue}';
 
   @override
   String visitADD$OffsetToStackPointer$Positive(
     ADD$OffsetToStackPointer$Positive i, [
     void _,
   ]) =>
-      'ADD '
-      'SP, '
-      '#${i.immediateValue}';
+      'add '
+      'sp, '
+      '${i.immediateValue}';
 
   @override
   String visitADD$OffsetToStackPointer$Negative(
     ADD$OffsetToStackPointer$Negative i, [
     void _,
   ]) =>
-      'ADD '
-      'SP, '
-      '#-${i.immediateValue}';
+      'add '
+      'sp, '
+      '-${i.immediateValue}';
 
   @override
   String visitPUSH$Registers(
     PUSH$Registers i, [
     void _,
   ]) =>
-      'PUSH '
-      '{${describeRegisterList(i.registerList)}}';
+      'push '
+      '{${describeRegisterList(i.registerList, length: 8)}}';
 
   @override
   String visitPUSH$RegistersAndLinkRegister(
     PUSH$RegistersAndLinkRegister i, [
     void _,
   ]) =>
-      'PUSH '
-      '{${describeRegisterList(i.registerList, 'LR')}}';
+      'push '
+      '{${describeRegisterList(i.registerList, length: 8, suffix: 'lr')}}';
 
   @override
   String visitPOP$Registers(
     POP$Registers i, [
     void _,
   ]) =>
-      'POP '
-      '{${describeRegisterList(i.registerList)}}';
+      'pop '
+      '{${describeRegisterList(i.registerList, length: 8)}}';
 
   @override
   String visitPOP$RegistersAndProgramCounter(
     POP$RegistersAndLinkRegister i, [
     void _,
   ]) =>
-      'POP '
-      '{${describeRegisterList(i.registerList, 'PC')}}';
+      'pop '
+      '{${describeRegisterList(i.registerList, length: 8, suffix: 'pc')}}';
 
   @override
   String visitSTMIA(
     STMIA i, [
     void _,
   ]) =>
-      'STMIA '
-      'R${i.baseRegister}!, '
-      '{${describeRegisterList(i.registerList)}}';
+      'stmia '
+      '${describeRegister(i.baseRegister)}!, '
+      '{${describeRegisterList(i.registerList, length: 8)}}';
 
   @override
   String visitLDMIA(
     LDMIA i, [
     void _,
   ]) =>
-      'LDMIA '
-      'R${i.baseRegister}!, '
-      '{${describeRegisterList(i.registerList)}}';
+      'ldmia '
+      '${describeRegister(i.baseRegister)}!, '
+      '{${describeRegisterList(i.registerList, length: 8)}}';
 
   @override
   String visitBEQ(
     BEQ i, [
     void _,
   ]) =>
-      'BEQ '
+      'beq '
       '${i.label}';
 
   @override
@@ -615,7 +607,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BNE i, [
     void _,
   ]) =>
-      'BNE '
+      'bne '
       '${i.label}';
 
   @override
@@ -623,7 +615,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BCS i, [
     void _,
   ]) =>
-      'BCS '
+      'bcs '
       '${i.label}';
 
   @override
@@ -631,7 +623,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BCC i, [
     void _,
   ]) =>
-      'BCC '
+      'bcc '
       '${i.label}';
 
   @override
@@ -639,7 +631,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BMI i, [
     void _,
   ]) =>
-      'BMI '
+      'bmi '
       '${i.label}';
 
   @override
@@ -647,7 +639,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BPL i, [
     void _,
   ]) =>
-      'BPL '
+      'bpl '
       '${i.label}';
 
   @override
@@ -655,7 +647,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BVS i, [
     void _,
   ]) =>
-      'BVS '
+      'bvs '
       '${i.label}';
 
   @override
@@ -663,7 +655,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BVC i, [
     void _,
   ]) =>
-      'BVC '
+      'bvc '
       '${i.label}';
 
   @override
@@ -671,7 +663,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BHI i, [
     void _,
   ]) =>
-      'BHI '
+      'bhi '
       '${i.label}';
 
   @override
@@ -679,7 +671,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BLS i, [
     void _,
   ]) =>
-      'BLS '
+      'bls '
       '${i.label}';
 
   @override
@@ -687,7 +679,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BGE i, [
     void _,
   ]) =>
-      'BGE '
+      'bge '
       '${i.label}';
 
   @override
@@ -695,7 +687,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BLT i, [
     void _,
   ]) =>
-      'BLT '
+      'blt '
       '${i.label}';
 
   @override
@@ -703,7 +695,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BGT i, [
     void _,
   ]) =>
-      'BGT '
+      'bgt '
       '${i.label}';
 
   @override
@@ -711,7 +703,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BLE i, [
     void _,
   ]) =>
-      'BLE '
+      'ble '
       '${i.label}';
 
   @override
@@ -719,7 +711,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     SWI i, [
     void _,
   ]) =>
-      'SWI '
+      'swi '
       '${i.value}';
 
   @override
@@ -727,7 +719,7 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     B i, [
     void _,
   ]) =>
-      'B '
+      'b '
       '${i.immdediateValue}';
 
   @override
@@ -735,6 +727,6 @@ class ThumbInstructionPrinter implements ThumbInstructionVisitor<String, void> {
     BL i, [
     void _,
   ]) =>
-      'BL '
+      'bl '
       '${i.offset}';
 }

@@ -4,7 +4,11 @@ part of '../printer.dart';
 mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
   /// Provide a way to encode a shifter operand.
   @visibleForOverriding
-  String _shifterOperand(bool treatAsImmediate, int bits);
+  String describeShifterOperand(bool treatAsImmediate, int bits);
+
+  /// Provide a way to encode a register.
+  @visibleForOverriding
+  String describeRegister(int register);
 
   /// Converts and [offset] into an assembler string.
   String _addressingMode2(
@@ -48,13 +52,13 @@ mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
     @required int immediateOffset,
     @required int upDownBit,
   }) {
-    var result = '[R$register, ';
+    var result = '[${describeRegister(register)}, ';
     if (upDownBit == 0) {
       result = '$result-';
     } else {
       result = '$result+';
     }
-    return '$result${_shifterOperand(immediateOffset == 0, offset)}]';
+    return '$result${describeShifterOperand(immediateOffset == 0, offset)}]';
   }
 
   String _addressingMode2$PreIndexedOffset(
@@ -78,15 +82,15 @@ mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
     @required int immediateOffset,
     @required int upDownBit,
   }) {
-    final op = _shifterOperand(immediateOffset == 0, offset);
-    if (op.endsWith('RRX')) {
+    final op = describeShifterOperand(immediateOffset == 0, offset);
+    if (op.endsWith('rrx')) {
       return _addressingMode2$PostIndexedOffset$RRX(
         register,
         op,
         upDownBit: upDownBit,
       );
     } else {
-      var result = '[R$register], ';
+      var result = '[${describeRegister(register)}], ';
       if (upDownBit == 0) {
         result = '$result-';
       } else {
@@ -102,6 +106,6 @@ mixin ArmLoadAndStoreWordOrUnsignedBytePrintHelper {
     @required int upDownBit,
   }) {
     final prefix = upDownBit == 0 ? '-' : '+';
-    return '[R$register, $prefix$offset]';
+    return '[${describeRegister(register)}, $prefix$offset]';
   }
 }

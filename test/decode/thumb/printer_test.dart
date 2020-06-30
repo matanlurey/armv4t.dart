@@ -1,79 +1,91 @@
-import 'package:armv4t/src/decode/thumb/printer.dart';
+import 'package:armv4t/src/decode/common.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
+class _TestPrinter with InstructionPrintHelper {}
+
 /// Additional tests not otherwise covered in `instruction_test.dart`.
 void main() {
+  final testPrinter = _TestPrinter();
+
   group('describeRegisterList', () {
-    test('<None>>', () {
+    test('<None>', () {
       expect(
-        ThumbInstructionPrinter.describeRegisterList(
+        testPrinter.describeRegisterList(
           ('0000' '0000').parseBits(),
+          length: 8,
         ),
         isEmpty,
       );
     });
 
-    test('R0', () {
+    test('r0', () {
       expect(
-        ThumbInstructionPrinter.describeRegisterList(
+        testPrinter.describeRegisterList(
           ('0000' '0001').parseBits(),
+          length: 8,
         ),
-        'R0',
+        'r0',
       );
     });
 
-    test('R4', () {
+    test('r4', () {
       expect(
-        ThumbInstructionPrinter.describeRegisterList(
+        testPrinter.describeRegisterList(
           ('0001' '0000').parseBits(),
+          length: 8,
         ),
-        'R4',
+        'r4',
       );
     });
 
-    test('R7', () {
+    test('r7', () {
       expect(
-        ThumbInstructionPrinter.describeRegisterList(
+        testPrinter.describeRegisterList(
           ('1000' '0000').parseBits(),
+          length: 8,
         ),
-        'R7',
+        'r7',
       );
     });
 
-    test('R0->R1', () {
+    test('r0->R1', () {
       expect(
-        ThumbInstructionPrinter.describeRegisterList(
+        testPrinter.describeRegisterList(
           ('0000' '0011').parseBits(),
+          length: 8,
         ),
-        'R0-R1',
+        'r0-r1',
       );
     });
 
-    test('R6->R7', () {
+    test('r6->R7', () {
       expect(
-        ThumbInstructionPrinter.describeRegisterList(
+        testPrinter.describeRegisterList(
           ('1100' '0000').parseBits(),
+          length: 8,
         ),
-        'R6-R7',
+        'r6-r7',
       );
     });
 
-    test('R0->R7', () {
+    test('r0->R7', () {
       expect(
-        ThumbInstructionPrinter.describeRegisterList(
+        testPrinter.describeRegisterList(
           ('1111' '1111').parseBits(),
+          length: 8,
         ),
-        'R0-R7',
+        'r0-r7',
       );
     });
 
-    test('R0->R1, R6->R7', () {
+    test('r0->R1, R6->R7', () {
       expect(
-        ThumbInstructionPrinter.describeRegisterList(
+        testPrinter.describeRegisterList(
           ('1100' '0011').parseBits(),
+          length: 8,
         ),
-        'R0-R1,R6-R7',
+        'r0-r1,r6-r7',
       );
     });
   });

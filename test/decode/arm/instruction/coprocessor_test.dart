@@ -31,54 +31,54 @@ void main() {
     group('LDC [L = 1]', () {
       test('<Default>', () {
         final instruction = build(l: 1);
-        expect(decode(instruction), matchesASM('LDC P6, C4, [R2, #-8]'));
+        expect(decode(instruction), matchesASM('ldc p6, c4, [r2, -8]'));
       });
 
       test('P = 1', () {
         final instruction = build(l: 1, p: 1);
-        expect(decode(instruction), matchesASM('LDC P6, C4, [R2], #-8'));
+        expect(decode(instruction), matchesASM('ldc p6, c4, [r2], -8'));
       });
 
       test('U = 1', () {
         final instruction = build(l: 1, u: 1);
-        expect(decode(instruction), matchesASM('LDC P6, C4, [R2, #+8]'));
+        expect(decode(instruction), matchesASM('ldc p6, c4, [r2, +8]'));
       });
 
       test('N = 1', () {
         final instruction = build(l: 1, n: 1);
-        expect(decode(instruction), matchesASM('LDCL P6, C4, [R2, #-8]'));
+        expect(decode(instruction), matchesASM('ldcl p6, c4, [r2, -8]'));
       });
 
       test('W = 1', () {
         final instruction = build(l: 1, w: 1);
-        expect(decode(instruction), matchesASM('LDC P6, C4, [R2, #-8]!'));
+        expect(decode(instruction), matchesASM('ldc p6, c4, [r2, -8]!'));
       });
     });
 
     group('STC [L = 0]', () {
       test('<Default>', () {
         final instruction = build(l: 0);
-        expect(decode(instruction), matchesASM('STC P6, C4, [R2, #-8]'));
+        expect(decode(instruction), matchesASM('stc p6, c4, [r2, -8]'));
       });
 
       test('P = 1', () {
         final instruction = build(l: 0, p: 1);
-        expect(decode(instruction), matchesASM('STC P6, C4, [R2], #-8'));
+        expect(decode(instruction), matchesASM('stc p6, c4, [r2], -8'));
       });
 
       test('U = 1', () {
         final instruction = build(l: 0, u: 1);
-        expect(decode(instruction), matchesASM('STC P6, C4, [R2, #+8]'));
+        expect(decode(instruction), matchesASM('stc p6, c4, [r2, +8]'));
       });
 
       test('N = 1', () {
         final instruction = build(l: 0, n: 1);
-        expect(decode(instruction), matchesASM('STCL P6, C4, [R2, #-8]'));
+        expect(decode(instruction), matchesASM('stcl p6, c4, [r2, -8]'));
       });
 
       test('W = 1', () {
         final instruction = build(l: 0, w: 1);
-        expect(decode(instruction), matchesASM('STC P6, C4, [R2, #-8]!'));
+        expect(decode(instruction), matchesASM('stc p6, c4, [r2, -8]!'));
       });
     });
   });
@@ -100,7 +100,7 @@ void main() {
 
     test('CDP', () {
       final instruction = build(1, 2, 3, 4, 5, 6);
-      expect(decode(instruction), matchesASM('CDP P4, 1, C3, C2, C6, 5'));
+      expect(decode(instruction), matchesASM('cdp p4, 1, c3, c2, c6, 5'));
     });
   });
 
@@ -120,12 +120,12 @@ void main() {
 
     test('MCR', () {
       final instruction = build(1, 0, 3, 4, 5, 6, 7);
-      expect(decode(instruction), matchesASM('MCR P5, 1, R4, C3, C7'));
+      expect(decode(instruction), matchesASM('mcr p5, 1, r4, c3, c7'));
     });
 
     test('MRC', () {
       final instruction = build(1, 1, 3, 4, 5, 6, 7);
-      expect(decode(instruction), matchesASM('MRC P5, 1, R4, C3, C7'));
+      expect(decode(instruction), matchesASM('mrc p5, 1, r4, c3, c7'));
     });
   });
 }

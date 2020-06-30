@@ -1,7 +1,6 @@
 import 'package:armv4t/src/decode/arm/format.dart';
 import 'package:armv4t/src/decode/arm/instruction.dart';
 import 'package:armv4t/src/decode/arm/printer.dart';
-import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
 // Example programs from https://onlinedisassembler.com/odaweb.
@@ -17,7 +16,7 @@ void main() {
     return program
         .map((p) =>
             '0x' +
-            p.toRadixString(16).toUpperCase().padLeft(8, '0') +
+            p.toRadixString(16).toLowerCase().padLeft(8, '0') +
             ': ' +
             decode(p).accept(ArmInstructionPrinter()))
         .toList();
@@ -36,13 +35,13 @@ void main() {
     ];
 
     expect(decodeAll(program), [
-      '0xE2402001: SUB R2, R0, #1',
-      '0xE0612002: RSB R2, R1, R2',
-      '0xE4D13001: LDRB R3, [R1], +#1',
-      '0xE3530000: CMP R3, #0',
-      '0xE7C13002: STRB R3, [R1, +R2]',
-      '0x1AFFFFFB: BNE 16777211',
-      '0xE12FFF1E: BX R14',
+      '0xe2402001: sub r2, r0, 1',
+      '0xe0612002: rsb r2, r1, r2',
+      '0xe4d13001: ldrb r3, [r1], +1',
+      '0xe3530000: cmp r3, 0',
+      '0xe7c13002: strb r3, [r1, +r2]',
+      '0x1afffffb: bne 16777211',
+      '0xe12fff1e: bx lr',
     ]);
   });
 }

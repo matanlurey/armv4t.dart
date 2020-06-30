@@ -1,6 +1,6 @@
-import 'package:armv4t/src/decode/common.dart' as common;
 import 'package:armv4t/src/decode/arm/condition.dart';
 import 'package:armv4t/src/decode/arm/operands.dart';
+import 'package:armv4t/src/decode/common.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -15,20 +15,12 @@ part 'printer/word_or_unsigned_byte.dart';
 /// Converts an [ArmInstruction] into its assembly-based [String] equivalent.
 class ArmInstructionPrinter
     with
+        InstructionPrintHelper,
         ArmLoadAndStoreWordOrUnsignedBytePrintHelper,
         ArmLoadAndStoreHalfWordOrLoadSignedByte,
         ArmLoadAndStoreMultiplePrintHelper,
         ArmLoadAndStoreCoprocessorPrintHelper
     implements ArmInstructionVisitor<String, void> {
-  @visibleForTesting
-  static String describeRegisterList(int registerList, [String suffix]) {
-    return common.describeRegisterList(
-      registerList,
-      length: 16,
-      suffix: suffix,
-    );
-  }
-
   final ArmConditionDecoder _conditionDecoder;
   final ArmConditionPrinter _conditionPrinter;
   final ShifterOperandDecoder _operandDecoder;
@@ -41,34 +33,37 @@ class ArmInstructionPrinter
     this._operandPrinter = const ShifterOperandPrinter(),
   ]);
 
-  String _cond(ArmInstruction i) {
-    return _conditionDecoder.decodeBits(i.condition).accept(_conditionPrinter);
+  String _describeCondition(ArmInstruction i) {
+    return _conditionDecoder
+        .decodeBits(i.condition)
+        .accept(_conditionPrinter)
+        .toLowerCase();
   }
 
-  String _s(int sBit) => sBit == 1 ? 'S' : '';
+  String _s(int sBit) => sBit == 1 ? 's' : '';
 
-  String _i(int iBit, int operand) => iBit == 1 ? '#${operand}' : 'R${operand}';
+  String _i(int iBit, int operand) => iBit == 1 ? '${operand}' : 'r${operand}';
 
-  String _fieldMask(int bits) {
+  String _describeFieldMask(int bits) {
     if (bits == 0) return '';
     final result = StringBuffer('_');
     if (bits.getBit(3) == 1) {
-      result.write('C');
+      result.write('c');
     }
     if (bits.getBit(2) == 1) {
-      result.write('X');
+      result.write('x');
     }
     if (bits.getBit(1) == 1) {
-      result.write('S');
+      result.write('s');
     }
     if (bits.getBit(0) == 1) {
-      result.write('F');
+      result.write('f');
     }
     return result.toString();
   }
 
   @override
-  String _shifterOperand(bool treatAsImmediate, int bits) {
+  String describeShifterOperand(bool treatAsImmediate, int bits) {
     ArmShifterOperand operand;
     if (treatAsImmediate) {
       operand = _operandDecoder.decodeImmediate(bits);
@@ -83,7 +78,7 @@ class ArmInstructionPrinter
     B i, [
     void _,
   ]) =>
-      'B${_cond(i)} '
+      'b${_describeCondition(i)} '
       '${i.targetAddress}';
 
   @override
@@ -91,7 +86,7 @@ class ArmInstructionPrinter
     BL i, [
     void _,
   ]) =>
-      'BL${_cond(i)} '
+      'bl${_describeCondition(i)} '
       '${i.targetAddress}';
 
   @override
@@ -99,8 +94,8 @@ class ArmInstructionPrinter
     BX i, [
     void _,
   ]) =>
-      'BX${_cond(i)} '
-      'R${i.targetAddress}';
+      'bx${_describeCondition(i)} '
+      '${describeRegister(i.targetRegister)}';
 
   @override
   String visitLDM(
@@ -120,9 +115,9 @@ class ArmInstructionPrinter
       upDownBit: i.u,
     );
     return ''
-        'LDM${_cond(i)}$addressingMode '
-        'R${i.baseRegister}${i.w == 1 ? '!' : ''}, '
-        '{${describeRegisterList(i.registerList)}}${i.s == 1 ? '^' : ''}';
+        'ldm${_describeCondition(i)}$addressingMode '
+        '${describeRegister(i.baseRegister)}${i.w == 1 ? '!' : ''}, '
+        '{${describeRegisterList(i.registerList, length: 16)}}${i.s == 1 ? '^' : ''}';
   }
 
   @override
@@ -143,9 +138,9 @@ class ArmInstructionPrinter
       upDownBit: i.u,
     );
     return ''
-        'STM${_cond(i)}$addressingMode '
-        'R${i.baseRegister}${i.w == 1 ? '!' : ''}, '
-        '{${describeRegisterList(i.registerList)}}${i.s == 1 ? '^' : ''}';
+        'stm${_describeCondition(i)}$addressingMode '
+        '${describeRegister(i.baseRegister)}${i.w == 1 ? '!' : ''}, '
+        '{${describeRegisterList(i.registerList, length: 16)}}${i.s == 1 ? '^' : ''}';
   }
 
   @override
@@ -162,8 +157,8 @@ class ArmInstructionPrinter
       writeBackBit: i.w,
     );
     return ''
-        'STR${_cond(i)}${i.w == 1 && i.p == 0 ? 'T' : ''} '
-        'R${i.destinationRegister}, '
+        'str${_describeCondition(i)}${i.w == 1 && i.p == 0 ? 't' : ''} '
+        '${describeRegister(i.destinationRegister)}, '
         '$addressMode2';
   }
 
@@ -181,8 +176,8 @@ class ArmInstructionPrinter
       writeBackBit: i.w,
     );
     return ''
-        'STR${_cond(i)}B${i.w == 1 && i.p == 0 ? 'T' : ''} '
-        'R${i.destinationRegister}, '
+        'str${_describeCondition(i)}b${i.w == 1 && i.p == 0 ? 't' : ''} '
+        '${describeRegister(i.destinationRegister)}, '
         '$addressMode2';
   }
 
@@ -200,8 +195,8 @@ class ArmInstructionPrinter
       writeBackBit: i.w,
     );
     return ''
-        'LDR${_cond(i)}${i.w == 1 && i.p == 0 ? 'T' : ''} '
-        'R${i.destinationRegister}, '
+        'ldr${_describeCondition(i)}${i.w == 1 && i.p == 0 ? 't' : ''} '
+        '${describeRegister(i.destinationRegister)}, '
         '$addressMode2';
   }
 
@@ -219,8 +214,8 @@ class ArmInstructionPrinter
       writeBackBit: i.w,
     );
     return ''
-        'LDR${_cond(i)}B${i.w == 1 && i.p == 0 ? 'T' : ''} '
-        'R${i.destinationRegister}, '
+        'ldr${_describeCondition(i)}b${i.w == 1 && i.p == 0 ? 't' : ''} '
+        '${describeRegister(i.destinationRegister)}, '
         '$addressMode2';
   }
 
@@ -240,7 +235,10 @@ class ArmInstructionPrinter
       upDownBit: i.u,
       writeBackBit: i.w,
     );
-    return 'LDR${_cond(i)}H R${i.sourceRegister}, $addressMode3';
+    return ''
+        'ldr${_describeCondition(i)}h '
+        '${describeRegister(i.sourceRegister)}, '
+        '$addressMode3';
   }
 
   @override
@@ -259,7 +257,10 @@ class ArmInstructionPrinter
       upDownBit: i.u,
       writeBackBit: i.w,
     );
-    return 'STR${_cond(i)}H R${i.destinationRegister}, $addressMode3';
+    return ''
+        'str${_describeCondition(i)}h '
+        '${describeRegister(i.destinationRegister)}, '
+        '$addressMode3';
   }
 
   @override
@@ -278,7 +279,10 @@ class ArmInstructionPrinter
       upDownBit: i.u,
       writeBackBit: i.w,
     );
-    return 'LDR${_cond(i)}SB R${i.sourceRegister}, $addressMode3';
+    return ''
+        'ldr${_describeCondition(i)}sb '
+        '${describeRegister(i.sourceRegister)}, '
+        '$addressMode3';
   }
 
   @override
@@ -297,7 +301,10 @@ class ArmInstructionPrinter
       upDownBit: i.u,
       writeBackBit: i.w,
     );
-    return 'LDR${_cond(i)}SH R${i.sourceRegister}, $addressMode3';
+    return ''
+        'ldr${_describeCondition(i)}sh '
+        '${describeRegister(i.sourceRegister)}, '
+        '$addressMode3';
   }
 
   @override
@@ -305,26 +312,27 @@ class ArmInstructionPrinter
     MOV i, [
     void _,
   ]) =>
-      'MOV${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'mov${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitMRS(
     MRS i, [
     void _,
   ]) =>
-      'MRS${_cond(i)} '
-      'R${i.destinationRegister}, '
-      '${i.sourcePSR == 0 ? 'CPSR' : 'SPSR'}';
+      'mrs${_describeCondition(i)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${i.sourcePSR == 0 ? 'cpsr' : 'spsr'}';
 
   @override
   String visitMSR(
     MSR i, [
     void _,
   ]) =>
-      'MSR${_cond(i)} '
-      '${i.destinationPSR == 0 ? 'CPSR' : 'SPSR'}${_fieldMask(i.fieldMask)}, '
+      'msr${_describeCondition(i)} '
+      '${i.destinationPSR == 0 ? 'cpsr' : 'spsr'}'
+      '${_describeFieldMask(i.fieldMask)}, '
       '${_i(i.immediateOperand, i.sourceOperand)}';
 
   @override
@@ -332,249 +340,249 @@ class ArmInstructionPrinter
     MVN i, [
     void _,
   ]) =>
-      'MVN${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'mvn${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitSWP(
     SWP i, [
     void _,
   ]) =>
-      'SWP${_cond(i)} '
-      'R${i.sourceRegister1}, '
-      'R${i.destinationRegister}, '
-      '[R${i.sourceRegister2}]';
+      'swp${_describeCondition(i)} '
+      '${describeRegister(i.sourceRegister1)}, '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.sourceRegister2)}]';
 
   @override
   String visitSWPB(
     SWPB i, [
     void _,
   ]) =>
-      'SWPB${_cond(i)} '
-      'R${i.sourceRegister1}, '
-      'R${i.destinationRegister}, '
-      '[R${i.sourceRegister2}]';
+      'swp${_describeCondition(i)}b '
+      '${describeRegister(i.sourceRegister1)}, '
+      '${describeRegister(i.destinationRegister)}, '
+      '[${describeRegister(i.sourceRegister2)}]';
 
   @override
   String visitAND(
     AND i, [
     void _,
   ]) =>
-      'AND${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'and${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitBIC(
     BIC i, [
     void _,
   ]) =>
-      'BIC${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'bic${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitCMN(
     CMN i, [
     void _,
   ]) =>
-      'CMN${_cond(i)} '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'cmn${_describeCondition(i)} '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitCMP(
     CMP i, [
     void _,
   ]) =>
-      'CMP${_cond(i)} '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'cmp${_describeCondition(i)} '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitEOR(
     EOR i, [
     void _,
   ]) =>
-      'EOR${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'eor${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitORR(
     ORR i, [
     void _,
   ]) =>
-      'ORR${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'orr${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitTEQ(
     TEQ i, [
     void _,
   ]) =>
-      'TEQ${_cond(i)} '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'teq${_describeCondition(i)} '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitTST(
     TST i, [
     void _,
   ]) =>
-      'TST${_cond(i)} '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'tst${_describeCondition(i)} '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitADC(
     ADC i, [
     void _,
   ]) =>
-      'ADC${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'adc${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitADD(
     ADD i, [
     void _,
   ]) =>
-      'ADD${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'add${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitMLA(
     MLA i, [
     void _,
   ]) =>
-      'MLA${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      'R${i.operandRegister1}, '
-      'R${i.operandRegister2}';
+      'mla${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeRegister(i.operandRegister1)}, '
+      '${describeRegister(i.operandRegister2)}';
 
   @override
   String visitMUL(
     MUL i, [
     void _,
   ]) =>
-      'MUL${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.operandRegister}, '
-      'R${i.sourceRegister}';
+      'mul${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.operandRegister)}, '
+      '${describeRegister(i.sourceRegister)}';
 
   @override
   String visitRSB(
     RSB i, [
     void _,
   ]) =>
-      'RSB${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'rsb${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitRSC(
     RSC i, [
     void _,
   ]) =>
-      'RSC${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'rsc${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitSBC(
     SBC i, [
     void _,
   ]) =>
-      'SBC${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'sbc${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitSUB(
     SUB i, [
     void _,
   ]) =>
-      'SUB${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegister}, '
-      'R${i.sourceRegister}, '
-      '${_shifterOperand(i.i == 1, i.shifterOperand)}';
+      'sub${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegister)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeShifterOperand(i.i == 1, i.shifterOperand)}';
 
   @override
   String visitSMLAL(
     SMLAL i, [
     void _,
   ]) =>
-      'SMLAL${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegisterLSW}, '
-      'R${i.destinationRegisterMSW}, '
-      'R${i.sourceRegister}, '
-      'R${i.operandRegister}';
+      'smlal${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegisterLSW)}, '
+      '${describeRegister(i.destinationRegisterMSW)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeRegister(i.operandRegister)}';
 
   @override
   String visitSMULL(
     SMULL i, [
     void _,
   ]) =>
-      'SMULL${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegisterLSW}, '
-      'R${i.destinationRegisterMSW}, '
-      'R${i.sourceRegister}, '
-      'R${i.operandRegister}';
+      'smull${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegisterLSW)}, '
+      '${describeRegister(i.destinationRegisterMSW)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeRegister(i.operandRegister)}';
 
   @override
   String visitUMLAL(
     UMLAL i, [
     void _,
   ]) =>
-      'UMLAL${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegisterLSW}, '
-      'R${i.destinationRegisterMSW}, '
-      'R${i.sourceRegister}, '
-      'R${i.operandRegister}';
+      'umlal${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegisterLSW)}, '
+      '${describeRegister(i.destinationRegisterMSW)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeRegister(i.operandRegister)}';
 
   @override
   String visitUMULL(
     UMULL i, [
     void _,
   ]) =>
-      'UMULL${_cond(i)}${_s(i.s)} '
-      'R${i.destinationRegisterLSW}, '
-      'R${i.destinationRegisterMSW}, '
-      'R${i.sourceRegister}, '
-      'R${i.operandRegister}';
+      'umull${_describeCondition(i)}${_s(i.s)} '
+      '${describeRegister(i.destinationRegisterLSW)}, '
+      '${describeRegister(i.destinationRegisterMSW)}, '
+      '${describeRegister(i.sourceRegister)}, '
+      '${describeRegister(i.operandRegister)}';
 
   @override
   String visitSWI(
     SWI i, [
     void _,
   ]) =>
-      'SWI${_cond(i)} #${i.immediate24}';
+      'swi${_describeCondition(i)} ${i.immediate24}';
 
   @override
   String visitCDP(
     CDP i, [
     void _,
   ]) =>
-      'CDP${_cond(i)} '
-      'P${i.coprocessorNumber}, '
+      'cdp${_describeCondition(i)} '
+      'p${i.coprocessorNumber}, '
       '${i.coprocessorOpCode}, '
-      'C${i.coprocessorDestinationRegister}, '
-      'C${i.coprocessorOperandRegister1}, '
-      'C${i.coprocessorOperandRegister2}, '
+      'c${i.coprocessorDestinationRegister}, '
+      'c${i.coprocessorOperandRegister1}, '
+      'c${i.coprocessorOperandRegister2}, '
       '${i.coprocessorInformation}';
 
   @override
@@ -582,9 +590,9 @@ class ArmInstructionPrinter
     LDC i, [
     void _,
   ]) =>
-      'LDC${_cond(i)}${i.n == 1 ? 'L' : ''} '
-      'P${i.coprocessorNumber}, '
-      'C${i.coprocessorSourceOrDestinationRegister}, '
+      'ldc${_describeCondition(i)}${i.n == 1 ? 'l' : ''} '
+      'p${i.coprocessorNumber}, '
+      'c${i.coprocessorSourceOrDestinationRegister}, '
       '${_addressingMode5(
         i.unsigned8BitImmediateOffset,
         i.baseRegister,
@@ -598,9 +606,9 @@ class ArmInstructionPrinter
     STC i, [
     void _,
   ]) =>
-      'STC${_cond(i)}${i.n == 1 ? 'L' : ''} '
-      'P${i.coprocessorNumber}, '
-      'C${i.coprocessorSourceOrDestinationRegister}, '
+      'stc${_describeCondition(i)}${i.n == 1 ? 'l' : ''} '
+      'p${i.coprocessorNumber}, '
+      'c${i.coprocessorSourceOrDestinationRegister}, '
       '${_addressingMode5(
         i.unsigned8BitImmediateOffset,
         i.baseRegister,
@@ -614,22 +622,22 @@ class ArmInstructionPrinter
     MCR i, [
     void _,
   ]) =>
-      'MCR${_cond(i)} '
-      'P${i.coprocessorNumber}, '
+      'mcr${_describeCondition(i)} '
+      'p${i.coprocessorNumber}, '
       '${i.coprocessorOperationCode}, '
-      'R${i.sourceRegister}, '
-      'C${i.coprocessorDestinationRegister}, '
-      'C${i.coprocessorOperandRegister}';
+      '${describeRegister(i.sourceRegister)}, '
+      'c${i.coprocessorDestinationRegister}, '
+      'c${i.coprocessorOperandRegister}';
 
   @override
   String visitMRC(
     MRC i, [
     void _,
   ]) =>
-      'MRC${_cond(i)} '
-      'P${i.coprocessorNumber}, '
+      'mrc${_describeCondition(i)} '
+      'p${i.coprocessorNumber}, '
       '${i.coprocessorOperationCode}, '
-      'R${i.destinationRegister}, '
-      'C${i.coprocessorSourceRegister}, '
-      'C${i.coprocessorOperandRegister}';
+      '${describeRegister(i.destinationRegister)}, '
+      'c${i.coprocessorSourceRegister}, '
+      'c${i.coprocessorOperandRegister}';
 }
