@@ -27,21 +27,21 @@ void main() {
     test('LSL', () {
       expect(
         decode(encode(0, 10, 2, 4)),
-        _matchesASM('LSL R4, R2, #10'),
+        _matchesASM('lsl r4, r2, #10'),
       );
     });
 
     test('LSR', () {
       expect(
         decode(encode(1, 10, 2, 4)),
-        _matchesASM('LSR R4, R2, #10'),
+        _matchesASM('lsr r4, r2, #10'),
       );
     });
 
     test('ASR', () {
       expect(
         decode(encode(2, 10, 2, 4)),
-        _matchesASM('ASR R4, R2, #10'),
+        _matchesASM('asr r4, r2, #10'),
       );
     });
   });
@@ -61,28 +61,28 @@ void main() {
     test('ADD (Rn)', () {
       expect(
         decode(encode(0, 0, 2, 4, 6)),
-        _matchesASM('ADD R6, R4, R2'),
+        _matchesASM('add r6, r4, r2'),
       );
     });
 
     test('ADD (#Offset3)', () {
       expect(
         decode(encode(1, 0, 2, 4, 6)),
-        _matchesASM('ADD R6, R4, #2'),
+        _matchesASM('add r6, r4, #2'),
       );
     });
 
     test('SUB (Rn)', () {
       expect(
         decode(encode(0, 1, 2, 4, 6)),
-        _matchesASM('SUB R6, R4, R2'),
+        _matchesASM('sub r6, r4, r2'),
       );
     });
 
     test('SUB (#Offset3)', () {
       expect(
         decode(encode(1, 1, 2, 4, 6)),
-        _matchesASM('SUB R6, R4, #2'),
+        _matchesASM('sub r6, r4, #2'),
       );
     });
   });
@@ -100,28 +100,28 @@ void main() {
     test('MOV', () {
       expect(
         decode(encode(0, 2, 16)),
-        _matchesASM('MOV R2, #16'),
+        _matchesASM('mov r2, #16'),
       );
     });
 
     test('CMP', () {
       expect(
         decode(encode(1, 2, 16)),
-        _matchesASM('CMP R2, #16'),
+        _matchesASM('cmp r2, #16'),
       );
     });
 
     test('ADD', () {
       expect(
         decode(encode(2, 2, 16)),
-        _matchesASM('ADD R2, #16'),
+        _matchesASM('add r2, #16'),
       );
     });
 
     test('SUB', () {
       expect(
         decode(encode(3, 2, 16)),
-        _matchesASM('SUB R2, #16'),
+        _matchesASM('sub r2, #16'),
       );
     });
   });
@@ -139,112 +139,112 @@ void main() {
     test('AND', () {
       expect(
         decode(encode(0, 2, 4)),
-        _matchesASM('AND R4, R2'),
+        _matchesASM('and r4, r2'),
       );
     });
 
     test('EOR', () {
       expect(
         decode(encode(1, 2, 4)),
-        _matchesASM('EOR R4, R2'),
+        _matchesASM('eor r4, r2'),
       );
     });
 
     test('LSL', () {
       expect(
         decode(encode(2, 2, 4)),
-        _matchesASM('LSL R4, R2'),
+        _matchesASM('lsl r4, r2'),
       );
     });
 
     test('LSR', () {
       expect(
         decode(encode(3, 2, 4)),
-        _matchesASM('LSR R4, R2'),
+        _matchesASM('lsr r4, r2'),
       );
     });
 
     test('ASR', () {
       expect(
         decode(encode(4, 2, 4)),
-        _matchesASM('ASR R4, R2'),
+        _matchesASM('asr r4, r2'),
       );
     });
 
     test('ADC', () {
       expect(
         decode(encode(5, 2, 4)),
-        _matchesASM('ADC R4, R2'),
+        _matchesASM('adc r4, r2'),
       );
     });
 
     test('SBC', () {
       expect(
         decode(encode(6, 2, 4)),
-        _matchesASM('SBC R4, R2'),
+        _matchesASM('sbc r4, r2'),
       );
     });
 
     test('ROR', () {
       expect(
         decode(encode(7, 2, 4)),
-        _matchesASM('ROR R4, R2'),
+        _matchesASM('ror r4, r2'),
       );
     });
 
     test('TST', () {
       expect(
         decode(encode(8, 2, 4)),
-        _matchesASM('TST R4, R2'),
+        _matchesASM('tst r4, r2'),
       );
     });
 
     test('NEG', () {
       expect(
         decode(encode(9, 2, 4)),
-        _matchesASM('NEG R4, R2'),
+        _matchesASM('neg r4, r2'),
       );
     });
 
     test('CMP', () {
       expect(
         decode(encode(10, 2, 4)),
-        _matchesASM('CMP R4, R2'),
+        _matchesASM('cmp r4, r2'),
       );
     });
 
     test('CMN', () {
       expect(
         decode(encode(11, 2, 4)),
-        _matchesASM('CMN R4, R2'),
+        _matchesASM('cmn r4, r2'),
       );
     });
 
     test('ORR', () {
       expect(
         decode(encode(12, 2, 4)),
-        _matchesASM('ORR R4, R2'),
+        _matchesASM('orr r4, r2'),
       );
     });
 
     test('MUL', () {
       expect(
         decode(encode(13, 2, 4)),
-        _matchesASM('MUL R4, R2'),
+        _matchesASM('mul r4, r2'),
       );
     });
 
     test('BIC', () {
       expect(
         decode(encode(14, 2, 4)),
-        _matchesASM('BIC R4, R2'),
+        _matchesASM('bic r4, r2'),
       );
     });
 
     test('MVN', () {
       expect(
         decode(encode(15, 2, 4)),
-        _matchesASM('MVN R4, R2'),
+        _matchesASM('mvn r4, r2'),
       );
     });
   });
@@ -264,77 +264,77 @@ void main() {
     test('ADD (Rd, Hs)', () {
       expect(
         decode(encode(0, 0, 1, 2, 4)),
-        _matchesASM('ADD R4, H2'),
+        _matchesASM('add r4, h2'),
       );
     });
 
     test('ADD (Hd, Rs)', () {
       expect(
         decode(encode(0, 1, 0, 2, 4)),
-        _matchesASM('ADD H4, R2'),
+        _matchesASM('add h4, r2'),
       );
     });
 
     test('ADD (Hd, Hs)', () {
       expect(
         decode(encode(0, 1, 1, 2, 4)),
-        _matchesASM('ADD H4, H2'),
+        _matchesASM('add h4, h2'),
       );
     });
 
     test('CMP (Rd, Hs)', () {
       expect(
         decode(encode(1, 0, 1, 2, 4)),
-        _matchesASM('CMP R4, H2'),
+        _matchesASM('cmp r4, h2'),
       );
     });
 
     test('CMP (Hd, Rs)', () {
       expect(
         decode(encode(1, 1, 0, 2, 4)),
-        _matchesASM('CMP H4, R2'),
+        _matchesASM('cmp h4, r2'),
       );
     });
 
     test('CMP (Hd, Hs)', () {
       expect(
         decode(encode(1, 1, 1, 2, 4)),
-        _matchesASM('CMP H4, H2'),
+        _matchesASM('cmp h4, h2'),
       );
     });
 
     test('MOV (Rd, Hs)', () {
       expect(
         decode(encode(2, 0, 1, 2, 4)),
-        _matchesASM('MOV R4, H2'),
+        _matchesASM('mov r4, h2'),
       );
     });
 
     test('MOV (Hd, Rs)', () {
       expect(
         decode(encode(2, 1, 0, 2, 4)),
-        _matchesASM('MOV H4, R2'),
+        _matchesASM('mov h4, r2'),
       );
     });
 
     test('MOV (Hd, Hs)', () {
       expect(
         decode(encode(2, 1, 1, 2, 4)),
-        _matchesASM('MOV H4, H2'),
+        _matchesASM('mov h4, h2'),
       );
     });
 
     test('BX Rs', () {
       expect(
         decode(encode(3, 0, 0, 2, 0)),
-        _matchesASM('BX R2'),
+        _matchesASM('bx r2'),
       );
     });
 
     test('BX Hs', () {
       expect(
         decode(encode(3, 0, 1, 2, 0)),
-        _matchesASM('BX H2'),
+        _matchesASM('bx h2'),
       );
     });
   });
@@ -351,7 +351,7 @@ void main() {
     test('LDR', () {
       expect(
         decode(encode(2, 16)),
-        _matchesASM('LDR R2, [PC, #16]'),
+        _matchesASM('ldr r2, [pc, #16]'),
       );
     });
   });
@@ -372,28 +372,28 @@ void main() {
     test('STR', () {
       expect(
         decode(encode(0, 0, 2, 4, 6)),
-        _matchesASM('STR R6, [R4, R2]'),
+        _matchesASM('str r6, [r4, r2]'),
       );
     });
 
     test('STRB', () {
       expect(
         decode(encode(0, 1, 2, 4, 6)),
-        _matchesASM('STRB R6, [R4, R2]'),
+        _matchesASM('strb r6, [r4, r2]'),
       );
     });
 
     test('LDR', () {
       expect(
         decode(encode(1, 0, 2, 4, 6)),
-        _matchesASM('LDR R6, [R4, R2]'),
+        _matchesASM('ldr r6, [r4, r2]'),
       );
     });
 
     test('LDRB', () {
       expect(
         decode(encode(1, 1, 2, 4, 6)),
-        _matchesASM('LDRB R6, [R4, R2]'),
+        _matchesASM('ldrb r6, [r4, r2]'),
       );
     });
   });
@@ -414,28 +414,28 @@ void main() {
     test('STRH', () {
       expect(
         decode(encode(0, 0, 2, 4, 6)),
-        _matchesASM('STRH R6, [R4, R2]'),
+        _matchesASM('strh r6, [r4, r2]'),
       );
     });
 
     test('LDRH', () {
       expect(
         decode(encode(1, 0, 2, 4, 6)),
-        _matchesASM('LDRH R6, [R4, R2]'),
+        _matchesASM('ldrh r6, [r4, r2]'),
       );
     });
 
     test('LDSB', () {
       expect(
         decode(encode(0, 1, 2, 4, 6)),
-        _matchesASM('LDSB R6, [R4, R2]'),
+        _matchesASM('ldsb r6, [r4, r2]'),
       );
     });
 
     test('LDSH', () {
       expect(
         decode(encode(1, 1, 2, 4, 6)),
-        _matchesASM('LDSH R6, [R4, R2]'),
+        _matchesASM('ldsh r6, [r4, r2]'),
       );
     });
   });
@@ -455,28 +455,28 @@ void main() {
     test('STR', () {
       expect(
         decode(encode(0, 0, 16, 2, 4)),
-        _matchesASM('STR R4, [R2, #16]'),
+        _matchesASM('str r4, [r2, #16]'),
       );
     });
 
     test('LDR', () {
       expect(
         decode(encode(1, 0, 16, 2, 4)),
-        _matchesASM('LDR R4, [R2, #16]'),
+        _matchesASM('ldr r4, [r2, #16]'),
       );
     });
 
     test('STRB', () {
       expect(
         decode(encode(0, 1, 16, 2, 4)),
-        _matchesASM('STRB R4, [R2, #16]'),
+        _matchesASM('strb r4, [r2, #16]'),
       );
     });
 
     test('LDRB', () {
       expect(
         decode(encode(1, 1, 16, 2, 4)),
-        _matchesASM('LDRB R4, [R2, #16]'),
+        _matchesASM('ldrb r4, [r2, #16]'),
       );
     });
   });
@@ -495,14 +495,14 @@ void main() {
     test('STRH', () {
       expect(
         decode(encode(0, 16, 2, 4)),
-        _matchesASM('STRH R4, [R2, #16]'),
+        _matchesASM('strh r4, [r2, #16]'),
       );
     });
 
     test('LDRH', () {
       expect(
         decode(encode(1, 16, 2, 4)),
-        _matchesASM('LDRH R4, [R2, #16]'),
+        _matchesASM('ldrh r4, [r2, #16]'),
       );
     });
   });
@@ -520,14 +520,14 @@ void main() {
     test('STR', () {
       expect(
         decode(encode(0, 2, 16)),
-        _matchesASM('STR R2, [SP, #16]'),
+        _matchesASM('str r2, [sp, #16]'),
       );
     });
 
     test('LDR', () {
       expect(
         decode(encode(1, 2, 16)),
-        _matchesASM('LDR R2, [SP, #16]'),
+        _matchesASM('ldr r2, [sp, #16]'),
       );
     });
   });
@@ -545,14 +545,14 @@ void main() {
     test('ADD [PC]', () {
       expect(
         decode(encode(0, 2, 16)),
-        _matchesASM('ADD R2, PC, #16'),
+        _matchesASM('add r2, pc, #16'),
       );
     });
 
     test('ADD [SP]', () {
       expect(
         decode(encode(1, 2, 16)),
-        _matchesASM('ADD R2, SP, #16'),
+        _matchesASM('add r2, sp, #16'),
       );
     });
   });
@@ -569,14 +569,14 @@ void main() {
     test('ADD [SP] +#', () {
       expect(
         decode(encode(0, 16)),
-        _matchesASM('ADD SP, #16'),
+        _matchesASM('add sp, #16'),
       );
     });
 
     test('ADD [SP] -#', () {
       expect(
         decode(encode(1, 16)),
-        _matchesASM('ADD SP, #-16'),
+        _matchesASM('add sp, #-16'),
       );
     });
   });
@@ -595,28 +595,28 @@ void main() {
     test('PUSH', () {
       expect(
         decode(encode(0, 0, 16)),
-        _matchesASM('PUSH {R4}'),
+        _matchesASM('push {r4}'),
       );
     });
 
     test('PUSH [LR]', () {
       expect(
         decode(encode(0, 1, 16)),
-        _matchesASM('PUSH {R4,LR}'),
+        _matchesASM('push {r4,lr}'),
       );
     });
 
     test('POP', () {
       expect(
         decode(encode(1, 0, 16)),
-        _matchesASM('POP {R4}'),
+        _matchesASM('pop {r4}'),
       );
     });
 
     test('POP [PC]', () {
       expect(
         decode(encode(1, 1, 16)),
-        _matchesASM('POP {R4,PC}'),
+        _matchesASM('pop {r4,pc}'),
       );
     });
   });
@@ -634,14 +634,14 @@ void main() {
     test('STMIA', () {
       expect(
         decode(encode(0, 2, 16)),
-        _matchesASM('STMIA R2!, {R4}'),
+        _matchesASM('stmia r2!, {r4}'),
       );
     });
 
     test('LDMIA', () {
       expect(
         decode(encode(1, 2, 16)),
-        _matchesASM('LDMIA R2!, {R4}'),
+        _matchesASM('ldmia r2!, {r4}'),
       );
     });
   });
@@ -656,20 +656,20 @@ void main() {
     }
 
     final result = [
-      'BEQ',
-      'BNE',
-      'BCS',
-      'BCC',
-      'BMI',
-      'BPL',
-      'BVS',
-      'BVC',
-      'BHI',
-      'BLS',
-      'BGE',
-      'BLT',
-      'BGT',
-      'BLE',
+      'beq',
+      'bne',
+      'bcs',
+      'bcc',
+      'bmi',
+      'bpl',
+      'bvs',
+      'bvc',
+      'bhi',
+      'bls',
+      'bge',
+      'blt',
+      'bgt',
+      'ble',
     ];
 
     for (var cond = 0; cond < '1101'.parseBits(); cond++) {
@@ -688,7 +688,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decode(encode(16)), _matchesASM('SWI 16'));
+    expect(decode(encode(16)), _matchesASM('swi 16'));
   });
 
   test('Unconditional branch: should decode', () {
@@ -699,7 +699,7 @@ void main() {
       ].join('').parseBits();
     }
 
-    expect(decode(encode(16)), _matchesASM('B 16'));
+    expect(decode(encode(16)), _matchesASM('b 16'));
   });
 
   group('Long branch with link: should decode', () {
@@ -712,7 +712,7 @@ void main() {
     }
 
     test('BL', () {
-      expect(decode(encode(0, 16)), _matchesASM('BL 16'));
+      expect(decode(encode(0, 16)), _matchesASM('bl 16'));
     });
   });
 }

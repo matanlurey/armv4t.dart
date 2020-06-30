@@ -252,7 +252,7 @@ class ThumbInstructionPrinter
     MVN i, [
     void _,
   ]) =>
-      'mcvn '
+      'mvn '
       '${describeRegister(i.destinationRegister)}, '
       '${describeRegister(i.sourceRegister)}';
 
@@ -308,7 +308,7 @@ class ThumbInstructionPrinter
   ]) =>
       'cmp '
       'h${i.destinationRegister}, '
-      'hH${i.sourceRegister}';
+      'h${i.sourceRegister}';
 
   @override
   String visitMOV$HiToLo(
@@ -351,7 +351,7 @@ class ThumbInstructionPrinter
     void _,
   ]) =>
       'bx '
-      'hH${i.sourceRegister}';
+      'h${i.sourceRegister}';
 
   @override
   String visitLDR$PCRelative(
@@ -711,7 +711,7 @@ class ThumbInstructionPrinter
     SWI i, [
     void _,
   ]) =>
-      'swo '
+      'swi '
       '${i.value}';
 
   @override
