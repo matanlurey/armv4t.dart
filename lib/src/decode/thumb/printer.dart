@@ -14,7 +14,7 @@ class ThumbInstructionPrinter
       'lsl '
       '${describeRegister(i.destinationRegister)}, '
       '${describeRegister(i.sourceRegister)}, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitLSR$MoveShiftedRegister(
@@ -24,7 +24,7 @@ class ThumbInstructionPrinter
       'lsr '
       '${describeRegister(i.destinationRegister)}, '
       '${describeRegister(i.sourceRegister)}, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitASR$MoveShiftedRegister(
@@ -34,7 +34,7 @@ class ThumbInstructionPrinter
       'asr '
       '${describeRegister(i.destinationRegister)}, '
       '${describeRegister(i.sourceRegister)}, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitADD$AddSubtract$Register(
@@ -54,7 +54,7 @@ class ThumbInstructionPrinter
       'add '
       '${describeRegister(i.destinationRegister)}, '
       '${describeRegister(i.sourceRegister)}, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitSUB$AddSubtract$Register(
@@ -74,7 +74,7 @@ class ThumbInstructionPrinter
       'sub '
       '${describeRegister(i.destinationRegister)}, '
       '${describeRegister(i.sourceRegister)}, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitMOV$MoveCompareAddSubtractImmediate(
@@ -83,7 +83,7 @@ class ThumbInstructionPrinter
   ]) =>
       'mov '
       '${describeRegister(i.destinationRegister)}, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitCMP$MoveCompareAddSubtractImmediate(
@@ -92,7 +92,7 @@ class ThumbInstructionPrinter
   ]) =>
       'cmp '
       '${describeRegister(i.destinationRegister)}, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitADD$MoveCompareAddSubtractImmediate(
@@ -101,7 +101,7 @@ class ThumbInstructionPrinter
   ]) =>
       'add '
       '${describeRegister(i.destinationRegister)}, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitSUB$MoveCompareAddSubtractImmediate(
@@ -110,7 +110,7 @@ class ThumbInstructionPrinter
   ]) =>
       'sub '
       '${describeRegister(i.destinationRegister)}, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitAND(
@@ -360,7 +360,7 @@ class ThumbInstructionPrinter
   ]) =>
       'ldr '
       '${describeRegister(i.destinationRegister)}, '
-      '[pc, #${i.immediateValue}]';
+      '[pc, ${i.immediateValue}]';
 
   @override
   String visitSTR$RelativeOffset(
@@ -441,7 +441,7 @@ class ThumbInstructionPrinter
   ]) =>
       'str '
       '${describeRegister(i.destinationRegister)}, '
-      '[${describeRegister(i.baseRegister)}, #${i.immediateValue}]';
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitLDR$ImmediateOffset(
@@ -450,7 +450,7 @@ class ThumbInstructionPrinter
   ]) =>
       'ldr '
       '${describeRegister(i.destinationRegister)}, '
-      '[${describeRegister(i.baseRegister)}, #${i.immediateValue}]';
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitSTRB$ImmediateOffset(
@@ -459,7 +459,7 @@ class ThumbInstructionPrinter
   ]) =>
       'strb '
       '${describeRegister(i.destinationRegister)}, '
-      '[${describeRegister(i.baseRegister)}, #${i.immediateValue}]';
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitLDRB$ImmediateOffset(
@@ -468,7 +468,7 @@ class ThumbInstructionPrinter
   ]) =>
       'ldrb '
       '${describeRegister(i.destinationRegister)}, '
-      '[${describeRegister(i.baseRegister)}, #${i.immediateValue}]';
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitSTRH$HalfWord(
@@ -477,7 +477,7 @@ class ThumbInstructionPrinter
   ]) =>
       'strh '
       '${describeRegister(i.destinationRegister)}, '
-      '[${describeRegister(i.baseRegister)}, #${i.immediateValue}]';
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitLDRH$HalfWord(
@@ -486,7 +486,7 @@ class ThumbInstructionPrinter
   ]) =>
       'ldrh '
       '${describeRegister(i.destinationRegister)}, '
-      '[${describeRegister(i.baseRegister)}, #${i.immediateValue}]';
+      '[${describeRegister(i.baseRegister)}, ${i.immediateValue}]';
 
   @override
   String visitSTR$SPRelative(
@@ -495,7 +495,7 @@ class ThumbInstructionPrinter
   ]) =>
       'str '
       '${describeRegister(i.destinationRegister)}, '
-      '[sp, #${i.immediateValue}]';
+      '[sp, ${i.immediateValue}]';
 
   @override
   String visitLDR$SPRelative(
@@ -504,7 +504,7 @@ class ThumbInstructionPrinter
   ]) =>
       'ldr '
       '${describeRegister(i.destinationRegister)}, '
-      '[sp, #${i.immediateValue}]';
+      '[sp, ${i.immediateValue}]';
 
   @override
   String visitADD$LoadAddress$PC(
@@ -514,7 +514,7 @@ class ThumbInstructionPrinter
       'add '
       '${describeRegister(i.destinationRegister)}, '
       'pc, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitADD$LoadAddress$SP(
@@ -524,7 +524,7 @@ class ThumbInstructionPrinter
       'add '
       '${describeRegister(i.destinationRegister)}, '
       'sp, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitADD$OffsetToStackPointer$Positive(
@@ -533,7 +533,7 @@ class ThumbInstructionPrinter
   ]) =>
       'add '
       'sp, '
-      '#${i.immediateValue}';
+      '${i.immediateValue}';
 
   @override
   String visitADD$OffsetToStackPointer$Negative(
@@ -542,7 +542,7 @@ class ThumbInstructionPrinter
   ]) =>
       'add '
       'sp, '
-      '#-${i.immediateValue}';
+      '-${i.immediateValue}';
 
   @override
   String visitPUSH$Registers(

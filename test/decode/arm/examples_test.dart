@@ -35,10 +35,10 @@ void main() {
     ];
 
     expect(decodeAll(program), [
-      '0xE2402001: SUB R2, R0, #1',
+      '0xE2402001: SUB R2, R0, 1',
       '0xE0612002: RSB R2, R1, R2',
-      '0xE4D13001: LDRB R3, [R1], +#1',
-      '0xE3530000: CMP R3, #0',
+      '0xE4D13001: LDRB R3, [R1], +1',
+      '0xE3530000: CMP R3, 0',
       '0xE7C13002: STRB R3, [R1, +R2]',
       '0x1AFFFFFB: BNE 16777211',
       '0xE12FFF1E: BX R14',

@@ -27,21 +27,21 @@ void main() {
     test('LSL', () {
       expect(
         decode(encode(0, 10, 2, 4)),
-        _matchesASM('lsl r4, r2, #10'),
+        _matchesASM('lsl r4, r2, 10'),
       );
     });
 
     test('LSR', () {
       expect(
         decode(encode(1, 10, 2, 4)),
-        _matchesASM('lsr r4, r2, #10'),
+        _matchesASM('lsr r4, r2, 10'),
       );
     });
 
     test('ASR', () {
       expect(
         decode(encode(2, 10, 2, 4)),
-        _matchesASM('asr r4, r2, #10'),
+        _matchesASM('asr r4, r2, 10'),
       );
     });
   });
@@ -65,10 +65,10 @@ void main() {
       );
     });
 
-    test('ADD (#Offset3)', () {
+    test('ADD (Offset3)', () {
       expect(
         decode(encode(1, 0, 2, 4, 6)),
-        _matchesASM('add r6, r4, #2'),
+        _matchesASM('add r6, r4, 2'),
       );
     });
 
@@ -79,10 +79,10 @@ void main() {
       );
     });
 
-    test('SUB (#Offset3)', () {
+    test('SUB (Offset3)', () {
       expect(
         decode(encode(1, 1, 2, 4, 6)),
-        _matchesASM('sub r6, r4, #2'),
+        _matchesASM('sub r6, r4, 2'),
       );
     });
   });
@@ -100,28 +100,28 @@ void main() {
     test('MOV', () {
       expect(
         decode(encode(0, 2, 16)),
-        _matchesASM('mov r2, #16'),
+        _matchesASM('mov r2, 16'),
       );
     });
 
     test('CMP', () {
       expect(
         decode(encode(1, 2, 16)),
-        _matchesASM('cmp r2, #16'),
+        _matchesASM('cmp r2, 16'),
       );
     });
 
     test('ADD', () {
       expect(
         decode(encode(2, 2, 16)),
-        _matchesASM('add r2, #16'),
+        _matchesASM('add r2, 16'),
       );
     });
 
     test('SUB', () {
       expect(
         decode(encode(3, 2, 16)),
-        _matchesASM('sub r2, #16'),
+        _matchesASM('sub r2, 16'),
       );
     });
   });
@@ -351,7 +351,7 @@ void main() {
     test('LDR', () {
       expect(
         decode(encode(2, 16)),
-        _matchesASM('ldr r2, [pc, #16]'),
+        _matchesASM('ldr r2, [pc, 16]'),
       );
     });
   });
@@ -455,28 +455,28 @@ void main() {
     test('STR', () {
       expect(
         decode(encode(0, 0, 16, 2, 4)),
-        _matchesASM('str r4, [r2, #16]'),
+        _matchesASM('str r4, [r2, 16]'),
       );
     });
 
     test('LDR', () {
       expect(
         decode(encode(1, 0, 16, 2, 4)),
-        _matchesASM('ldr r4, [r2, #16]'),
+        _matchesASM('ldr r4, [r2, 16]'),
       );
     });
 
     test('STRB', () {
       expect(
         decode(encode(0, 1, 16, 2, 4)),
-        _matchesASM('strb r4, [r2, #16]'),
+        _matchesASM('strb r4, [r2, 16]'),
       );
     });
 
     test('LDRB', () {
       expect(
         decode(encode(1, 1, 16, 2, 4)),
-        _matchesASM('ldrb r4, [r2, #16]'),
+        _matchesASM('ldrb r4, [r2, 16]'),
       );
     });
   });
@@ -495,14 +495,14 @@ void main() {
     test('STRH', () {
       expect(
         decode(encode(0, 16, 2, 4)),
-        _matchesASM('strh r4, [r2, #16]'),
+        _matchesASM('strh r4, [r2, 16]'),
       );
     });
 
     test('LDRH', () {
       expect(
         decode(encode(1, 16, 2, 4)),
-        _matchesASM('ldrh r4, [r2, #16]'),
+        _matchesASM('ldrh r4, [r2, 16]'),
       );
     });
   });
@@ -520,14 +520,14 @@ void main() {
     test('STR', () {
       expect(
         decode(encode(0, 2, 16)),
-        _matchesASM('str r2, [sp, #16]'),
+        _matchesASM('str r2, [sp, 16]'),
       );
     });
 
     test('LDR', () {
       expect(
         decode(encode(1, 2, 16)),
-        _matchesASM('ldr r2, [sp, #16]'),
+        _matchesASM('ldr r2, [sp, 16]'),
       );
     });
   });
@@ -545,14 +545,14 @@ void main() {
     test('ADD [PC]', () {
       expect(
         decode(encode(0, 2, 16)),
-        _matchesASM('add r2, pc, #16'),
+        _matchesASM('add r2, pc, 16'),
       );
     });
 
     test('ADD [SP]', () {
       expect(
         decode(encode(1, 2, 16)),
-        _matchesASM('add r2, sp, #16'),
+        _matchesASM('add r2, sp, 16'),
       );
     });
   });
@@ -566,17 +566,17 @@ void main() {
       ].join('').parseBits();
     }
 
-    test('ADD [SP] +#', () {
+    test('ADD [SP] +', () {
       expect(
         decode(encode(0, 16)),
-        _matchesASM('add sp, #16'),
+        _matchesASM('add sp, 16'),
       );
     });
 
-    test('ADD [SP] -#', () {
+    test('ADD [SP] -', () {
       expect(
         decode(encode(1, 16)),
-        _matchesASM('add sp, #-16'),
+        _matchesASM('add sp, -16'),
       );
     });
   });

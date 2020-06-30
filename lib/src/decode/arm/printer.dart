@@ -40,24 +40,24 @@ class ArmInstructionPrinter
         .toLowerCase();
   }
 
-  String _s(int sBit) => sBit == 1 ? 'S' : '';
+  String _s(int sBit) => sBit == 1 ? 's' : '';
 
-  String _i(int iBit, int operand) => iBit == 1 ? '#${operand}' : 'R${operand}';
+  String _i(int iBit, int operand) => iBit == 1 ? '${operand}' : 'r${operand}';
 
   String _describeFieldMask(int bits) {
     if (bits == 0) return '';
     final result = StringBuffer('_');
     if (bits.getBit(3) == 1) {
-      result.write('C');
+      result.write('c');
     }
     if (bits.getBit(2) == 1) {
-      result.write('X');
+      result.write('x');
     }
     if (bits.getBit(1) == 1) {
-      result.write('S');
+      result.write('s');
     }
     if (bits.getBit(0) == 1) {
-      result.write('F');
+      result.write('f');
     }
     return result.toString();
   }
@@ -570,7 +570,7 @@ class ArmInstructionPrinter
     SWI i, [
     void _,
   ]) =>
-      'swi${_describeCondition(i)} #${i.immediate24}';
+      'swi${_describeCondition(i)} ${i.immediate24}';
 
   @override
   String visitCDP(
@@ -622,12 +622,12 @@ class ArmInstructionPrinter
     MCR i, [
     void _,
   ]) =>
-      'MCR${_describeCondition(i)} '
-      'P${i.coprocessorNumber}, '
+      'mcr${_describeCondition(i)} '
+      'p${i.coprocessorNumber}, '
       '${i.coprocessorOperationCode}, '
       '${describeRegister(i.sourceRegister)}, '
-      'C${i.coprocessorDestinationRegister}, '
-      'C${i.coprocessorOperandRegister}';
+      'c${i.coprocessorDestinationRegister}, '
+      'c${i.coprocessorOperandRegister}';
 
   @override
   String visitMRC(

@@ -77,7 +77,7 @@ class CoprocessorDataTransfer extends ArmInstructionSet {
       'L': l,
       'Rn': registerN,
       'CRd': cpRegisterD,
-      'CP#': cpNumber,
+      'CP': cpNumber,
       'Offset': offset,
     };
   }

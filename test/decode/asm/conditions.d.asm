@@ -1,39 +1,39 @@
-MSR CPSR_C, #257                ; 0xE328F101
-BEQ 16777215                    ; 0xAFFFFFF
-MSR CPSR_C, #0                  ; 0xE328F000
-BNE 16777215                    ; 0x1AFFFFFF
-MSR CPSR_C, #514                ; 0xE328F202
-BCS 16777215                    ; 0x2AFFFFFF
-MSR CPSR_C, #0                  ; 0xE328F000
-BCC 16777215                    ; 0x3AFFFFFF
-MSR CPSR_C, #258                ; 0xE328F102
-BMI 16777215                    ; 0x4AFFFFFF
-MSR CPSR_C, #0                  ; 0xE328F000
-BPL 16777215                    ; 0x5AFFFFFF
-MSR CPSR_C, #513                ; 0xE328F201
-BVS 16777215                    ; 0x6AFFFFFF
-MSR CPSR_C, #0                  ; 0xE328F000
-BVC 16777215                    ; 0x7AFFFFFF
-MSR CPSR_C, #514                ; 0xE328F202
-BHI 16777215                    ; 0x8AFFFFFF
-MSR CPSR_C, #257                ; 0xE328F101
-BLS 16777215                    ; 0x9AFFFFFF
-MSR CPSR_C, #0                  ; 0xE328F000
-BGE 16777215                    ; 0xAAFFFFFF
-MSR CPSR_C, #521                ; 0xE328F209
-BGE 16777215                    ; 0xAAFFFFFF
-MSR CPSR_C, #258                ; 0xE328F102
-BLT 16777215                    ; 0xBAFFFFFF
-MSR CPSR_C, #513                ; 0xE328F201
-BLT 16777215                    ; 0xBAFFFFFF
-MSR CPSR_C, #0                  ; 0xE328F000
-BGT 16777215                    ; 0xCAFFFFFF
-MSR CPSR_C, #521                ; 0xE328F209
-BGT 16777215                    ; 0xCAFFFFFF
-MSR CPSR_C, #257                ; 0xE328F101
-BLE 16777215                    ; 0xDAFFFFFF
-MSR CPSR_C, #258                ; 0xE328F102
-BLE 16777215                    ; 0xDAFFFFFF
-MSR CPSR_C, #513                ; 0xE328F201
-BLE 16777215                    ; 0xDAFFFFFF
-B 16777215                      ; 0xEAFFFFFF
+msr cpsr_c, 257                 ; 0xE328F101
+beq 16777215                    ; 0xAFFFFFF
+msr cpsr_c, 0                   ; 0xE328F000
+bne 16777215                    ; 0x1AFFFFFF
+msr cpsr_c, 514                 ; 0xE328F202
+bcs 16777215                    ; 0x2AFFFFFF
+msr cpsr_c, 0                   ; 0xE328F000
+bcc 16777215                    ; 0x3AFFFFFF
+msr cpsr_c, 258                 ; 0xE328F102
+bmi 16777215                    ; 0x4AFFFFFF
+msr cpsr_c, 0                   ; 0xE328F000
+bpl 16777215                    ; 0x5AFFFFFF
+msr cpsr_c, 513                 ; 0xE328F201
+bvs 16777215                    ; 0x6AFFFFFF
+msr cpsr_c, 0                   ; 0xE328F000
+bvc 16777215                    ; 0x7AFFFFFF
+msr cpsr_c, 514                 ; 0xE328F202
+bhi 16777215                    ; 0x8AFFFFFF
+msr cpsr_c, 257                 ; 0xE328F101
+bls 16777215                    ; 0x9AFFFFFF
+msr cpsr_c, 0                   ; 0xE328F000
+bge 16777215                    ; 0xAAFFFFFF
+msr cpsr_c, 521                 ; 0xE328F209
+bge 16777215                    ; 0xAAFFFFFF
+msr cpsr_c, 258                 ; 0xE328F102
+blt 16777215                    ; 0xBAFFFFFF
+msr cpsr_c, 513                 ; 0xE328F201
+blt 16777215                    ; 0xBAFFFFFF
+msr cpsr_c, 0                   ; 0xE328F000
+bgt 16777215                    ; 0xCAFFFFFF
+msr cpsr_c, 521                 ; 0xE328F209
+bgt 16777215                    ; 0xCAFFFFFF
+msr cpsr_c, 257                 ; 0xE328F101
+ble 16777215                    ; 0xDAFFFFFF
+msr cpsr_c, 258                 ; 0xE328F102
+ble 16777215                    ; 0xDAFFFFFF
+msr cpsr_c, 513                 ; 0xE328F201
+ble 16777215                    ; 0xDAFFFFFF
+b 16777215                      ; 0xEAFFFFFF

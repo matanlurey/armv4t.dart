@@ -20,7 +20,7 @@ mixin ArmLoadAndStoreHalfWordOrLoadSignedByte {
       // POST
       if (immediateOffset == 0) {
         // Post-indexed [Rn], #+/-8bit_Offset
-        return '[${describeRegister(register)}], #${sign}$offset';
+        return '[${describeRegister(register)}], ${sign}$offset';
       } else {
         // Post-indexed [Rn], +/-Rm
         return '[${describeRegister(register)}], ${sign}$offset';
@@ -30,18 +30,18 @@ mixin ArmLoadAndStoreHalfWordOrLoadSignedByte {
       if (writeBackBit == 0) {
         if (immediateOffset == 0) {
           // Immediate offset [Rn, #+/-8bit_Offset]
-          return '[${describeRegister(register)}, #${sign}$offset]';
+          return '[${describeRegister(register)}, ${sign}$offset]';
         } else {
           // Register [Rn, +/-Rm]
-          return '[${describeRegister(register)}, #${sign}R$offset]';
+          return '[${describeRegister(register)}, ${sign}R$offset]';
         }
       } else {
         if (immediateOffset == 0) {
           // Pre-indexed [Rn, #+/-8bit_Offset]!
-          return '[${describeRegister(register)}, #${sign}$offset]!';
+          return '[${describeRegister(register)}, ${sign}$offset]!';
         } else {
           // Pre-indexed [Rn, +/-Rm]!
-          return '[${describeRegister(register)}, #${sign}R$offset]!';
+          return '[${describeRegister(register)}, ${sign}R$offset]!';
         }
       }
     }

@@ -25,14 +25,14 @@ void _testMultiply() {
   test('MUL', () {
     expect(
       decode(build(0, 0, 2, 4, 6, 8)),
-      matchesASM('MUL R2, R4, R6'),
+      matchesASM('mul r2, r4, r6'),
     );
   });
 
   test('MLA', () {
     expect(
       decode(build(1, 0, 2, 4, 6, 8)),
-      matchesASM('MLA R2, R6, R4, R8'),
+      matchesASM('mla r2, r6, r4, r8'),
     );
   });
 }
@@ -54,28 +54,28 @@ void _testMultiplyLong() {
   test('SMULL', () {
     expect(
       decode(build(0, 0, 0, 2, 4, 6, 8)),
-      matchesASM('SMULL R4, R2, R6, R8'),
+      matchesASM('smull r4, r2, r6, r8'),
     );
   });
 
   test('SMLAL', () {
     expect(
       decode(build(0, 1, 0, 2, 4, 6, 8)),
-      matchesASM('SMLAL R4, R2, R6, R8'),
+      matchesASM('smlal r4, r2, r6, r8'),
     );
   });
 
   test('UMULL', () {
     expect(
       decode(build(1, 0, 0, 2, 4, 6, 8)),
-      matchesASM('UMULL R4, R2, R6, R8'),
+      matchesASM('umull r4, r2, r6, r8'),
     );
   });
 
   test('UMLAL', () {
     expect(
       decode(build(1, 1, 0, 2, 4, 6, 8)),
-      matchesASM('UMLAL R4, R2, R6, R8'),
+      matchesASM('umlal r4, r2, r6, r8'),
     );
   });
 }
