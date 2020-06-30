@@ -117,29 +117,29 @@ void _testLogicAndMath() {
   group('[S = 1]', () {
     test('TST', () {
       expect(
-        decode(build(0, _OpCode.TST.index, 1, 2, 4, 6)),
-        matchesASM('TST R4, R2, R6'),
+        decode(build(0, _OpCode.TST.index, 1, 2, 0, 6)),
+        matchesASM('TST R2, R6'),
       );
     });
 
     test('TEQ', () {
       expect(
-        decode(build(0, _OpCode.TEQ.index, 1, 2, 4, 6)),
-        matchesASM('TEQ R4, R2, R6'),
+        decode(build(0, _OpCode.TEQ.index, 1, 2, 0, 6)),
+        matchesASM('TEQ R2, R6'),
       );
     });
 
     test('CMP', () {
       expect(
-        decode(build(0, _OpCode.CMP.index, 1, 2, 4, 6)),
-        matchesASM('CMP R4, R2, R6'),
+        decode(build(0, _OpCode.CMP.index, 1, 2, 0, 6)),
+        matchesASM('CMP R2, R6'),
       );
     });
 
     test('CMN', () {
       expect(
-        decode(build(0, _OpCode.CMN.index, 1, 2, 4, 6)),
-        matchesASM('CMN R4, R2, R6'),
+        decode(build(0, _OpCode.CMN.index, 1, 2, 0, 6)),
+        matchesASM('CMN R2, R6'),
       );
     });
   });

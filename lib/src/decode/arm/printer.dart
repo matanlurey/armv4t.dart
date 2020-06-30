@@ -382,7 +382,6 @@ class ArmInstructionPrinter
     void _,
   ]) =>
       'CMN${_cond(i)} '
-      'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
@@ -392,7 +391,6 @@ class ArmInstructionPrinter
     void _,
   ]) =>
       'CMP${_cond(i)} '
-      'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
@@ -422,7 +420,6 @@ class ArmInstructionPrinter
     void _,
   ]) =>
       'TEQ${_cond(i)} '
-      'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
@@ -432,7 +429,6 @@ class ArmInstructionPrinter
     void _,
   ]) =>
       'TST${_cond(i)} '
-      'R${i.destinationRegister}, '
       'R${i.sourceRegister}, '
       '${_shifterOperand(i.i == 1, i.shifterOperand)}';
 
