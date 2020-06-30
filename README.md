@@ -27,6 +27,7 @@ A few different resources and documents used to develop this package.
 
 ### Documentation
 
+- [ARM Assembly Basics](https://azeria-labs.com/writing-arm-assembly-part-1/)
 - [ARM Assembler Guide](doc/arm-assembler-guide.pdf)
 - [ARM CPU Overview](https://problemkaputt.de/gbatek.htm#armcpuoverview)
 - [ARM THUMB Programmers Guide](doc/arm-thumb-programmers-model.pdf)

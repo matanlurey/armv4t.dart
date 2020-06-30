@@ -25,19 +25,15 @@ abstract class ArmShifterOperand {
 
 /// Decodes an [int] `bits` into an [ArmShifterOperand].
 class ShifterOperandDecoder {
-  static final _immediatePatterns = [
-    ImmediateOperand._pattern,
-    RegisterOperandLogicalShiftLeftByImmediate._pattern,
-    RegisterOperandLogicalShiftRightByImmediate._pattern,
-    RegisterOperandArithmeticShiftRightByImmediate._pattern,
-    RegisterOperandRotateRightByImmediate._pattern,
-  ].toGroup();
-
   static final _registerPatterns = [
     RegisterOperand._pattern,
+    RegisterOperandLogicalShiftLeftByImmediate._pattern,
     RegisterOperandLogicalShiftLeftByRegister._pattern,
+    RegisterOperandLogicalShiftRightByImmediate._pattern,
     RegisterOperandLogicalShiftRightByRegister._pattern,
+    RegisterOperandArithmeticShiftRightByImmediate._pattern,
     RegisterOperandArithmeticShiftRightByRegister._pattern,
+    RegisterOperandRotateRightByImmediate._pattern,
     RegisterOperandRotateRightByRegister._pattern,
     RegisterOperandRotateRightWithExtend._pattern,
   ].toGroup();
@@ -52,42 +48,11 @@ class ShifterOperandDecoder {
 
   /// Decodes [bits] into an [ArmShifterOperand].
   ArmShifterOperand decodeImmediate(int bits) {
-    final p = _immediatePatterns.match(bits);
-    if (p == null) {
-      _couldNotDecode(bits);
-    }
-    final c = p.capture(bits);
-    if (identical(p, ImmediateOperand._pattern)) {
-      return ImmediateOperand(
-        rotateImmediate: c[0],
-        immediate8: c[1],
-      );
-    }
-    if (identical(p, RegisterOperandLogicalShiftLeftByImmediate._pattern)) {
-      return RegisterOperandLogicalShiftLeftByImmediate(
-        shiftImmediate: c[0],
-        register: c[1],
-      );
-    }
-    if (identical(p, RegisterOperandLogicalShiftRightByImmediate._pattern)) {
-      return RegisterOperandLogicalShiftRightByImmediate(
-        shiftImmediate: c[0],
-        register: c[1],
-      );
-    }
-    if (identical(p, RegisterOperandArithmeticShiftRightByImmediate._pattern)) {
-      return RegisterOperandArithmeticShiftRightByImmediate(
-        shiftImmediate: c[0],
-        register: c[1],
-      );
-    }
-    if (identical(p, RegisterOperandRotateRightByImmediate._pattern)) {
-      return RegisterOperandRotateRightByImmediate(
-        shiftImmediate: c[0],
-        register: c[1],
-      );
-    }
-    return _couldNotDecode(bits);
+    final c = ImmediateOperand._pattern.capture(bits);
+    return ImmediateOperand(
+      rotateImmediate: c[0],
+      immediate8: c[1],
+    );
   }
 
   /// Decodes [bits] into an [ArmShifterOperand].
@@ -102,9 +67,21 @@ class ShifterOperandDecoder {
         register: c[0],
       );
     }
+    if (identical(p, RegisterOperandLogicalShiftLeftByImmediate._pattern)) {
+      return RegisterOperandLogicalShiftLeftByImmediate(
+        shiftImmediate: c[0],
+        register: c[1],
+      );
+    }
     if (identical(p, RegisterOperandLogicalShiftLeftByRegister._pattern)) {
       return RegisterOperandLogicalShiftLeftByRegister(
         shiftRegister: c[0],
+        register: c[1],
+      );
+    }
+    if (identical(p, RegisterOperandLogicalShiftRightByImmediate._pattern)) {
+      return RegisterOperandLogicalShiftRightByImmediate(
+        shiftImmediate: c[0],
         register: c[1],
       );
     }
@@ -114,9 +91,21 @@ class ShifterOperandDecoder {
         register: c[1],
       );
     }
+    if (identical(p, RegisterOperandArithmeticShiftRightByImmediate._pattern)) {
+      return RegisterOperandArithmeticShiftRightByImmediate(
+        shiftImmediate: c[0],
+        register: c[1],
+      );
+    }
     if (identical(p, RegisterOperandArithmeticShiftRightByRegister._pattern)) {
       return RegisterOperandArithmeticShiftRightByRegister(
         shiftRegister: c[0],
+        register: c[1],
+      );
+    }
+    if (identical(p, RegisterOperandRotateRightByImmediate._pattern)) {
+      return RegisterOperandRotateRightByImmediate(
+        shiftImmediate: c[0],
         register: c[1],
       );
     }
