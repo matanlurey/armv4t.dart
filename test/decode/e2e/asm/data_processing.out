@@ -1,0 +1,226 @@
+; Automatically generated
+
+mov r0, 32                      ; 0xe3a00020
+cmp r0, 32                      ; 0xe3500020
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mvn r0, 0                       ; 0xe3e00000
+adds r0, r0, 1                  ; 0xe2900001
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 255                     ; 0xe3a000ff
+and r0, r0, 15                  ; 0xe200000f
+cmp r0, 15                      ; 0xe350000f
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 255                     ; 0xe3a000ff
+eor r0, r0, 240                 ; 0xe22000f0
+cmp r0, 15                      ; 0xe350000f
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 240                     ; 0xe3a000f0
+orr r0, r0, 15                  ; 0xe380000f
+cmp r0, 255                     ; 0xe35000ff
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 255                     ; 0xe3a000ff
+bic r0, r0, 15                  ; 0xe3c0000f
+cmp r0, 240                     ; 0xe35000f0
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 32                      ; 0xe3a00020
+add r0, r0, 32                  ; 0xe2800020
+cmp r0, 64                      ; 0xe3500040
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 0                   ; 0xe328f000
+movs r0, 32                     ; 0xe3b00020
+adc r0, r0, 32                  ; 0xe2a00020
+cmp r0, 64                      ; 0xe3500040
+bne 5                           ; 0x1a000005
+msr cpsr_c, 514                 ; 0xe328f202
+mov r0, 32                      ; 0xe3a00020
+adc r0, r0, 32                  ; 0xe2a00020
+cmp r0, 65                      ; 0xe3500041
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 64                      ; 0xe3a00040
+sub r0, r0, 32                  ; 0xe2400020
+cmp r0, 32                      ; 0xe3500020
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 32                      ; 0xe3a00020
+rsb r0, r0, 64                  ; 0xe2600040
+cmp r0, 32                      ; 0xe3500020
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 0                   ; 0xe328f000
+mov r0, 64                      ; 0xe3a00040
+sbc r0, r0, 32                  ; 0xe2c00020
+cmp r0, 31                      ; 0xe350001f
+bne 5                           ; 0x1a000005
+msr cpsr_c, 514                 ; 0xe328f202
+mov r0, 64                      ; 0xe3a00040
+sbc r0, r0, 32                  ; 0xe2c00020
+cmp r0, 32                      ; 0xe3500020
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 0                   ; 0xe328f000
+mov r0, 32                      ; 0xe3a00020
+rsc r0, r0, 64                  ; 0xe2e00040
+cmp r0, 31                      ; 0xe350001f
+bne 5                           ; 0x1a000005
+msr cpsr_c, 514                 ; 0xe328f202
+mov r0, 32                      ; 0xe3a00020
+rsc r0, r0, 64                  ; 0xe2e00040
+cmp r0, 32                      ; 0xe3500020
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 32                      ; 0xe3a00020
+cmp r0, r0                      ; 0xe1500000
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 8                       ; 0xe3a00102
+cmn r0, r0                      ; 0xe1700000
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 240                     ; 0xe3a000f0
+tst r0, 15                      ; 0xe310000f
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 255                     ; 0xe3a000ff
+teq r0, 255                     ; 0xe33000ff
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 4278190080              ; 0xe3a00cff
+mov r1, 255                     ; 0xe3a010ff
+mov r1, r1, lsl r4              ; 0xe1a01401
+cmp r1, r0                      ; 0xe1510000
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+movs r0, 4080                   ; 0xe3b002ff
+bcc 2                           ; 0x3a000002
+movs r0, 1044480                ; 0xe3b006ff
+bcs 0                           ; 0x2a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 255                     ; 0xe3a000ff
+mov r1, 4                       ; 0xe3a01004
+movs r2, r0, ror r1             ; 0xe1b02170
+bcc 4                           ; 0x3a000004
+mov r0, 240                     ; 0xe3a000f0
+mov r1, 4                       ; 0xe3a01004
+movs r2, r0, ror r1             ; 0xe1b02170
+bcs 0                           ; 0x2a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 255                     ; 0xe3a000ff
+movs r1, r0, ror 4              ; 0xe1b01260
+bcc 3                           ; 0x3a000003
+mov r0, 240                     ; 0xe3a000f0
+movs r1, r0, ror 4              ; 0xe1b01260
+bcs 0                           ; 0x2a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 0                       ; 0xe3a00000
+msr cpsr_c, 514                 ; 0xe328f202
+movs r0, r0, rrx                ; 0xe1b00060
+bcs 2                           ; 0x2a000002
+cmp r0, 8                       ; 0xe3500102
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+add r0, pc, 4                   ; 0xe28f0004
+cmp r0, r15                     ; 0xe150000f
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+add r0, pc, 0                   ; 0xe28f0000
+mov pc, r0                      ; 0xe1a0f000
+mov r8, 32                      ; 0xe3a08020
+msr cpsr_cf, 17                 ; 0xe329f011
+mov r8, 64                      ; 0xe3a08040
+msr spsr_cf, 31                 ; 0xe369f01f
+subs pc, pc, 4                  ; 0xe25ff004
+cmp r8, 32                      ; 0xe3580020
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 0                       ; 0xe3a00000
+???? <FormatException>          ; 0xe1a0001f
+cmp r0, r15                     ; 0xe150000f
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 0                       ; 0xe3a00000
+???? <FormatException>          ; 0xe08f0010
+cmp r0, r15                     ; 0xe150000f
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+mov r0, 0                       ; 0xe3a00000
+mov r2, r14                     ; 0xe1a0200e
+bl 16777215                     ; 0xebffffff
+mov r1, r14                     ; 0xe1a0100e
+mov lr, r2                      ; 0xe1a0e002
+add r0, pc, r0                  ; 0xe08f0000
+add r1, r1, 16                  ; 0xe2811010
+cmp r1, r0                      ; 0xe1510000
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 0                   ; 0xe328f000
+movs r0, 8                      ; 0xe3b00102
+bcc 1                           ; 0x3a000001
+bpl 0                           ; 0x5a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 514                 ; 0xe328f202
+mov r0, 0                       ; 0xe3a00000
+adcs r0, r0, 8                  ; 0xe2b00102
+cmp r0, 24                      ; 0xe3500106
+bne 5                           ; 0x1a000005
+msr cpsr_c, 514                 ; 0xe328f202
+mov r0, 0                       ; 0xe3a00000
+adcs r0, r0, 112                ; 0xe2b00207
+cmp r0, 368                     ; 0xe3500217
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 0                   ; 0xe328f000
+mov r0, 128                     ; 0xe3a00080
+movs r0, r0, ror 8              ; 0xe1b00460
+bcc 1                           ; 0x3a000001
+bpl 0                           ; 0x5a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 514                 ; 0xe328f202
+mov r0, 0                       ; 0xe3a00000
+mov r1, 128                     ; 0xe3a01080
+adcs r0, r0, r1, ror 8          ; 0xe0b00461
+cmp r0, 24                      ; 0xe3500106
+bne 6                           ; 0x1a000006
+msr cpsr_c, 514                 ; 0xe328f202
+mov r0, 0                       ; 0xe3a00000
+mov r1, 112                     ; 0xe3a01070
+adcs r0, r0, r1, ror 8          ; 0xe0b00461
+cmp r0, 368                     ; 0xe3500217
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 0                   ; 0xe328f000
+mov r0, 128                     ; 0xe3a00080
+mov r1, 8                       ; 0xe3a01008
+movs r0, r0, ror r1             ; 0xe1b00170
+bcc 1                           ; 0x3a000001
+bpl 0                           ; 0x5a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 514                 ; 0xe328f202
+mov r0, 0                       ; 0xe3a00000
+mov r1, 128                     ; 0xe3a01080
+mov r2, 8                       ; 0xe3a02008
+adcs r0, r0, r1, ror r2         ; 0xe0b00271
+cmp r0, 24                      ; 0xe3500106
+bne 7                           ; 0x1a000007
+msr cpsr_c, 514                 ; 0xe328f202
+mov r0, 0                       ; 0xe3a00000
+mov r1, 112                     ; 0xe3a01070
+mov r2, 8                       ; 0xe3a02008
+adcs r0, r0, r1, ror r2         ; 0xe0b00271
+cmp r0, 368                     ; 0xe3500217
+bne 0                           ; 0x1a000000
+b 16777215                      ; 0xeaffffff
+msr cpsr_c, 0                   ; 0xe328f000
+tst r0, 8                       ; 0xe3100102
+bcc 3                           ; 0x3a000003
+msr cpsr_c, 0                   ; 0xe328f000
+teq r0, 8                       ; 0xe3300102
+bcc 0                           ; 0x3a000000
+b 16777215                      ; 0xeaffffff
