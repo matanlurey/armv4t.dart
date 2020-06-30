@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'package:armv4t/src/decode/arm/format.dart';
 import 'package:armv4t/src/decode/arm/instruction.dart';
 import 'package:armv4t/src/decode/arm/printer.dart';
-import 'package:binary/binary.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 

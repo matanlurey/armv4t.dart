@@ -18,6 +18,7 @@ mixin InstructionPrintHelper {
   }
 
   @protected
+  @visibleForTesting
   String describeRegisterList(
     int registerList, {
     String suffix,

@@ -2,10 +2,10 @@ part of '../printer.dart';
 
 /// Encapsualtes code to print block data transfers (`LDM`, `STM`).
 mixin ArmLoadAndStoreMultiplePrintHelper {
-  static const _incrementBefore = 'IB';
-  static const _incrementAfter = 'IA';
-  static const _decrementBefore = 'DB';
-  static const _decrementAfter = 'DA';
+  static const _incrementBefore = 'ib';
+  static const _incrementAfter = 'ia';
+  static const _decrementBefore = 'db';
+  static const _decrementAfter = 'da';
 
   /// Converts the provided bits into an assembler string mnemonic.
   ///

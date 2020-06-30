@@ -443,6 +443,7 @@ void _testHalfwordDataTransferRegisterOffset() {
 
 void _testHalfwordDataTransferImmediateOffset() {
   // CCCC_000P_U1WL_NNNN_DDDD_OOOO_1SH1_KKKK
+  // ignore: unused_element
   int build({
     int p = 0,
     int u = 0,

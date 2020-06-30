@@ -1,7 +1,6 @@
 import 'package:armv4t/src/decode/arm/format.dart';
 import 'package:armv4t/src/decode/arm/instruction.dart';
 import 'package:armv4t/src/decode/arm/printer.dart';
-import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
 // Example programs from https://onlinedisassembler.com/odaweb.
