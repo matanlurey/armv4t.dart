@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `UMLAL{cond}{S} RdLo,RdHi,Rm,Rs`.
+///
+/// ## Execution
+///
+/// `RdHiLo = Rm * Rs + RdHiLo`.
+///
+/// ## Cycles
+///
+/// `1S+mI+2I`.
+///
+/// ## Flags
+///
+/// `NZx-`.
 @immutable
 @sealed
 class UMLAL extends MultiplyAndMultiplyLongArmInstruction {

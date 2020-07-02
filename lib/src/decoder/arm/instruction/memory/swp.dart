@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `SWP{cond}{B} Rd,Rm,[Rn]`.
+///
+/// ## Execution
+///
+/// `Rd = [Rn], [Rn] = Rm`.
+///
+/// ## Cycles
+///
+/// `1S+2N+1I`.
 @immutable
 @sealed
 class SWP

@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `EOR{cond}{S} Rd,Rn,Op2`.
+///
+/// ## Execution
+///
+/// `Rd = Rn XOR Op2`.
+///
+/// ## Cycles
+///
+/// `1S+x+y`.
+///
+/// ## Flags
+///
+/// `NZc-`.
 @immutable
 @sealed
 class EOR extends DataProcessingArmInstruction {

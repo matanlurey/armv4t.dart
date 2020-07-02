@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `STM{cond}{amod} Rn{!}, <Rlist>{^}`.
+///
+/// ## Execution
+///
+/// Store Multiple.
+///
+/// ## Cycles
+///
+/// `(n-1)S+2N`.
 class STM extends BlockDataTransfer {
   STM({
     @required Condition condition,

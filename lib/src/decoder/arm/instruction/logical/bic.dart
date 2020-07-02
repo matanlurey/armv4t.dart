@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `BIC{cond}{S} Rd,Rn,Op2`.
+///
+/// ## Execution
+///
+/// `Rd = Rn AND NOT Op2`.
+///
+/// ## Cycles
+///
+/// `1S+x+y`.
+///
+/// ## Flags
+///
+/// `NZc-`.
 @immutable
 @sealed
 class BIC extends DataProcessingArmInstruction {

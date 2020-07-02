@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `MOV{cond}{S} Rd,Op2`.
+///
+/// ## Execution
+///
+/// `Rd = Op2`.
+///
+/// ## Cycles
+///
+/// `1S+x+y`.
+///
+/// ## Flags
+///
+/// `NZc-`.
 @immutable
 @sealed
 class MOV extends DataProcessingArmInstruction {

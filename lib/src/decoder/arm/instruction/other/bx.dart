@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `BX{cond} Rn`.
+///
+/// ## Execution
+///
+/// `PC = Rn, T = Rn.0`
+///
+/// ## Cycles
+///
+/// `2S+1N`.
 class BX extends ArmInstruction {
   /// Operand register.
   final RegisterNotPC operand;

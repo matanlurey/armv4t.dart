@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `MVN{cond}{S} Rd,Op2`.
+///
+/// ## Execution
+///
+/// `Rd = NOT Op2`.
+///
+/// ## Cycles
+///
+/// `1S+x+y`.
+///
+/// ## Flags
+///
+/// `NZc-`.
 @immutable
 @sealed
 class MVN extends DataProcessingArmInstruction {

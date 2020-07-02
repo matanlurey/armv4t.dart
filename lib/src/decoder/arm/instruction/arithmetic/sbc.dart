@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `SBC{cond}{S} Rd,Rn,Op2`.
+///
+/// ## Execution
+///
+/// `Rd = Rn - Op2 + Cy - 1`.
+///
+/// ## Cycles
+///
+/// `1S+x+y`.
+///
+/// ## Flags
+///
+/// `NZCV`.
 @immutable
 @sealed
 class SBC extends DataProcessingArmInstruction {

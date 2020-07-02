@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `TST{cond}{P} Rn,Op2`.
+///
+/// ## Execution
+///
+/// `Void = Rn AND Op2`
+///
+/// ## Cycles
+///
+/// `1S+x`.
+///
+/// ## Flags
+///
+/// `NZc-`.
 @immutable
 @sealed
 class TST extends DataProcessingArmInstruction {

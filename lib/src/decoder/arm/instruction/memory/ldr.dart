@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `LDR{cond}{B}{T} Rn,<Address>`.
+///
+/// ## Execution
+///
+/// `Rd = [Rn +/- <Offset>]`.
+///
+/// ## Cycles
+///
+/// `1S+1N+1I+y`.
 class LDR extends SingleDataTransfer {
   LDR({
     @required Condition condition,

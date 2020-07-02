@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `LDR{cond}H Rd,<Address>`.
+///
+/// ## Execution
+///
+/// Load unsigned halfword.
+///
+/// ## Cycles
+///
+/// `1S+1N+1I+y`.
 class LDRH extends HalfwordDataTransfer {
   LDRH({
     @required Condition condition,

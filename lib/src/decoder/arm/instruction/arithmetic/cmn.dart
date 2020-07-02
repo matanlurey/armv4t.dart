@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `CMN{cond}{P} Rn,Op2`.
+///
+/// ## Execution
+///
+/// `Void = Rn + Op2`.
+///
+/// ## Cycles
+///
+/// `1S+x`.
+///
+/// ## Flags
+///
+/// `NZCV`.
 @immutable
 @sealed
 class CMN extends DataProcessingArmInstruction {

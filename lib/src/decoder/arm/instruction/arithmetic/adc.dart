@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `ADC{cond}{S} Rd,Rn,Op2`.
+///
+/// ## Execution
+///
+/// `Rd = Rn + Op2 + Cy`.
+///
+/// ## Cycles
+///
+/// `1S+x+y`.
+///
+/// ## Flags
+///
+/// `NZCV`.
 @immutable
 @sealed
 class ADC extends DataProcessingArmInstruction {

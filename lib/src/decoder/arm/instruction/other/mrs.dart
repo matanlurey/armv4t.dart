@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `MRS{cond} Rd,Psr`.
+///
+/// ## Execution
+///
+/// `Rd = Psr`
+///
+/// ## Cycles
+///
+/// `1S`.
 @immutable
 @sealed
 class MRS extends PsrTransfer {

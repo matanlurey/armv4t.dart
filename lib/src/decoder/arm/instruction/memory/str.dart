@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `STR{cond}{B}{T} Rd,<Address>`.
+///
+/// ## Execution
+///
+/// `[Rn +/- <Offst>] = Rd`
+///
+/// ## Cycles
+///
+/// `2N`.
 class STR extends SingleDataTransfer {
   STR({
     @required Condition condition,

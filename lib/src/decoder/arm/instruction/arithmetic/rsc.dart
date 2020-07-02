@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `RSC{cond}{S} Rd,Rn,Op2`.
+///
+/// ## Execution
+///
+/// `Rd = Op2 - Rn - Cy - 1`.
+///
+/// ## Cycles
+///
+/// `1S+x+y`.
+///
+/// ## Flags
+///
+/// `NZCV`.
 @immutable
 @sealed
 class RSC extends DataProcessingArmInstruction {

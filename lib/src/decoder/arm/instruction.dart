@@ -26,7 +26,6 @@ part 'instruction/logical/tst.dart';
 part 'instruction/memory.dart';
 part 'instruction/memory/ldm.dart';
 part 'instruction/memory/ldr.dart';
-part 'instruction/memory/ldrd.dart';
 part 'instruction/memory/ldrh.dart';
 part 'instruction/memory/ldrsb.dart';
 part 'instruction/memory/ldrsh.dart';

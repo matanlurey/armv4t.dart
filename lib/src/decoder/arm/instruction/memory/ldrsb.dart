@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `LDR{cond}SB Rd,<Address>`.
+///
+/// ## Execution
+///
+/// Load signed byte.
+///
+/// ## Cycles
+///
+/// `1S+1N+1I+y`.
 class LDRSB extends HalfwordDataTransfer {
   LDRSB({
     @required Condition condition,

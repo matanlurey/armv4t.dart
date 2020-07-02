@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `LDM{cond}{amod} Rn{!}, <Rlist>{^}`.
+///
+/// ## Execution
+///
+/// Load Multiple.
+///
+/// ## Cycles
+///
+/// `nS+1N+1I+y`.
 class LDM extends BlockDataTransfer {
   LDM({
     @required Condition condition,

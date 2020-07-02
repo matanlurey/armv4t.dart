@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `MSR{cond} Psr{_field},Op`.
+///
+/// ## Execution
+///
+/// `Psr[field] = Op`
+///
+/// ## Flags
+///
+/// `(PSR)`
+///
+/// ## Cycles
+///
+/// `1S`.
 @immutable
 @sealed
 class MSR extends PsrTransfer {

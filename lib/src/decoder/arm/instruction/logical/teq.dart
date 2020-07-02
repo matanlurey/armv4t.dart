@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `TEQ{cond}{P} Rn,Op2`.
+///
+/// ## Execution
+///
+/// `Void = Rn XOR Op2`
+///
+/// ## Cycles
+///
+/// `1S+x`.
+///
+/// ## Flags
+///
+/// `NZc-`.
 @immutable
 @sealed
 class TEQ extends DataProcessingArmInstruction {

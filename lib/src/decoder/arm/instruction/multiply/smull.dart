@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `SMULL{cond}{S} RdLo,RdHi,Rm,Rs`.
+///
+/// ## Execution
+///
+/// `RdHiLo = Rm * Rs`.
+///
+/// ## Cycles
+///
+/// `1S+mI+1I`.
+///
+/// ## Flags
+///
+/// `NZx-`.
 @immutable
 @sealed
 class SMULL extends MultiplyAndMultiplyLongArmInstruction {

@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `ADD{cond}{S} Rd,Rn,Op2`.
+///
+/// ## Execution
+///
+/// `Rd = Rn + Op2`.
+///
+/// ## Cycles
+///
+/// `1S+x+y`.
+///
+/// ## Flags
+///
+/// `NZCV`.
 @immutable
 @sealed
 class ADD extends DataProcessingArmInstruction {

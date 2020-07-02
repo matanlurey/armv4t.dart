@@ -1,5 +1,18 @@
 part of '../../instruction.dart';
 
+/// `MLA{cond}{S} Rd,Rm,Rs,Rn`.
+///
+/// ## Execution
+///
+/// `Rd = Rm * Rs + Rn`.
+///
+/// ## Cycles
+///
+/// `1S+mI+1I`.
+///
+/// ## Flags
+///
+/// `NZx-`.
 @immutable
 @sealed
 class MLA extends MultiplyAndMultiplyLongArmInstruction {

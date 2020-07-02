@@ -1,5 +1,14 @@
 part of '../../instruction.dart';
 
+/// `STR{cond}H Rd,<Address>`.
+///
+/// ## Execution
+///
+/// Store halfword.
+///
+/// ## Cycles
+///
+/// `2N`.
 class STRH extends HalfwordDataTransfer {
   STRH({
     @required Condition condition,
