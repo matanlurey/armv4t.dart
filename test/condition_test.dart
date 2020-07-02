@@ -1,4 +1,4 @@
-import 'package:armv4t/src/condition.dart';
+import 'package:armv4t/src/decoder/arm/condition.dart';
 import 'package:test/test.dart';
 
 void main() {
