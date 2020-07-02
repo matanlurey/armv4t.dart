@@ -2,7 +2,7 @@ part of '../../instruction.dart';
 
 @immutable
 @sealed
-abstract class MLA extends MultiplyAndMultiplyLongArmInstruction {
+class MLA extends MultiplyAndMultiplyLongArmInstruction {
   MLA({
     @required Condition condition,
     @required bool setConditionCodes,

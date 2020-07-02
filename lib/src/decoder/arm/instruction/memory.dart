@@ -14,11 +14,7 @@ abstract class DataTransfer extends ArmInstruction {
   /// > If [addOffsetBeforeTransfer] is set, this is _always_ `true`.
   ///
   /// `T`: Whether to force non-privileged access (`1`), otherwise (`0`).
-  @protected
   final bool writeAddressIntoBaseOrForceNonPrivilegedAccess;
-
-  /// `L`: Whether to load from memory, otherwise store to memory (`0`).
-  final bool loadFromMemory;
 
   /// Base register.
   final RegisterAny base;
@@ -28,7 +24,6 @@ abstract class DataTransfer extends ArmInstruction {
     @required this.addOffsetBeforeTransfer,
     @required this.addOffsetToBase,
     @required this.writeAddressIntoBaseOrForceNonPrivilegedAccess,
-    @required this.loadFromMemory,
     @required this.base,
   }) : super._(condition: condition);
 }
@@ -70,7 +65,6 @@ abstract class SingleDataTransfer
     @required bool addOffsetToBase,
     @required bool writeAddressIntoBaseOrForceNonPrivilegedAccess,
     @required this.transferByte,
-    @required bool loadFromMemory,
     @required RegisterAny base,
     @required this.sourceOrDestination,
     @required this.offset,
@@ -80,7 +74,6 @@ abstract class SingleDataTransfer
           addOffsetToBase: addOffsetToBase,
           writeAddressIntoBaseOrForceNonPrivilegedAccess:
               writeAddressIntoBaseOrForceNonPrivilegedAccess,
-          loadFromMemory: loadFromMemory,
           base: base,
         );
 }
@@ -103,7 +96,6 @@ abstract class HalfwordDataTransfer
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,
     @required bool writeAddressIntoBase,
-    @required bool loadFromMemory,
     @required RegisterAny base,
     @required this.sourceOrDestination,
     @required this.offset,
@@ -112,7 +104,6 @@ abstract class HalfwordDataTransfer
           addOffsetBeforeTransfer: addOffsetBeforeTransfer,
           addOffsetToBase: addOffsetToBase,
           writeAddressIntoBaseOrForceNonPrivilegedAccess: writeAddressIntoBase,
-          loadFromMemory: loadFromMemory,
           base: base,
         );
 }
@@ -131,7 +122,6 @@ abstract class BlockDataTransfer extends DataTransfer with HasWriteBackOnly {
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,
     @required bool writeAddressIntoBase,
-    @required bool loadFromMemory,
     @required RegisterAny base,
     @required this.addressingMode,
     @required this.registerList,
@@ -140,39 +130,10 @@ abstract class BlockDataTransfer extends DataTransfer with HasWriteBackOnly {
           addOffsetBeforeTransfer: addOffsetBeforeTransfer,
           addOffsetToBase: addOffsetToBase,
           writeAddressIntoBaseOrForceNonPrivilegedAccess: writeAddressIntoBase,
-          loadFromMemory: loadFromMemory,
           base: base,
         );
 }
 
 class BlockDataAddressingMode {
   const BlockDataAddressingMode._();
-}
-
-@immutable
-@sealed
-abstract class SingleDataSwap
-    /**/ extends ArmInstruction
-    /**/ implements
-        HasTransferByte {
-  /// `B`: Whether to transfer a byte (8-bits, `1`) otherwise a word (32, `0`).
-  @override
-  final bool transferByte;
-
-  /// Base register.
-  final RegisterNotPC base;
-
-  /// Destination register.
-  final RegisterNotPC destination;
-
-  /// Source register.
-  final RegisterNotPC source;
-
-  SingleDataSwap._({
-    @required Condition condition,
-    @required this.transferByte,
-    @required this.base,
-    @required this.destination,
-    @required this.source,
-  }) : super._(condition: condition);
 }

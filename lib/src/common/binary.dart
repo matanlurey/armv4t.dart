@@ -131,3 +131,45 @@ class Uint24 extends Integral<Uint24> {
   @override
   String toDebugString() => '$_name {$value}';
 }
+
+/// Encapsulates an signed 24-bit aggregation.
+@sealed
+class Int24 extends Integral<Int24> {
+  /// Returns [value] if in range, otherwise throws [RangeError].
+  static int checkRange(int value) => Int24(value).value;
+
+  /// Returns [value].
+  ///
+  /// When assertions are enabled, throws a [RangeError].
+  static int assertRange(int value) {
+    return assertionsEnabled ? checkRange(value) : value;
+  }
+
+  static const _name = 'Int24';
+  static const _size = 24;
+  static const _signed = true;
+
+  /// A pre-computed instance of `Int24(0)`.
+  static const zero = Int24._(0);
+
+  /// Wraps a [value] that is otherwise a valid 24-bit unsigned integer.
+  Int24(int value)
+      : super.checked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  const Int24._(int value)
+      : super.unchecked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  @override
+  Int24 wrapSafeValue(int value) => Int24(value);
+
+  @override
+  String toDebugString() => '$_name {$value}';
+}

@@ -2,7 +2,7 @@ part of '../../instruction.dart';
 
 @immutable
 @sealed
-abstract class UMULL extends MultiplyAndMultiplyLongArmInstruction {
+class UMULL extends MultiplyAndMultiplyLongArmInstruction {
   UMULL({
     @required Condition condition,
     @required bool setConditionCodes,
