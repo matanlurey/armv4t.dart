@@ -29,4 +29,9 @@ class SMULL extends MultiplyAndMultiplyLongArmInstruction {
           operand2: operand2,
           destination: destination,
         );
+
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitSMULL(this, context);
+  }
 }

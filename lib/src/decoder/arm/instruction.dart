@@ -60,5 +60,5 @@ abstract class ArmInstruction {
   });
 
   /// Invokes a specific method of the provided [visitor].
-  /// R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]);
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]);
 }

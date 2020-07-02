@@ -35,4 +35,9 @@ class SWP
     @required this.destination,
     @required this.source,
   }) : super._(condition: condition);
+
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitSWP(this, context);
+  }
 }

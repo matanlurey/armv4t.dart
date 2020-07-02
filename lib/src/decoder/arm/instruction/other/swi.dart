@@ -16,4 +16,9 @@ class SWI extends ArmInstruction {
     @required Condition condition,
     @required this.comment,
   }) : super._(condition: condition);
+
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitSWI(this, context);
+  }
 }

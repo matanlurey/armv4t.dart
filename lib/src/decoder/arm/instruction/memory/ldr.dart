@@ -31,6 +31,11 @@ class LDR extends SingleDataTransfer {
           offset: offset,
         );
 
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitLDR(this, context);
+  }
+
   /// Source register.
   RegisterAny get source => sourceOrDestination;
 }

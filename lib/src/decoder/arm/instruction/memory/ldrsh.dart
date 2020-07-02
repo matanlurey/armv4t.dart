@@ -28,6 +28,11 @@ class LDRSH extends HalfwordDataTransfer {
           offset: offset,
         );
 
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitLDRSH(this, context);
+  }
+
   /// Source register.
   RegisterAny get source => sourceOrDestination;
 }

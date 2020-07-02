@@ -32,4 +32,9 @@ class RSB extends DataProcessingArmInstruction {
           destination: destination,
           operand2: operand2,
         );
+
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitRSB(this, context);
+  }
 }

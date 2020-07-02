@@ -28,6 +28,11 @@ class STRH extends HalfwordDataTransfer {
           offset: offset,
         );
 
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitSTRH(this, context);
+  }
+
   /// Destination register.
   RegisterAny get destination => sourceOrDestination;
 }

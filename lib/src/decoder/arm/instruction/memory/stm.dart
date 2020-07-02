@@ -27,4 +27,9 @@ class STM extends BlockDataTransfer {
           addressingMode: addressingMode,
           registerList: registerList,
         );
+
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitSTM(this, context);
+  }
 }

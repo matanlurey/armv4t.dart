@@ -31,6 +31,11 @@ class STR extends SingleDataTransfer {
           offset: offset,
         );
 
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitSTR(this, context);
+  }
+
   /// Destination register.
   RegisterAny get destination => sourceOrDestination;
 }

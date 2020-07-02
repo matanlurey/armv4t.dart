@@ -43,4 +43,9 @@ class MSR extends PsrTransfer {
           condition: condition,
           useSPSR: useSPSR,
         );
+
+  @override
+  R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
+    return visitor.visitMSR(this, context);
+  }
 }
