@@ -5,8 +5,6 @@ abstract class MaySetConditionCodes implements ArmInstruction {
   bool get setConditionCodes;
 }
 
-abstract class ArmInstructionVisitor {}
-
 class Address {}
 
 class AddressingMode {}

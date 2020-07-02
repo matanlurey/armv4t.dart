@@ -47,6 +47,7 @@ part 'instruction/other/bx.dart';
 part 'instruction/other/mrs.dart';
 part 'instruction/other/msr.dart';
 part 'instruction/other/swi.dart';
+part 'instruction/visitor.dart';
 
 @immutable
 @sealed
@@ -57,4 +58,7 @@ abstract class ArmInstruction {
   const ArmInstruction._({
     @required this.condition,
   });
+
+  /// Invokes a specific method of the provided [visitor].
+  /// R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]);
 }
