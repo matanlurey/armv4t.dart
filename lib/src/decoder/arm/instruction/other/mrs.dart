@@ -28,4 +28,7 @@ class MRS extends PsrTransferArmInstruction {
   R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
     return visitor.visitMRS(this, context);
   }
+
+  @override
+  List<Object> _values() => [condition, useSPSR, destination];
 }

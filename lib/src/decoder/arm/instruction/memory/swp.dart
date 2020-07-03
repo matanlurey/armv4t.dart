@@ -40,4 +40,15 @@ class SWP
   R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
     return visitor.visitSWP(this, context);
   }
+
+  @override
+  List<Object> _values() {
+    return [
+      condition,
+      transferByte,
+      base,
+      destination,
+      source,
+    ];
+  }
 }

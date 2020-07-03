@@ -57,7 +57,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       // I = 1
       final rorShift = format.operand2.bitRange(11, 8).value.asUint4();
       final immediate = format.operand2.bitRange(7, 0).value.asUint8();
-      operand2 = Or3.right(ShiftedImmediate(rorShift, immediate));
+      operand2 = Or3.right(ShiftedImmediate(rorShift, Immediate(immediate)));
     } else {
       // I = 0
       final shiftByRegister = format.operand2.isSet(4);
@@ -237,7 +237,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         sourceOrImmediate = Or2.right(
           ShiftedImmediate(
             format.operand2.bitRange(11, 8).value.asUint4(),
-            format.operand2.bitRange(7, 0).value.asUint8(),
+            Immediate(format.operand2.bitRange(7, 0).value.asUint8()),
           ),
         );
       } else {

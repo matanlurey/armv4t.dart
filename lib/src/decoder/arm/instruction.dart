@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/common/union.dart';
 import 'package:armv4t/src/decoder/arm/format.dart';
 import 'package:binary/binary.dart';
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import 'condition.dart';
@@ -63,4 +66,24 @@ abstract class ArmInstruction {
 
   /// Invokes a specific method of the provided [visitor].
   R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]);
+
+  @override
+  int get hashCode => const ListEquality<Object>().hash(_values());
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) {
+      return true;
+    }
+    if (o is ArmInstruction && runtimeType == o.runtimeType) {
+      return const ListEquality<Object>().equals(_values(), o._values());
+    } else {
+      return false;
+    }
+  }
+
+  /// Implement in order to automatically implement `==` and [hashCode].
+  @protected
+  @visibleForOverriding
+  List<Object> _values();
 }

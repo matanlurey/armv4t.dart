@@ -3,7 +3,7 @@ part of '../instruction.dart';
 abstract class MultiplyAndMultiplyLongArmInstruction
     /**/ extends ArmInstruction
     /**/ implements
-        MaySetConditionCodes {
+        _MaySetConditionCodes {
   /// Whether to set condition codes on the PSR.
   ///
   /// Must be `true` for Halfword and `UMAAL`.
@@ -26,4 +26,15 @@ abstract class MultiplyAndMultiplyLongArmInstruction
     @required this.operand2,
     @required this.destination,
   }) : super._(condition: condition);
+
+  @override
+  List<Object> _values() {
+    return [
+      condition,
+      setConditionCodes,
+      operand1,
+      operand2,
+      destination,
+    ];
+  }
 }

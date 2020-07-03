@@ -5,7 +5,7 @@ part of '../instruction.dart';
 abstract class DataProcessingArmInstruction
     /**/ extends ArmInstruction
     /**/ implements
-        MaySetConditionCodes {
+        _MaySetConditionCodes {
   /// Whether to set condition codes on the PSR.
   ///
   /// Must be `true` for `TST`, `TEQ`, `CMP`, and `CMN`.
@@ -40,4 +40,15 @@ abstract class DataProcessingArmInstruction
     @required this.destination,
     @required this.operand2,
   }) : super._(condition: condition);
+
+  @override
+  List<Object> _values() {
+    return [
+      condition,
+      setConditionCodes,
+      operand1,
+      destination,
+      operand2,
+    ];
+  }
 }

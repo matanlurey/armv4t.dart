@@ -21,4 +21,7 @@ class BL extends ArmInstruction {
   R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
     return visitor.visitBL(this, context);
   }
+
+  @override
+  List<Object> _values() => [condition, offset];
 }

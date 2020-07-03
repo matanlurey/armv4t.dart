@@ -48,4 +48,17 @@ class MSR extends PsrTransferArmInstruction {
   R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
     return visitor.visitMSR(this, context);
   }
+
+  @override
+  List<Object> _values() {
+    return [
+      condition,
+      useSPSR,
+      writeToFlagsField,
+      writeToStatusField,
+      writeToExtensionField,
+      writeToControlField,
+      sourceOrImmediate,
+    ];
+  }
 }

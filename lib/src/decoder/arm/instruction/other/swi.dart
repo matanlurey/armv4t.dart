@@ -21,4 +21,7 @@ class SWI extends ArmInstruction {
   R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
     return visitor.visitSWI(this, context);
   }
+
+  @override
+  List<Object> _values() => [condition, comment];
 }

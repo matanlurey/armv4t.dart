@@ -77,6 +77,20 @@ abstract class SingleDataTransferArmInstruction
               writeAddressIntoBaseOrForceNonPrivilegedAccess,
           base: base,
         );
+
+  @override
+  List<Object> _values() {
+    return [
+      condition,
+      addOffsetBeforeTransfer,
+      addOffsetToBase,
+      writeAddressIntoBaseOrForceNonPrivilegedAccess,
+      transferByte,
+      base,
+      sourceOrDestination,
+      offset,
+    ];
+  }
 }
 
 @immutable
@@ -107,6 +121,19 @@ abstract class HalfwordDataTransferArmInstruction
           writeAddressIntoBaseOrForceNonPrivilegedAccess: writeAddressIntoBase,
           base: base,
         );
+
+  @override
+  List<Object> _values() {
+    return [
+      condition,
+      addOffsetBeforeTransfer,
+      addOffsetToBase,
+      writeAddressIntoBaseOrForceNonPrivilegedAccess,
+      base,
+      sourceOrDestination,
+      offset,
+    ];
+  }
 }
 
 @immutable
@@ -132,4 +159,16 @@ abstract class BlockDataTransferArmInstruction
           writeAddressIntoBaseOrForceNonPrivilegedAccess: writeAddressIntoBase,
           base: base,
         );
+
+  @override
+  List<Object> _values() {
+    return [
+      condition,
+      addOffsetBeforeTransfer,
+      addOffsetToBase,
+      writeAddressIntoBase,
+      base,
+      registerList,
+    ];
+  }
 }

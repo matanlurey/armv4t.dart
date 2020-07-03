@@ -25,4 +25,7 @@ class BX extends ArmInstruction {
 
   /// Whether to switch to _THUMB_ mode when branching.
   bool get switchToThumbMode => operand.index.isSet(0);
+
+  @override
+  List<Object> _values() => [condition, operand];
 }
