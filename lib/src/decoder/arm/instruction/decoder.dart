@@ -12,12 +12,32 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     final opCode = _ALUOpCode.values[format.opCode.value];
     if (!format.setConditionCodes) {
       switch (opCode) {
-        case _ALUOpCode.TEQ:
-        case _ALUOpCode.TST:
-        case _ALUOpCode.CMP:
-        case _ALUOpCode.CMN:
-          // TODO: Instead of probing for bits, pass isMSR/usePSR based on code.
-          return _decodePsrTransfer(format, condition, opCode.index.isSet(0));
+        //                               isMSR
+        //                              V
+        case _ALUOpCode.TST: // 0x8 | 1000 <-- useSPSR
+          return _decodePsrTransfer(
+            format,
+            condition,
+          );
+        case _ALUOpCode.TEQ: // 0x9 | 1001
+          return _decodePsrTransfer(
+            format,
+            condition,
+            useSPSR: true,
+          );
+        case _ALUOpCode.CMP: // 0xa | 1010
+          return _decodePsrTransfer(
+            format,
+            condition,
+            isMSR: true,
+          );
+        case _ALUOpCode.CMN: // 0xb | 1011
+          return _decodePsrTransfer(
+            format,
+            condition,
+            isMSR: true,
+            useSPSR: true,
+          );
         default:
           break;
       }
@@ -204,10 +224,10 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   PsrTransferArmInstruction _decodePsrTransfer(
     DataProcessingOrPsrTransfer format,
-    Condition condition,
-    bool isMSR,
-  ) {
-    final useSPSR = format.opCode.isSet(1);
+    Condition condition, {
+    bool isMSR = false,
+    bool useSPSR = false,
+  }) {
     if (isMSR) {
       final flagMask = format.operand1Register;
       Or2<RegisterAny, ShiftedImmediate<Uint8>> sourceOrImmediate;
@@ -375,8 +395,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       switch (format.opCode.value) {
         case 0x2:
           return LDRSB(
-            condition: null,
-            addOffsetBeforeTransfer: null,
+            condition: condition,
+            addOffsetBeforeTransfer: addOffsetBeforeTransfer,
             addOffsetToBase: null,
             writeAddressIntoBase: null,
             base: null,
@@ -385,8 +405,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           );
         case 0x3:
           return LDRSH(
-            condition: null,
-            addOffsetBeforeTransfer: null,
+            condition: condition,
+            addOffsetBeforeTransfer: addOffsetBeforeTransfer,
             addOffsetToBase: null,
             writeAddressIntoBase: null,
             base: null,
@@ -399,8 +419,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     } else {
       // L = 0 (STRH)
       return STRH(
-        condition: null,
-        addOffsetBeforeTransfer: null,
+        condition: condition,
+        addOffsetBeforeTransfer: addOffsetBeforeTransfer,
         addOffsetToBase: null,
         writeAddressIntoBase: null,
         base: null,
