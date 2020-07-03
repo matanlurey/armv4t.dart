@@ -16,7 +16,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         case _ALUOpCode.TST:
         case _ALUOpCode.CMP:
         case _ALUOpCode.CMN:
-          return _decodePsrTransfer(format, opCode.index.isSet(0));
+          // TODO: Instead of probing for bits, pass isMSR/usePSR based on code.
+          return _decodePsrTransfer(format, condition, opCode.index.isSet(0));
         default:
           break;
       }
@@ -26,9 +27,9 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     final destination = RegisterAny(format.destinationRegister);
 
     Or3<
-        ShiftedRegister<Immediate<Uint4>>,
+        ShiftedRegister<Immediate<Uint4>, RegisterAny>,
         /**/
-        ShiftedRegister<RegisterNotPC>,
+        ShiftedRegister<RegisterNotPC, RegisterAny>,
         /**/
         ShiftedImmediate<Uint8>> operand2;
 
@@ -203,73 +204,338 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   PsrTransferArmInstruction _decodePsrTransfer(
     DataProcessingOrPsrTransfer format,
+    Condition condition,
     bool isMSR,
   ) {
-    throw UnimplementedError();
+    final useSPSR = format.opCode.isSet(1);
+    if (isMSR) {
+      final flagMask = format.operand1Register;
+      Or2<RegisterAny, ShiftedImmediate<Uint8>> sourceOrImmediate;
+
+      if (format.immediateOperand) {
+        // I = 1
+        sourceOrImmediate = Or2.right(
+          ShiftedImmediate(
+            format.operand2.bitRange(11, 8).value.asUint4(),
+            format.operand2.bitRange(7, 0).value.asUint8(),
+          ),
+        );
+      } else {
+        // I = 0
+        sourceOrImmediate = Or2.left(
+          RegisterAny(format.operand2.bitRange(3, 0).value.asUint4()),
+        );
+      }
+
+      return MSR(
+        condition: condition,
+        useSPSR: useSPSR,
+        writeToFlagsField: flagMask.isSet(3),
+        writeToStatusField: flagMask.isSet(2),
+        writeToExtensionField: flagMask.isSet(1),
+        writeToControlField: flagMask.isSet(0),
+        sourceOrImmediate: sourceOrImmediate,
+      );
+    } else {
+      return MRS(
+        condition: condition,
+        useSPSR: useSPSR,
+        destination: RegisterNotPC(format.destinationRegister),
+      );
+    }
   }
 
   @override
   MultiplyAndMultiplyLongArmInstruction visitMultiply(
     Multiply format, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    final condition = Condition.parse(format.condition.value);
+    final setConditionCodes = format.setConditionCodes;
+    final operand1 = RegisterNotPC(format.operandRegister1);
+    final operand2 = RegisterNotPC(format.operandRegister2);
+    final destination = RegisterNotPC(format.destinationRegister);
+
+    if (format.accumulate) {
+      // A = 1
+      return MLA(
+        condition: condition,
+        setConditionCodes: setConditionCodes,
+        operand1: operand1,
+        operand2: operand2,
+        destination: destination,
+      );
+    } else {
+      // A = 0
+      return MLA(
+        condition: condition,
+        setConditionCodes: setConditionCodes,
+        operand1: operand1,
+        operand2: operand2,
+        destination: destination,
+      );
+    }
+  }
 
   @override
   MultiplyAndMultiplyLongArmInstruction visitMultiplyLong(
     MultiplyLong format, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    final condition = Condition.parse(format.condition.value);
+    final setConditionCodes = format.setConditionCodes;
+    final operand1 = RegisterNotPC(format.operandRegister1);
+    final operand2 = RegisterNotPC(format.operandRegister2);
+    final destination = RegisterNotPC(
+      format.destinationRegisterHi << Uint4(4) | format.destinationRegisterLo,
+    );
+
+    if (format.accumulate) {
+      // A = 1
+      // UMLAL or SMLAL
+      if (format.signed) {
+        // S = 1
+        return SMLAL(
+          condition: condition,
+          setConditionCodes: setConditionCodes,
+          operand1: operand1,
+          operand2: operand2,
+          destination: destination,
+        );
+      } else {
+        // S = 0
+        return UMLAL(
+          condition: condition,
+          setConditionCodes: setConditionCodes,
+          operand1: operand1,
+          operand2: operand2,
+          destination: destination,
+        );
+      }
+    } else {
+      // A = 0
+      // UMULL or SMULL
+      if (format.signed) {
+        // S = 1
+        return SMULL(
+          condition: condition,
+          setConditionCodes: setConditionCodes,
+          operand1: operand1,
+          operand2: operand2,
+          destination: destination,
+        );
+      } else {
+        // S = 0
+        return UMULL(
+          condition: condition,
+          setConditionCodes: setConditionCodes,
+          operand1: operand1,
+          operand2: operand2,
+          destination: destination,
+        );
+      }
+    }
+  }
 
   @override
   SWP visitSingleDataSwap(
     SingleDataSwap format, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    return SWP(
+      condition: Condition.parse(format.condition.value),
+      transferByte: format.swapByteQuantity,
+      base: RegisterNotPC(format.baseRegister),
+      destination: RegisterNotPC(format.destinationRegister),
+      source: RegisterNotPC(format.sourceRegister),
+    );
+  }
 
   @override
   BX visitBranchAndExchange(
     BranchAndExchange format, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    return BX(
+      condition: Condition.parse(format.condition.value),
+      operand: RegisterNotPC(format.operand),
+    );
+  }
 
   @override
   HalfwordDataTransferArmInstruction visitHalfwordDataTransfer(
     HalfwordDataTransfer format, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    final condition = Condition.parse(format.condition.value);
+    final addOffsetBeforeTransfer = format.preIndexingBit;
+
+    if (format.loadMemoryBit) {
+      // L = 1 (LDRSB, LDRSH)
+      switch (format.opCode.value) {
+        case 0x2:
+          return LDRSB(
+            condition: null,
+            addOffsetBeforeTransfer: null,
+            addOffsetToBase: null,
+            writeAddressIntoBase: null,
+            base: null,
+            source: null,
+            offset: null,
+          );
+        case 0x3:
+          return LDRSH(
+            condition: null,
+            addOffsetBeforeTransfer: null,
+            addOffsetToBase: null,
+            writeAddressIntoBase: null,
+            base: null,
+            source: null,
+            offset: null,
+          );
+        default:
+          throw FormatException('Unexpected opCode: ${format.opCode.value}');
+      }
+    } else {
+      // L = 0 (STRH)
+      return STRH(
+        condition: null,
+        addOffsetBeforeTransfer: null,
+        addOffsetToBase: null,
+        writeAddressIntoBase: null,
+        base: null,
+        destination: null,
+        offset: null,
+      );
+    }
+  }
 
   @override
   SingleDataTransferArmInstruction visitSingleDataTransfer(
     SingleDataTransfer format, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    final condition = Condition.parse(format.condition.value);
+    final addOffsetBeforeTransfer = format.preIndexingBit;
+    final addOffsetToBase = format.addOffsetBit;
+    final writeBack = format.writeAddressBit;
+    final transferByte = format.byteQuantityBit;
+    final base = RegisterAny(format.baseRegister);
+    final sourceOrDestination = RegisterAny(format.sourceOrDestinationRegister);
+
+    Or2<Immediate<Uint12>, ShiftedRegister<Immediate<Uint4>, RegisterNotPC>>
+        offset;
+
+    if (format.immediateOffset) {
+      // I = 0
+      offset = Or2.left(Immediate(format.offset));
+    } else {
+      // I = 1
+      // format.offset.bitRange(11, 7).value.asUint4(),
+      offset = Or2.right(ShiftedRegister(
+        RegisterNotPC(format.offset.bitRange(3, 0).value.asUint4()),
+        ShiftType.values[format.offset.bitRange(6, 5).value],
+        Immediate(format.offset.bitRange(11, 7).value.asUint4()),
+      ));
+    }
+
+    if (format.loadMemoryBit) {
+      // L = 1
+      return LDR(
+        condition: condition,
+        addOffsetBeforeTransfer: addOffsetBeforeTransfer,
+        addOffsetToBase: addOffsetToBase,
+        writeAddressIntoBaseOrForceNonPrivilegedAccess: writeBack,
+        transferByte: transferByte,
+        base: base,
+        source: sourceOrDestination,
+        offset: offset,
+      );
+    } else {
+      // L = 0
+      return STR(
+        condition: condition,
+        addOffsetBeforeTransfer: addOffsetBeforeTransfer,
+        addOffsetToBase: addOffsetToBase,
+        writeAddressIntoBaseOrForceNonPrivilegedAccess: writeBack,
+        transferByte: transferByte,
+        base: base,
+        destination: sourceOrDestination,
+        offset: offset,
+      );
+    }
+  }
 
   @override
   BlockDataTransferArmInstruction visitBlockDataTransfer(
     BlockDataTransfer format, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    final condition = Condition.parse(format.condition.value);
+    final addOffsetBeforeTransfer = format.preIndexingBit;
+    final addOffsetToBase = format.addOffsetBit;
+    final writeAddressIntoBase = format.writeAddressBit;
+    final base = RegisterAny(format.baseRegister);
+    final registerList = RegisterList<RegisterAny>.parse(
+      format.registerList.value,
+    );
+
+    if (format.loadMemoryBit) {
+      // L = 1
+      return LDM(
+        condition: condition,
+        addOffsetBeforeTransfer: addOffsetBeforeTransfer,
+        addOffsetToBase: addOffsetToBase,
+        writeAddressIntoBase: writeAddressIntoBase,
+        base: base,
+        registerList: registerList,
+      );
+    } else {
+      // L = 0
+      return STM(
+        condition: condition,
+        addOffsetBeforeTransfer: addOffsetBeforeTransfer,
+        addOffsetToBase: addOffsetToBase,
+        writeAddressIntoBase: writeAddressIntoBase,
+        base: base,
+        registerList: registerList,
+      );
+    }
+  }
 
   @override
   ArmInstruction visitBranch(
     Branch format, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    final condition = Condition.parse(format.condition.value);
+    final offset = format.offset;
+
+    if (format.link) {
+      // L = 1
+      return BL(
+        condition: condition,
+        offset: offset,
+      );
+    } else {
+      // L = 0
+      return B(
+        condition: condition,
+        offset: offset,
+      );
+    }
+  }
 
   @override
   SWI visitSoftwareInterrupt(
     SoftwareInterrupt format, [
     void _,
-  ]) =>
-      throw UnimplementedError();
+  ]) {
+    return SWI(
+      condition: Condition.parse(format.condition.value),
+      comment: Comment(format.comment),
+    );
+  }
 }
 
 enum _ALUOpCode {

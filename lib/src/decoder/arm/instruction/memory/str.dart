@@ -18,7 +18,9 @@ class STR extends SingleDataTransferArmInstruction {
     @required bool transferByte,
     @required RegisterAny base,
     @required RegisterAny destination,
-    @required Or2<Immediate<Uint12>, ShiftedRegister<Immediate<Uint4>>> offset,
+    @required
+        Or2<Immediate<Uint12>, ShiftedRegister<Immediate<Uint4>, RegisterNotPC>>
+            offset,
   }) : super._(
           condition: condition,
           addOffsetBeforeTransfer: addOffsetBeforeTransfer,

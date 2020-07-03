@@ -28,7 +28,7 @@ class SWP
   /// Source register.
   final RegisterNotPC source;
 
-  SWP._({
+  SWP({
     @required Condition condition,
     @required this.transferByte,
     @required this.base,

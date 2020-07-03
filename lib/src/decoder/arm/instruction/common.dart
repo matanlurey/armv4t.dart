@@ -9,7 +9,11 @@ class Address {}
 
 class AddressingMode {}
 
-class Comment {}
+class Comment {
+  final Uint24 value;
+
+  const Comment(this.value);
+}
 
 class Immediate<T extends Integral<T>> implements Shiftable<Immediate<T>> {
   final T value;
@@ -40,7 +44,9 @@ class RegisterNotPC extends Register<RegisterNotPC> {
   }
 }
 
-class RegisterList<R extends Register<R>> {}
+class RegisterList<R extends Register<R>> {
+  factory RegisterList.parse(int bitMask) => throw UnimplementedError();
+}
 
 abstract class Shiftable<T extends Shiftable<T>> {}
 
@@ -54,9 +60,9 @@ class ShiftedImmediate<T extends Integral<T>> {
   const ShiftedImmediate(this.rorShift, this.immediate);
 }
 
-class ShiftedRegister<T extends Shiftable<T>> {
+class ShiftedRegister<T extends Shiftable<T>, R extends Register<R>> {
   /// Operand register.
-  final RegisterAny operand;
+  final R operand;
 
   /// Shift type.
   final ShiftType type;

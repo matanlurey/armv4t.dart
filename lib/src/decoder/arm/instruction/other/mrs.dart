@@ -13,9 +13,9 @@ part of '../../instruction.dart';
 @sealed
 class MRS extends PsrTransferArmInstruction {
   /// Destination register.
-  final RegisterAny destination;
+  final RegisterNotPC destination;
 
-  MRS._({
+  MRS({
     @required Condition condition,
     @required bool useSPSR,
     @required this.destination,

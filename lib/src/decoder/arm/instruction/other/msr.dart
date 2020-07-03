@@ -31,7 +31,7 @@ class MSR extends PsrTransferArmInstruction {
   /// Either the source register or an unsigend 8-bit shifted immediate.
   final Or2<RegisterAny, ShiftedImmediate<Uint8>> sourceOrImmediate;
 
-  MSR._({
+  MSR({
     @required Condition condition,
     @required bool useSPSR,
     @required this.writeToFlagsField,

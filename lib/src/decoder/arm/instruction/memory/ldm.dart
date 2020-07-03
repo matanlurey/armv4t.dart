@@ -16,15 +16,13 @@ class LDM extends BlockDataTransferArmInstruction {
     @required bool addOffsetToBase,
     @required bool writeAddressIntoBase,
     @required RegisterAny base,
-    @required BlockDataAddressingMode addressingMode,
-    @required RegisterList registerList,
+    @required RegisterList<RegisterAny> registerList,
   }) : super._(
           condition: condition,
           addOffsetBeforeTransfer: addOffsetBeforeTransfer,
           addOffsetToBase: addOffsetToBase,
           writeAddressIntoBase: writeAddressIntoBase,
           base: base,
-          addressingMode: addressingMode,
           registerList: registerList,
         );
 
