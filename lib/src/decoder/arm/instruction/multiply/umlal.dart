@@ -15,19 +15,21 @@ part of '../../instruction.dart';
 /// `NZx-`.
 @immutable
 @sealed
-class UMLAL extends MultiplyAndMultiplyLongArmInstruction {
+class UMLAL extends MultiplyLongArmInstruction {
   UMLAL({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterNotPC operand1,
     @required RegisterNotPC operand2,
-    @required RegisterNotPC destination,
+    @required RegisterNotPC destinationHiBits,
+    @required RegisterNotPC destinationLoBits,
   }) : super._(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
           operand2: operand2,
-          destination: destination,
+          destinationHiBits: destinationHiBits,
+          destinationLoBits: destinationLoBits,
         );
 
   @override

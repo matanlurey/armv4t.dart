@@ -15,7 +15,7 @@ part of '../../instruction.dart';
 /// `NZx-`.
 @immutable
 @sealed
-class MUL extends MultiplyAndMultiplyLongArmInstruction {
+class MUL extends MultiplyArmInstruction {
   MUL({
     @required Condition condition,
     @required bool setConditionCodes,

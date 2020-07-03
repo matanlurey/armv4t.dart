@@ -158,30 +158,37 @@ class SuperArmInstructionVisitor<R, C> implements ArmInstructionVisitor<R, C> {
   @override
   R visitSWP(SWP i, [C context]) => visitInstruction(i, context);
 
-  R visitMultiplyAndMultiplyLong(
-    MultiplyAndMultiplyLongArmInstruction i, [
+  R visitMultiply(
+    MultiplyArmInstruction i, [
     C context,
   ]) {
     return visitInstruction(i, context);
   }
 
   @override
-  R visitMLA(MLA i, [C context]) => visitMultiplyAndMultiplyLong(i);
+  R visitMLA(MLA i, [C context]) => visitMultiply(i);
 
   @override
-  R visitMUL(MUL i, [C context]) => visitMultiplyAndMultiplyLong(i);
+  R visitMUL(MUL i, [C context]) => visitMultiply(i);
+
+  R visitMultiplyLong(
+    MultiplyLongArmInstruction i, [
+    C context,
+  ]) {
+    return visitInstruction(i, context);
+  }
 
   @override
-  R visitSMLAL(SMLAL i, [C context]) => visitMultiplyAndMultiplyLong(i);
+  R visitSMLAL(SMLAL i, [C context]) => visitMultiplyLong(i);
 
   @override
-  R visitSMULL(SMULL i, [C context]) => visitMultiplyAndMultiplyLong(i);
+  R visitSMULL(SMULL i, [C context]) => visitMultiplyLong(i);
 
   @override
-  R visitUMLAL(UMLAL i, [C context]) => visitMultiplyAndMultiplyLong(i);
+  R visitUMLAL(UMLAL i, [C context]) => visitMultiplyLong(i);
 
   @override
-  R visitUMULL(UMULL i, [C context]) => visitMultiplyAndMultiplyLong(i);
+  R visitUMULL(UMULL i, [C context]) => visitMultiplyLong(i);
 
   @override
   R visitB(B i, [C context]) => visitInstruction(i, context);

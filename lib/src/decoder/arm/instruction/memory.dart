@@ -54,7 +54,6 @@ abstract class SingleDataTransferArmInstruction
   final bool transferByte;
 
   /// Source or destination register (`Rd`).
-  @protected
   final RegisterAny sourceOrDestination;
 
   /// Either an unsigned 12-bit immediate or register shifted by immediate.

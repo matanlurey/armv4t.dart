@@ -16,17 +16,8 @@ part of '../../instruction.dart';
 @immutable
 @sealed
 class MSR extends PsrTransferArmInstruction {
-  /// `F`: Write to flags field (aka `_flg`).
-  final bool writeToFlagsField;
-
-  /// `S`: Write to status field (reserved, don't change).
-  final bool writeToStatusField;
-
-  /// `X`: Write to extension field (reserved, don't change).
-  final bool writeToExtensionField;
-
-  /// `C`: Write to control field (aka `_ctl`).
-  final bool writeToControlField;
+  /// Which field, if any, to write to - may be `null`.
+  final MSRWriteField writeToField;
 
   /// Either the source register or an unsigend 8-bit shifted immediate.
   final Or2<RegisterAny, ShiftedImmediate<Uint8>> sourceOrImmediate;
@@ -34,10 +25,7 @@ class MSR extends PsrTransferArmInstruction {
   MSR({
     @required Condition condition,
     @required bool useSPSR,
-    @required this.writeToFlagsField,
-    @required this.writeToStatusField,
-    @required this.writeToExtensionField,
-    @required this.writeToControlField,
+    @required this.writeToField,
     @required this.sourceOrImmediate,
   }) : super._(
           condition: condition,
@@ -54,11 +42,22 @@ class MSR extends PsrTransferArmInstruction {
     return [
       condition,
       useSPSR,
-      writeToFlagsField,
-      writeToStatusField,
-      writeToExtensionField,
-      writeToControlField,
+      writeToField,
       sourceOrImmediate,
     ];
   }
+}
+
+enum MSRWriteField {
+  /// Bit 19: `F` (bits 31-24, aka `_flg`).
+  flag,
+
+  /// Bit 18: `S`` (bits 23-16, reserved, do not change).
+  status,
+
+  /// Bit 17: `X` (bits 15-8, reserved, do not change).
+  extension,
+
+  /// Bit 16: `C` (bits 7-0, aka `_ctl`)
+  control,
 }

@@ -382,15 +382,9 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final mnuemonic = super.visitDataProcessing(i);
     final register = visitRegister(i.operand1);
     final operand2 = i.operand2.pick(
-      (shiftedRegisterByImmediate) => visitShiftedRegisterByImmediate(
-        shiftedRegisterByImmediate,
-      ),
-      (shiftedRegisterByRegister) => visitShiftedRegisterByRegister(
-        shiftedRegisterByRegister,
-      ),
-      (shiftedImmediate) => visitShiftedImmediate(
-        shiftedImmediate,
-      ),
+      visitShiftedRegisterByImmediate,
+      visitShiftedRegisterByRegister,
+      visitShiftedImmediate,
     );
     return '$mnuemonic $register,$operand2';
   }
@@ -410,7 +404,31 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     final mnuemonic = super.visitSingleDataTransfer(i);
-    return '$mnuemonic';
+    final b = i.transferByte ? 'b' : '';
+    final t = i.forceNonPrivilegedAccess ? 't' : '';
+    final d = visitRegister(i.sourceOrDestination);
+    final prefix = '$mnuemonic$b$t $d';
+    return i.offset.pick(
+      (immediate) {
+        // 1. An expression which generates an address.
+        return '$prefix ${visitImmediate(immediate)}';
+      },
+      (shiftedRegister) {
+        if (i.addOffsetBeforeTransfer) {
+          // 2. A pre-indexed addressing specification.
+          //   [Rn]
+          //   [Rn, expression]{!}
+          //   [Rn, {+/-}Rm{,shift}]{!}
+          final w = i.writeAddressIntoBase ? '!' : '';
+          return '[]$w';
+        } else {
+          // 3. A post-indexed addressing specification.
+          //   [Rn], expression
+          //   [Rn], +/-Rm{, shift}
+          return '[]';
+        }
+      },
+    );
   }
 
   @override
@@ -423,21 +441,63 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
   }
 
   @override
-  String visitMultiplyAndMultiplyLong(
-    MultiplyAndMultiplyLongArmInstruction i, [
+  String visitMultiply(
+    MultiplyArmInstruction i, [
     void _,
   ]) {
-    final mnuemonic = super.visitMultiplyAndMultiplyLong(i);
-    return '$mnuemonic';
+    final mnuemonic = super.visitMultiply(i);
+    final d = visitRegister(i.destination);
+    final m = visitRegister(i.operand1);
+    final s = visitRegister(i.operand2);
+    return '$mnuemonic $d,$m,$s';
   }
 
   @override
-  String visitPsrTransfer(
-    PsrTransferArmInstruction i, [
+  String visitMultiplyLong(
+    MultiplyLongArmInstruction i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitMultiplyLong(i);
+    final h = visitRegister(i.destinationHiBits);
+    final l = visitRegister(i.destinationLoBits);
+    final m = visitRegister(i.operand1);
+    final s = visitRegister(i.operand2);
+    return '$mnuemonic $l,$h,$m,$s';
+  }
+
+  @override
+  String visitMRS(
+    MRS i, [
     void _,
   ]) {
     final mnuemonic = super.visitPsrTransfer(i);
-    return '$mnuemonic';
+    final d = visitRegister(i.destination);
+    final psr = i.useSPSR ? 'spsr' : 'cpsr';
+    return '$mnuemonic $d,$psr';
+  }
+
+  @override
+  String visitMSR(
+    MSR i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitPsrTransfer(i);
+    final m = i.sourceOrImmediate.pick(
+      visitRegister,
+      visitShiftedImmediate,
+    );
+    var psr = i.useSPSR ? 'spsr' : 'cpsr';
+    switch (i.writeToField) {
+      case MSRWriteField.flag:
+        psr = '${psr}_flg';
+        break;
+      case MSRWriteField.control:
+        psr = '${psr}_ctl';
+        break;
+      default:
+        break;
+    }
+    return '$mnuemonic $psr,$m';
   }
 
   @override

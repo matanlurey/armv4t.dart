@@ -247,13 +247,22 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         );
       }
 
+      MSRWriteField writeTo;
+
+      if (flagMask.isSet(3)) {
+        writeTo = MSRWriteField.flag;
+      } else if (flagMask.isSet(2)) {
+        writeTo = MSRWriteField.status;
+      } else if (flagMask.isSet(1)) {
+        writeTo = MSRWriteField.extension;
+      } else if (flagMask.isSet(0)) {
+        writeTo = MSRWriteField.control;
+      }
+
       return MSR(
         condition: condition,
         useSPSR: useSPSR,
-        writeToFlagsField: flagMask.isSet(3),
-        writeToStatusField: flagMask.isSet(2),
-        writeToExtensionField: flagMask.isSet(1),
-        writeToControlField: flagMask.isSet(0),
+        writeToField: writeTo,
         sourceOrImmediate: sourceOrImmediate,
       );
     } else {
@@ -306,9 +315,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     final setConditionCodes = format.setConditionCodes;
     final operand1 = RegisterNotPC(format.operandRegister1);
     final operand2 = RegisterNotPC(format.operandRegister2);
-    final destination = RegisterNotPC(
-      format.destinationRegisterHi << Uint4(4) | format.destinationRegisterLo,
-    );
+    final destinationHiBits = RegisterNotPC(format.destinationRegisterHi);
+    final destinationLoBits = RegisterNotPC(format.destinationRegisterLo);
 
     if (format.accumulate) {
       // A = 1
@@ -320,7 +328,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           setConditionCodes: setConditionCodes,
           operand1: operand1,
           operand2: operand2,
-          destination: destination,
+          destinationHiBits: destinationHiBits,
+          destinationLoBits: destinationLoBits,
         );
       } else {
         // S = 0
@@ -329,7 +338,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           setConditionCodes: setConditionCodes,
           operand1: operand1,
           operand2: operand2,
-          destination: destination,
+          destinationHiBits: destinationHiBits,
+          destinationLoBits: destinationLoBits,
         );
       }
     } else {
@@ -342,7 +352,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           setConditionCodes: setConditionCodes,
           operand1: operand1,
           operand2: operand2,
-          destination: destination,
+          destinationHiBits: destinationHiBits,
+          destinationLoBits: destinationLoBits,
         );
       } else {
         // S = 0
@@ -351,7 +362,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           setConditionCodes: setConditionCodes,
           operand1: operand1,
           operand2: operand2,
-          destination: destination,
+          destinationHiBits: destinationHiBits,
+          destinationLoBits: destinationLoBits,
         );
       }
     }
