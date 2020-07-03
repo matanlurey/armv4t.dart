@@ -1,6 +1,6 @@
 part of '../instruction.dart';
 
-abstract class _MaySetConditionCodes implements ArmInstruction {
+abstract class MaySetConditionCodes implements ArmInstruction {
   /// Whether to set condition codes on the PSR.
   bool get setConditionCodes;
 }

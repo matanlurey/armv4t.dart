@@ -1,0 +1,382 @@
+import 'package:armv4t/src/decoder/arm/condition.dart';
+import 'package:armv4t/src/decoder/arm/instruction.dart';
+import 'package:meta/meta.dart';
+
+/// Given an [ArmInstruction], outputs the mnemonic (human-readable prefix).
+@immutable
+@sealed
+class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
+  const ArmMnemonicPrinter();
+
+  @protected
+  String visitCondition(Condition c) => c.mnuemonic;
+
+  @protected
+  String visitSetConditionCodes(bool v) => v ? 's' : '';
+
+  @protected
+  String visitSetPrivilegedMode(bool v) => v ? 'p' : '';
+
+  @protected
+  String visitMaySetConditionCodes(
+    String mnemonic,
+    MaySetConditionCodes i,
+  ) {
+    return ''
+        '$mnemonic'
+        '${visitCondition(i.condition)}'
+        '${visitSetConditionCodes(i.setConditionCodes)}';
+  }
+
+  @override
+  String visitADC(ADC i, [void _]) {
+    return visitMaySetConditionCodes('adc', i);
+  }
+
+  @override
+  String visitADD(ADD i, [void _]) {
+    return visitMaySetConditionCodes('add', i);
+  }
+
+  @override
+  String visitRSB(RSB i, [void _]) {
+    return visitMaySetConditionCodes('rsb', i);
+  }
+
+  @override
+  String visitRSC(RSC i, [void _]) {
+    return visitMaySetConditionCodes('rsc', i);
+  }
+
+  @override
+  String visitSBC(SBC i, [void _]) {
+    return visitMaySetConditionCodes('sbc', i);
+  }
+
+  @override
+  String visitSUB(SUB i, [void _]) {
+    return visitMaySetConditionCodes('sub', i);
+  }
+
+  @override
+  String visitAND(AND i, [void _]) {
+    return visitMaySetConditionCodes('and', i);
+  }
+
+  @override
+  String visitBIC(BIC i, [void _]) {
+    return visitMaySetConditionCodes('bic', i);
+  }
+
+  @override
+  String visitEOR(EOR i, [void _]) {
+    return visitMaySetConditionCodes('eor', i);
+  }
+
+  @override
+  String visitMOV(MOV i, [void _]) {
+    return visitMaySetConditionCodes('mov', i);
+  }
+
+  @override
+  String visitMVN(MVN i, [void _]) {
+    return visitMaySetConditionCodes('mvn', i);
+  }
+
+  @override
+  String visitORR(ORR i, [void _]) {
+    return visitMaySetConditionCodes('orr', i);
+  }
+
+  @protected
+  String visitDataProcessingWithVoidDestination(
+    String mnemonic,
+    DataProcessingArmInstruction i,
+  ) {
+    return ''
+        '$mnemonic'
+        '${visitCondition(i.condition)}'
+        '${visitSetPrivilegedMode(i.destination == Register.filledWith1s)}';
+  }
+
+  @override
+  String visitCMN(CMN i, [void _]) {
+    return visitDataProcessingWithVoidDestination('cmn', i);
+  }
+
+  @override
+  String visitCMP(CMP i, [void _]) {
+    return visitDataProcessingWithVoidDestination('cmp', i);
+  }
+
+  @override
+  String visitTEQ(TEQ i, [void _]) {
+    return visitDataProcessingWithVoidDestination('teq', i);
+  }
+
+  @override
+  String visitTST(TST i, [void _]) {
+    return visitDataProcessingWithVoidDestination('tst', i);
+  }
+
+  @protected
+  String visitSingleDataTransfer(
+    String prefix,
+    SingleDataTransferArmInstruction i, [
+    String suffix = '',
+  ]) {
+    final b = i.transferByte ? 'b' : '';
+    final t = i.forceNonPrivilegedAccess ? 't' : '';
+    return '$prefix${visitCondition(i.condition)}$b$t$suffix';
+  }
+
+  @override
+  String visitSTR(STR i, [void _]) {
+    return visitSingleDataTransfer('str', i);
+  }
+
+  @override
+  String visitLDR(LDR i, [void _]) {
+    return visitSingleDataTransfer('ldr', i);
+  }
+
+  @override
+  String visitLDRH(LDRH i, [void _]) {
+    return 'ldr${visitCondition(i.condition)}h';
+  }
+
+  @override
+  String visitLDRSB(LDRSB i, [void _]) {
+    return 'ldr${visitCondition(i.condition)}h';
+  }
+
+  @override
+  String visitLDRSH(LDRSH i, [void _]) {
+    return 'ldr${visitCondition(i.condition)}sh';
+  }
+
+  @override
+  String visitSTRH(STRH i, [void _]) {
+    return 'str${visitCondition(i.condition)}h';
+  }
+
+  @protected
+  String visitBlockDataTransfer(
+    String mnemonic,
+    BlockDataTransferArmInstruction i,
+  ) {
+    String addressingMode;
+    if (i.addOffsetBeforeTransfer) {
+      // P = 1
+      if (i.addOffsetToBase) {
+        addressingMode = 'ib';
+      } else {
+        // U = 0
+        addressingMode = 'db';
+      }
+    } else {
+      // P = 0
+      if (i.addOffsetToBase) {
+        // U = 1
+        addressingMode = 'ia';
+      } else {
+        // U = 0
+        addressingMode = 'da';
+      }
+    }
+    return '$mnemonic${visitCondition(i.condition)}$addressingMode';
+  }
+
+  @override
+  String visitLDM(LDM i, [void _]) {
+    return visitBlockDataTransfer('ldm', i);
+  }
+
+  @override
+  String visitSTM(STM i, [void _]) {
+    return visitBlockDataTransfer('stm', i);
+  }
+
+  @override
+  String visitSWP(SWP i, [void _]) {
+    final b = i.transferByte ? 'b' : '';
+    return 'swp${visitCondition(i.condition)}$b';
+  }
+
+  @override
+  String visitMLA(MLA i, [void _]) {
+    return visitMaySetConditionCodes('mla', i);
+  }
+
+  @override
+  String visitMUL(MUL i, [void _]) {
+    return visitMaySetConditionCodes('mul', i);
+  }
+
+  @override
+  String visitSMLAL(SMLAL i, [void _]) {
+    return visitMaySetConditionCodes('smlal', i);
+  }
+
+  @override
+  String visitSMULL(SMULL i, [void _]) {
+    return visitMaySetConditionCodes('smull', i);
+  }
+
+  @override
+  String visitUMLAL(UMLAL i, [void _]) {
+    return visitMaySetConditionCodes('umlal', i);
+  }
+
+  @override
+  String visitUMULL(UMULL i, [void _]) {
+    return visitMaySetConditionCodes('umull', i);
+  }
+
+  @override
+  String visitB(B i, [void _]) {
+    return 'b${visitCondition(i.condition)}';
+  }
+
+  @override
+  String visitBL(BL i, [void _]) {
+    return 'bl${visitCondition(i.condition)}';
+  }
+
+  @override
+  String visitBX(BX i, [void _]) {
+    return 'bx${visitCondition(i.condition)}';
+  }
+
+  @override
+  String visitMRS(MRS i, [void _]) {
+    return 'mrs${visitCondition(i.condition)}';
+  }
+
+  @override
+  String visitMSR(MSR i, [void _]) {
+    return 'msr${visitCondition(i.condition)}';
+  }
+
+  @override
+  String visitSWI(SWI i, [void _]) {
+    return 'swi${visitCondition(i.condition)}';
+  }
+}
+
+@immutable
+@sealed
+class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
+  final ArmMnemonicPrinter _mnemonicPrinter;
+
+  const ArmInstructionPrinter({
+    ArmMnemonicPrinter mnemonicPrinter,
+  }) : _mnemonicPrinter = mnemonicPrinter ?? const ArmMnemonicPrinter();
+
+  @override
+  String visitInstruction(
+    ArmInstruction i, [
+    void _,
+  ]) {
+    return i.accept(_mnemonicPrinter);
+  }
+
+  @override
+  String visitDataProcessing(
+    DataProcessingArmInstruction i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitDataProcessing(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitBlockDataTransfer(
+    BlockDataTransferArmInstruction i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitBlockDataTransfer(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitSingleDataTransfer(
+    SingleDataTransferArmInstruction i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitSingleDataTransfer(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitHalfwordDataTransfer(
+    HalfwordDataTransferArmInstruction i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitHalfwordDataTransfer(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitMultiplyAndMultiplyLong(
+    MultiplyAndMultiplyLongArmInstruction i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitMultiplyAndMultiplyLong(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitPsrTransfer(
+    PsrTransferArmInstruction i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitPsrTransfer(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitSWP(
+    SWP i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitSWP(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitB(
+    B i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitB(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitBL(
+    BL i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitBL(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitBX(
+    BX i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitBX(i);
+    return '$mnuemonic';
+  }
+
+  @override
+  String visitSWI(
+    SWI i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitSWI(i);
+    return '$mnuemonic';
+  }
+}
