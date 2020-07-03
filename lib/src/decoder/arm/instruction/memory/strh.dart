@@ -9,7 +9,7 @@ part of '../../instruction.dart';
 /// ## Cycles
 ///
 /// `2N`.
-class STRH extends HalfwordDataTransfer {
+class STRH extends HalfwordDataTransferArmInstruction {
   STRH({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,

@@ -11,7 +11,7 @@ part of '../../instruction.dart';
 /// `1S`.
 @immutable
 @sealed
-class MRS extends PsrTransfer {
+class MRS extends PsrTransferArmInstruction {
   /// Destination register.
   final RegisterAny destination;
 

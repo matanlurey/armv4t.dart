@@ -9,7 +9,7 @@ part of '../../instruction.dart';
 /// ## Cycles
 ///
 /// `1S+1N+1I+y`.
-class LDRH extends HalfwordDataTransfer {
+class LDRH extends HalfwordDataTransferArmInstruction {
   LDRH({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,

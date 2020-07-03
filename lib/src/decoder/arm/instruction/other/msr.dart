@@ -15,7 +15,7 @@ part of '../../instruction.dart';
 /// `1S`.
 @immutable
 @sealed
-class MSR extends PsrTransfer {
+class MSR extends PsrTransferArmInstruction {
   /// `F`: Write to flags field (aka `_flg`).
   final bool writeToFlagsField;
 

@@ -1,5 +1,6 @@
 import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/common/union.dart';
+import 'package:armv4t/src/decoder/arm/format.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -15,6 +16,7 @@ part 'instruction/arithmetic/rsc.dart';
 part 'instruction/arithmetic/sbc.dart';
 part 'instruction/arithmetic/sub.dart';
 part 'instruction/common.dart';
+part 'instruction/decoder.dart';
 part 'instruction/logical/and.dart';
 part 'instruction/logical/bic.dart';
 part 'instruction/logical/eor.dart';

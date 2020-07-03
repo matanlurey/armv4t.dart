@@ -9,7 +9,7 @@ part of '../../instruction.dart';
 /// ## Cycles
 ///
 /// `1S+1N+1I+y`.
-class LDR extends SingleDataTransfer {
+class LDR extends SingleDataTransferArmInstruction {
   LDR({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,

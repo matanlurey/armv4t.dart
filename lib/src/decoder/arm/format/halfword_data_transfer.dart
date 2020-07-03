@@ -1,6 +1,7 @@
 part of '../format.dart';
 
 /// A decoded _Halfword and Signed Data Transfer_ instruction _format_.
+@immutable
 @sealed
 class HalfwordDataTransfer extends ArmFormat {
   /// Whether to add offset before transfer (`1`) or after (`0`).

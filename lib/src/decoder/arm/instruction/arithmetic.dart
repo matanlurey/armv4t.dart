@@ -29,7 +29,7 @@ abstract class DataProcessingArmInstruction
       /**/
       ShiftedRegister<RegisterNotPC>,
       /**/
-      ShiftedImmediate<Uint4>
+      ShiftedImmediate<Uint8>
       /**/
       > operand2;
 

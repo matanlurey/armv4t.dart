@@ -23,7 +23,7 @@ class SUB extends DataProcessingArmInstruction {
     @required RegisterAny destination,
     @required
         Or3<ShiftedRegister<Immediate<Uint8>>, ShiftedRegister<RegisterNotPC>,
-                ShiftedImmediate<Uint4>>
+                ShiftedImmediate<Uint8>>
             operand2,
   }) : super._(
           condition: condition,

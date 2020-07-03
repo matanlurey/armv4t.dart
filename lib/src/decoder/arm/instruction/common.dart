@@ -40,7 +40,15 @@ class RegisterList<R extends Register<R>> {}
 
 abstract class Shiftable<T extends Shiftable<T>> {}
 
-class ShiftedImmediate<T extends Integral<T>> {}
+class ShiftedImmediate<T extends Integral<T>> {
+  /// ROR-Shift applied to [immediate] (`0-30`, in steps of 2).
+  final Uint4 rorShift;
+
+  /// Immediate value.
+  final T immediate;
+
+  const ShiftedImmediate(this.rorShift, this.immediate);
+}
 
 class ShiftedRegister<T extends Shiftable<T>> {}
 
