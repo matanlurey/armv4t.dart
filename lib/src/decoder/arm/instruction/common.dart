@@ -11,7 +11,11 @@ class AddressingMode {}
 
 class Comment {}
 
-class Immediate<T extends Integral<T>> implements Shiftable<Immediate<T>> {}
+class Immediate<T extends Integral<T>> implements Shiftable<Immediate<T>> {
+  final T value;
+
+  const Immediate(this.value);
+}
 
 class Label {}
 
@@ -50,8 +54,22 @@ class ShiftedImmediate<T extends Integral<T>> {
   const ShiftedImmediate(this.rorShift, this.immediate);
 }
 
-class ShiftedRegister<T extends Shiftable<T>> {}
+class ShiftedRegister<T extends Shiftable<T>> {
+  /// Operand register.
+  final RegisterAny operand;
 
-class ShiftType {
-  const ShiftType._();
+  /// Shift type.
+  final ShiftType type;
+
+  /// Shift by.
+  final T by;
+
+  const ShiftedRegister(this.operand, this.type, this.by);
+}
+
+enum ShiftType {
+  LSL,
+  LSR,
+  ASR,
+  ROR,
 }

@@ -22,7 +22,7 @@ class RSC extends DataProcessingArmInstruction {
     @required RegisterAny operand1,
     @required RegisterAny destination,
     @required
-        Or3<ShiftedRegister<Immediate<Uint8>>, ShiftedRegister<RegisterNotPC>,
+        Or3<ShiftedRegister<Immediate<Uint4>>, ShiftedRegister<RegisterNotPC>,
                 ShiftedImmediate<Uint8>>
             operand2,
   }) : super._(

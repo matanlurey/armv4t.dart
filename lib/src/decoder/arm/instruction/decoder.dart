@@ -26,7 +26,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     final destination = RegisterAny(format.destinationRegister);
 
     Or3<
-        ShiftedRegister<Immediate<Uint8>>,
+        ShiftedRegister<Immediate<Uint4>>,
         /**/
         ShiftedRegister<RegisterNotPC>,
         /**/
@@ -40,14 +40,30 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     } else {
       // I = 0
       final shiftByRegister = format.operand2.isSet(4);
+      final shiftType = ShiftType.values[format.operand2.bitRange(6, 5).value];
+      final shiftOperand = RegisterAny(
+        format.operand2.bitRange(3, 0).value.asUint4(),
+      );
       if (shiftByRegister) {
         // R = 1
-        // TODO: Complete.
-        operand2 = Or3.middle(null);
+        final shiftRegister = format.operand2.bitRange(11, 8).value.asUint4();
+        operand2 = Or3.middle(
+          ShiftedRegister(
+            shiftOperand,
+            shiftType,
+            RegisterNotPC(shiftRegister),
+          ),
+        );
       } else {
         // R = 0
-        // TODO: Complete.
-        operand2 = Or3.left(null);
+        final shiftAmount = format.operand2.bitRange(11, 7).value.asUint4();
+        operand2 = Or3.left(
+          ShiftedRegister(
+            shiftOperand,
+            shiftType,
+            Immediate(shiftAmount),
+          ),
+        );
       }
     }
 
