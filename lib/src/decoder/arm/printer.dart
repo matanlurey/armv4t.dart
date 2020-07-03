@@ -1,5 +1,6 @@
 import 'package:armv4t/src/decoder/arm/condition.dart';
 import 'package:armv4t/src/decoder/arm/instruction.dart';
+import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
 /// Given an [ArmInstruction], outputs the mnemonic (human-readable prefix).
@@ -264,14 +265,84 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
   }
 }
 
+/// Given an [ArmInstruction], outputs disassembled (human-readable) assembly.
+///
+/// The goal is to output as close as possible to the ARM assembly instructions
+/// used to generate the encoded instructions, with the exceptions of aliases
+/// and ambiguities.
 @immutable
 @sealed
 class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
-  final ArmMnemonicPrinter _mnemonicPrinter;
+  final ArmInstructionVisitor<String, void> _mnemonicPrinter;
 
+  /// Creates a new instruction printer.
+  ///
+  /// If not specified [mnemonicPrinter] defaults to [ArmMnemonicPrinter], which
+  /// is used to output the first part of the instruction (the name and various
+  /// bit-flip codes that make up the first segment).
   const ArmInstructionPrinter({
-    ArmMnemonicPrinter mnemonicPrinter,
+    ArmInstructionVisitor<String, void> mnemonicPrinter,
   }) : _mnemonicPrinter = mnemonicPrinter ?? const ArmMnemonicPrinter();
+
+  @protected
+  String visitImmediate(Immediate<Integral<void>> immediate) {
+    return '${immediate.value}';
+  }
+
+  @protected
+  String visitRegister(Register<void> register) {
+    return 'r${register.index.value}';
+  }
+
+  @protected
+  String visitShiftedRegisterByRegister(
+    ShiftedRegister<Register<void>, Register<void>> register,
+  ) {
+    final operand = visitRegister(register.operand);
+    final typeOf = visitShiftType(register.type);
+    final shiftBy = visitRegister(register.by);
+    return '$operand, $typeOf $shiftBy';
+  }
+
+  @protected
+  String visitShiftedRegisterByImmediate(
+    ShiftedRegister<Immediate<Integral<void>>, Register<void>> register,
+  ) {
+    final operand = visitRegister(register.operand);
+    final typeOf = visitShiftType(register.type);
+    final shiftBy = visitImmediate(register.by);
+    return '$operand, $typeOf $shiftBy';
+  }
+
+  @protected
+  String visitShiftedImmediate(ShiftedImmediate<Integral<void>> immediate) {
+    // Immediate values are signified by a leading # symbol. The operand is
+    // actually stored in the instruction as an 8-bit value with a 4-bit
+    // rotation code. The resultant value is the 8-th bit value rotated right
+    // 0-30 bits (twice the rotation code amount).
+    //
+    // To undo the encoding, we rotate left 0-30 bits.
+    final code = immediate.rorShift.value;
+    final bits = immediate.immediate.value.value;
+    final undo = bits << code;
+    return '$undo';
+  }
+
+  @protected
+  String visitShiftType(ShiftType type) {
+    switch (type) {
+      case ShiftType.LSL:
+        return 'LSL';
+      case ShiftType.LSR:
+        return 'LSR';
+      case ShiftType.ASR:
+        return 'ASR';
+      case ShiftType.ROR:
+        return 'ROR';
+      default:
+        throw StateError('Unexpected shiftType: $type.');
+    }
+  }
 
   @override
   String visitInstruction(
@@ -287,7 +358,41 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     final mnuemonic = super.visitDataProcessing(i);
-    return '$mnuemonic';
+    final destination = visitRegister(i.destination);
+    final register = visitRegister(i.operand1);
+    final operand2 = i.operand2.pick(
+      (shiftedRegisterByImmediate) => visitShiftedRegisterByImmediate(
+        shiftedRegisterByImmediate,
+      ),
+      (shiftedRegisterByRegister) => visitShiftedRegisterByRegister(
+        shiftedRegisterByRegister,
+      ),
+      (shiftedImmediate) => visitShiftedImmediate(
+        shiftedImmediate,
+      ),
+    );
+    return '$mnuemonic $destination,$register,$operand2';
+  }
+
+  @override
+  String visitDataProcessingVoidReturn(
+    DataProcessingArmInstruction i, [
+    void _,
+  ]) {
+    final mnuemonic = super.visitDataProcessing(i);
+    final register = visitRegister(i.operand1);
+    final operand2 = i.operand2.pick(
+      (shiftedRegisterByImmediate) => visitShiftedRegisterByImmediate(
+        shiftedRegisterByImmediate,
+      ),
+      (shiftedRegisterByRegister) => visitShiftedRegisterByRegister(
+        shiftedRegisterByRegister,
+      ),
+      (shiftedImmediate) => visitShiftedImmediate(
+        shiftedImmediate,
+      ),
+    );
+    return '$mnuemonic $register,$operand2';
   }
 
   @override
@@ -350,7 +455,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     final mnuemonic = super.visitB(i);
-    return '$mnuemonic';
+    return '$mnuemonic ${i.offset.value}';
   }
 
   @override
@@ -359,7 +464,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     final mnuemonic = super.visitBL(i);
-    return '$mnuemonic';
+    return '$mnuemonic ${i.offset.value}';
   }
 
   @override
@@ -368,7 +473,8 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     final mnuemonic = super.visitBX(i);
-    return '$mnuemonic';
+    final register = visitRegister(i.operand);
+    return '$mnuemonic $register';
   }
 
   @override

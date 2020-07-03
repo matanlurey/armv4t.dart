@@ -64,6 +64,10 @@ class SuperArmInstructionVisitor<R, C> implements ArmInstructionVisitor<R, C> {
     return visitInstruction(i, context);
   }
 
+  R visitDataProcessingVoidReturn(DataProcessingArmInstruction i, [C context]) {
+    return visitDataProcessing(i, context);
+  }
+
   @override
   R visitADC(ADC i, [C context]) => visitDataProcessing(i, context);
 
@@ -71,10 +75,10 @@ class SuperArmInstructionVisitor<R, C> implements ArmInstructionVisitor<R, C> {
   R visitADD(ADD i, [C context]) => visitDataProcessing(i, context);
 
   @override
-  R visitCMN(CMN i, [C context]) => visitDataProcessing(i, context);
+  R visitCMN(CMN i, [C context]) => visitDataProcessingVoidReturn(i, context);
 
   @override
-  R visitCMP(CMP i, [C context]) => visitDataProcessing(i, context);
+  R visitCMP(CMP i, [C context]) => visitDataProcessingVoidReturn(i, context);
 
   @override
   R visitRSB(RSB i, [C context]) => visitDataProcessing(i, context);
@@ -107,10 +111,10 @@ class SuperArmInstructionVisitor<R, C> implements ArmInstructionVisitor<R, C> {
   R visitORR(ORR i, [C context]) => visitDataProcessing(i, context);
 
   @override
-  R visitTEQ(TEQ i, [C context]) => visitDataProcessing(i, context);
+  R visitTEQ(TEQ i, [C context]) => visitDataProcessingVoidReturn(i, context);
 
   @override
-  R visitTST(TST i, [C context]) => visitDataProcessing(i, context);
+  R visitTST(TST i, [C context]) => visitDataProcessingVoidReturn(i, context);
 
   R visitBlockDataTransfer(BlockDataTransferArmInstruction i, [C context]) {
     return visitInstruction(i, context);
