@@ -1,0 +1,23 @@
+{
+  "AND": "and r3, r2, 4 ; 0xe2023004",
+  "EOR": "eor r3, r2, 4 ; 0xe2223004",
+  "SUB": "sub r3, r2, 4 ; 0xe2423004",
+  "RSB": "rsb r3, r2, 4 ; 0xe2623004",
+  "ADD": "add r3, r2, 4 ; 0xe2823004",
+  "ADC": "adc r3, r2, 4 ; 0xe2a23004",
+  "SBC": "sbc r3, r2, 4 ; 0xe2c23004",
+  "RSC": "rsc r3, r2, 4 ; 0xe2e23004",
+  "TST": "tst r2, 4 ; 0xe3123004",
+  "TEQ": "teq r2, 4 ; 0xe3323004",
+  "CMP": "cmp r2, 4 ; 0xe3523004",
+  "CMN": "cmn r2, 4 ; 0xe3723004",
+  "ORR": "orr r3, r2, 4 ; 0xe3823004",
+  "MOV": "mov r3, r2, 4 ; 0xe3a23004",
+  "BIC": "bic r3, r2, 4 ; 0xe3c23004",
+  "MVN": "mvn r3, r2, 4 ; 0xe3e23004",
+  "AND.Register:ShiftType.LSL": "and r3, r2, r0, LSL 0 ; 0xe0023000",
+  "AND.Register:ShiftType.LSR": "and r3, r2, r0, LSL 0 ; 0xe0023000",
+  "AND.Register:ShiftType.ASR": "and r3, r2, r0, LSL 0 ; 0xe0023000",
+  "AND.Register:ShiftType.ROR": "and r3, r2, r0, LSL 0 ; 0xe0023000",
+  "AND.Register:ShiftType.RRX": "and r3, r2, r0, LSL 0 ; 0xe0023000"
+}

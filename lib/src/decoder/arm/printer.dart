@@ -10,7 +10,9 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
   const ArmMnemonicPrinter();
 
   @protected
-  String visitCondition(Condition c) => c.mnuemonic;
+  String visitCondition(Condition c) {
+    return c == Condition.al ? '' : c.mnuemonic;
+  }
 
   @protected
   String visitSetConditionCodes(bool v) => v ? 's' : '';
@@ -294,7 +296,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
 
   @protected
   String visitImmediate(Immediate<Integral<void>> immediate) {
-    return '${immediate.value}';
+    return '${immediate.value.value}';
   }
 
   @alwaysThrows
