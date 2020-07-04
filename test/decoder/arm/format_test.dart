@@ -18,6 +18,9 @@ void main() {
   });
 
   tearDown(() {
+    if (a == null) {
+      return;
+    }
     final b = decoder.convert(encoder.convert(a));
     expect(b, a, reason: '${encoder.convert(a).toBinaryPadded()}');
   });
