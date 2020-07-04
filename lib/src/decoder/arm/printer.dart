@@ -274,6 +274,7 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
 @sealed
 class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
   final ArmInstructionVisitor<String, void> _mnemonicPrinter;
+  final String _delimiter;
 
   /// Creates a new instruction printer.
   ///
@@ -282,7 +283,14 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
   /// bit-flip codes that make up the first segment).
   const ArmInstructionPrinter({
     ArmInstructionVisitor<String, void> mnemonicPrinter,
-  }) : _mnemonicPrinter = mnemonicPrinter ?? const ArmMnemonicPrinter();
+    String delimiter,
+  })  : _mnemonicPrinter = mnemonicPrinter ?? const ArmMnemonicPrinter(),
+        _delimiter = delimiter ?? ', ';
+
+  @protected
+  String visitComponents(List<String> components) {
+    return components.join(_delimiter);
+  }
 
   @protected
   String visitImmediate(Immediate<Integral<void>> immediate) {
@@ -301,13 +309,52 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
   }
 
   @protected
+  String visitRegisterList(RegisterList<Register<void>> list) {
+    final registers = list.registers.toList()..sort();
+    if (registers.isEmpty) {
+      return '';
+    }
+    final output = <String>[];
+    final chain = <Register<void>>[];
+
+    void write() {
+      assert(chain.isNotEmpty);
+      if (chain.length == 1) {
+        output.add(visitRegister(chain.first));
+      } else {
+        output.add(
+          '${visitRegister(chain.first)}-${visitRegister(chain.last)}',
+        );
+      }
+      chain.clear();
+    }
+
+    for (final register in registers) {
+      if (chain.isEmpty) {
+        chain.add(register);
+      } else if (chain.last.index.value + 1 == register.index.value) {
+        chain.add(register);
+      } else {
+        write();
+        chain.add(register);
+      }
+    }
+
+    if (chain.isNotEmpty) {
+      write();
+    }
+
+    return output.join(_delimiter);
+  }
+
+  @protected
   String visitShiftedRegisterByRegister(
     ShiftedRegister<Register<void>, Register<void>> register,
   ) {
     final operand = visitRegister(register.operand);
     final typeOf = visitShiftType(register.type);
     final shiftBy = visitRegister(register.by);
-    return '$operand, $typeOf $shiftBy';
+    return visitComponents([operand, '$typeOf $shiftBy']);
   }
 
   @protected
@@ -317,7 +364,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final operand = visitRegister(register.operand);
     final typeOf = visitShiftType(register.type);
     final shiftBy = visitImmediate(register.by);
-    return '$operand, $typeOf $shiftBy';
+    return visitComponents([operand, '$typeOf $shiftBy']);
   }
 
   @protected
@@ -379,7 +426,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
         shiftedImmediate,
       ),
     );
-    return '$mnuemonic $destination,$register,$operand2';
+    return visitComponents(['$mnuemonic $destination', register, operand2]);
   }
 
   @override
@@ -394,7 +441,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
       visitShiftedRegisterByRegister,
       visitShiftedImmediate,
     );
-    return '$mnuemonic $register,$operand2';
+    return visitComponents(['$mnuemonic $register', operand2]);
   }
 
   @override
@@ -402,8 +449,15 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     BlockDataTransferArmInstruction i, [
     void _,
   ]) {
+    // <LDM|STM>{cond}<FD|ED|FA|EA|IA|IB|DA|DB> Rn{!},<Rlist>{^}
     final mnuemonic = super.visitBlockDataTransfer(i);
-    return '$mnuemonic';
+    final w = i.writeAddressIntoBase ? 'w' : '';
+    final c = i.loadPsrOrForceUserMode ? '^' : '';
+    return visitComponents([
+      mnuemonic,
+      '${visitRegister(i.base)}$w',
+      '${visitRegisterList(i.registerList)}$c',
+    ]);
   }
 
   @override
@@ -466,7 +520,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
         if (offsetOf0) {
           address = '[${visitRegister(i.base)}]$w';
         } else {
-          address = '[${visitRegister(i.base)},$operand]$w';
+          address = '[${visitComponents([visitRegister(i.base), operand])}]$w';
         }
       } else {
         // Case 3 | P = 0 (Post-indexed)
@@ -474,10 +528,10 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
           visitImmediate,
           visitShiftedRegisterByImmediate,
         );
-        address = '[${visitRegister(i.base)},$operand]';
+        address = visitComponents(['[${visitRegister(i.base)}]', operand]);
       }
     }
-    return '$mnuemonic$b$t, $d,$address';
+    return visitComponents(['$mnuemonic$b$t', d, address]);
   }
 
   @override
@@ -512,13 +566,18 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
         if (offsetOf0) {
           address = '[${visitRegister(i.base)}]$w';
         } else {
-          address = '[${visitRegister(i.base)},$operand]$w';
+          address = '[${visitComponents([visitRegister(i.base), operand])}]$w';
         }
       } else {
         // Case 3 | P = 0 (Post-indexed)
+        final operand = i.offset.pick(
+          visitRegister,
+          visitImmediate,
+        );
+        address = visitComponents(['[${visitRegister(i.base)}]', operand]);
       }
     }
-    return '$mnuemonic $d,$address';
+    return visitComponents(['$mnuemonic $d', address]);
   }
 
   @override
@@ -530,7 +589,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final d = visitRegister(i.destination);
     final m = visitRegister(i.operand1);
     final s = visitRegister(i.operand2);
-    return '$mnuemonic $d,$m,$s';
+    return visitComponents(['$mnuemonic $d', m, s]);
   }
 
   @override
@@ -543,7 +602,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final l = visitRegister(i.destinationLoBits);
     final m = visitRegister(i.operand1);
     final s = visitRegister(i.operand2);
-    return '$mnuemonic $l,$h,$m,$s';
+    return visitComponents(['$mnuemonic $l', h, m, s]);
   }
 
   @override
@@ -554,7 +613,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final mnuemonic = super.visitPsrTransfer(i);
     final d = visitRegister(i.destination);
     final psr = i.useSPSR ? 'spsr' : 'cpsr';
-    return '$mnuemonic $d,$psr';
+    return visitComponents(['$mnuemonic $d', psr]);
   }
 
   @override
@@ -578,7 +637,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
       default:
         break;
     }
-    return '$mnuemonic $psr,$m';
+    return visitComponents(['$mnuemonic $psr', m]);
   }
 
   @override
@@ -587,7 +646,11 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     final mnuemonic = super.visitSWP(i);
-    return '$mnuemonic';
+    return visitComponents([
+      '$mnuemonic ${visitRegister(i.destination)}',
+      visitRegister(i.source),
+      '[${visitRegister(i.base)}]',
+    ]);
   }
 
   @override
@@ -624,6 +687,6 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     final mnuemonic = super.visitSWI(i);
-    return '$mnuemonic';
+    return '$mnuemonic ${i.comment.value.value}';
   }
 }

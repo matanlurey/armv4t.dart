@@ -15,6 +15,7 @@ class LDM extends BlockDataTransferArmInstruction {
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,
     @required bool writeAddressIntoBase,
+    @required bool loadPsrOrForceUserMode,
     @required RegisterAny base,
     @required RegisterList<RegisterAny> registerList,
   }) : super._(
@@ -22,6 +23,7 @@ class LDM extends BlockDataTransferArmInstruction {
           addOffsetBeforeTransfer: addOffsetBeforeTransfer,
           addOffsetToBase: addOffsetToBase,
           writeAddressIntoBase: writeAddressIntoBase,
+          loadPsrOrForceUserMode: loadPsrOrForceUserMode,
           base: base,
           registerList: registerList,
         );

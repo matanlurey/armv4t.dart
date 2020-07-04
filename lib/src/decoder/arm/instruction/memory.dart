@@ -170,11 +170,15 @@ abstract class BlockDataTransferArmInstruction
   /// Register list.
   final RegisterList<RegisterAny> registerList;
 
+  /// `S`: Whether to load PSR or force user mode (`1`) or not.
+  final bool loadPsrOrForceUserMode;
+
   BlockDataTransferArmInstruction._({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,
     @required bool writeAddressIntoBase,
+    @required this.loadPsrOrForceUserMode,
     @required RegisterAny base,
     @required this.registerList,
   }) : super._(
@@ -184,6 +188,12 @@ abstract class BlockDataTransferArmInstruction
           writeAddressIntoBaseOrForceNonPrivilegedAccess: writeAddressIntoBase,
           base: base,
         );
+
+  @override
+  @protected
+  bool get writeAddressIntoBaseOrForceNonPrivilegedAccess {
+    return super.writeAddressIntoBaseOrForceNonPrivilegedAccess;
+  }
 
   @override
   List<Object> _values() {

@@ -519,6 +519,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         addOffsetBeforeTransfer: addOffsetBeforeTransfer,
         addOffsetToBase: addOffsetToBase,
         writeAddressIntoBase: writeAddressIntoBase,
+        loadPsrOrForceUserMode: format.loadPsrOrForceUserMode,
         base: base,
         registerList: registerList,
       );
@@ -529,6 +530,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         addOffsetBeforeTransfer: addOffsetBeforeTransfer,
         addOffsetToBase: addOffsetToBase,
         writeAddressIntoBase: writeAddressIntoBase,
+        loadPsrOrForceUserMode: format.loadPsrOrForceUserMode,
         base: base,
         registerList: registerList,
       );

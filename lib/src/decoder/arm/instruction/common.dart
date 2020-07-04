@@ -44,7 +44,8 @@ class Immediate<T extends Integral<T>> implements Shiftable<Immediate<T>> {
 /// Note that two registers are considered equal if the [index] is the same.
 @immutable
 @sealed
-abstract class Register<R extends Register<R>> implements Shiftable<R> {
+abstract class Register<R extends Register<R>>
+    implements Comparable<Register<R>>, Shiftable<R> {
   /// A register that is zero-filled (`0000`).
   static final filledWith0s = RegisterAny(Uint4.zero);
 
@@ -54,6 +55,9 @@ abstract class Register<R extends Register<R>> implements Shiftable<R> {
   final Uint4 index;
 
   Register._(this.index);
+
+  @override
+  int compareTo(Register<void> other) => index.compareTo(other.index);
 
   @override
   int get hashCode => index.hashCode;
