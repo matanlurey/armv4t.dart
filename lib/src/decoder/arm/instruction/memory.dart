@@ -14,7 +14,6 @@ abstract class DataTransferArmInstruction extends ArmInstruction {
   /// > If [addOffsetBeforeTransfer] is set, this is _always_ `true`.
   ///
   /// `T`: Whether to force non-privileged access (`1`), otherwise (`0`).
-  @protected
   final bool writeAddressIntoBaseOrForceNonPrivilegedAccess;
 
   /// Base register.
@@ -127,7 +126,6 @@ abstract class HalfwordDataTransferArmInstruction
     /**/ with
         HasWriteBackOnly {
   /// Source or destination register (`Rd`).
-  @protected
   final RegisterAny sourceOrDestination;
 
   /// Either an offset register or 8-bit immediate offset.

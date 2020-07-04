@@ -60,6 +60,9 @@ abstract class Register<R extends Register<R>> implements Shiftable<R> {
 
   @override
   bool operator ==(Object o) => o is Register && index == o.index;
+
+  /// Whether this refers to the program counter (`r15`).
+  bool get isProgramCounter => index.value == 15;
 }
 
 /// A register that referes to any index (0-15).
@@ -209,4 +212,7 @@ enum ShiftType {
 
   /// Rotate right.
   ROR,
+
+  /// Rotate right with extend.
+  RRX,
 }

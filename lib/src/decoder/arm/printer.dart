@@ -289,6 +289,12 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     return '${immediate.value}';
   }
 
+  @alwaysThrows
+  @protected
+  String throwInvalidCase(Object any) {
+    throw FormatException('Not an expected address or offset: $any');
+  }
+
   @protected
   String visitRegister(Register<void> register) {
     return 'r${register.index.value}';
@@ -339,6 +345,8 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
         return 'ASR';
       case ShiftType.ROR:
         return 'ROR';
+      case ShiftType.RRX:
+        return 'RRX';
       default:
         throw StateError('Unexpected shiftType: $type.');
     }
@@ -407,28 +415,69 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final b = i.transferByte ? 'b' : '';
     final t = i.forceNonPrivilegedAccess ? 't' : '';
     final d = visitRegister(i.sourceOrDestination);
-    final prefix = '$mnuemonic$b$t $d';
-    return i.offset.pick(
-      (immediate) {
-        // 1. An expression which generates an address.
-        return '$prefix ${visitImmediate(immediate)}';
-      },
-      (shiftedRegister) {
-        if (i.addOffsetBeforeTransfer) {
-          // 2. A pre-indexed addressing specification.
-          //   [Rn]
-          //   [Rn, expression]{!}
-          //   [Rn, {+/-}Rm{,shift}]{!}
-          final w = i.writeAddressIntoBase ? '!' : '';
-          return '[]$w';
+    // <LDR|STR>{cond}{B}{T} Rd, <Address>
+    //   Rd = Register (Destination)
+    //   Rn, Rm = Registers. If Rn is R15, then the assembler will subtract 8
+    //            from the offset value to allow for pipelining. In this case
+    //            write-back should not be specified.
+    //
+    //   <Address> can be:
+    //     1. <expression>: An expression which generates an address; the
+    //                      assember will attempt to generate an instruction
+    //                      using the PC as a base and a corrected immediate
+    //                      offset to address the location given by evaluating
+    //                      the expression. This will be a PC-relative,
+    //                      pre-indexed address.
+    //
+    //     2. A pre-indexed addressing specification:
+    //       A. [Rn] (Offset of zero)
+    //       B. [Rn, <#expression>]{!} (Offset of <expression> bytes)
+    //       C. [Rn, {+/-}Rm{,<shift>}]{!} (Offset of +/- contents of index
+    //                                      register, shifted by <shift>).
+    //
+    //     3. A post-indexed addressing specification:
+    //       A. [Rn], <#expression> (Offset of <expression> bytes)
+    //       B. [Rn], {+/-}Rm{, <shift>} (Offset of +/- contents of index
+    //                                    register, shifted by <shift>).
+    //
+    //    <shift> is a general shift operation, by an immediate value
+    //    {!} writes back the base register if present
+    String address;
+    if (i.base.isProgramCounter) {
+      // Case 1.
+      address = i.offset.pick(
+        visitImmediate,
+        throwInvalidCase,
+      );
+    } else {
+      if (i.addOffsetBeforeTransfer) {
+        // Case 2 | P = 1 (Pre-indexed)
+        var offsetOf0 = false;
+        final operand = i.offset.pick(
+          (immediate) {
+            if (immediate.value.value == 0) {
+              offsetOf0 = true;
+            }
+            return visitImmediate(immediate);
+          },
+          visitShiftedRegisterByImmediate,
+        );
+        final w = i.writeAddressIntoBaseOrForceNonPrivilegedAccess ? '!' : '';
+        if (offsetOf0) {
+          address = '[${visitRegister(i.base)}]$w';
         } else {
-          // 3. A post-indexed addressing specification.
-          //   [Rn], expression
-          //   [Rn], +/-Rm{, shift}
-          return '[]';
+          address = '[${visitRegister(i.base)},$operand]$w';
         }
-      },
-    );
+      } else {
+        // Case 3 | P = 0 (Post-indexed)
+        final operand = i.offset.pick(
+          visitImmediate,
+          visitShiftedRegisterByImmediate,
+        );
+        address = '[${visitRegister(i.base)},$operand]';
+      }
+    }
+    return '$mnuemonic$b$t, $d,$address';
   }
 
   @override
@@ -437,7 +486,39 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     final mnuemonic = super.visitHalfwordDataTransfer(i);
-    return '$mnuemonic';
+    final d = visitRegister(i.sourceOrDestination);
+    // Similar to "visitSingleDataTransfer", but a bit simpler.
+    String address = '';
+    if (i.base.isProgramCounter) {
+      // Case 1.
+      address = i.offset.pick(
+        throwInvalidCase,
+        visitImmediate,
+      );
+    } else {
+      if (i.addOffsetBeforeTransfer) {
+        // Case 2 | P = 1 (Pre-indexed)
+        var offsetOf0 = false;
+        final operand = i.offset.pick(
+          visitRegister,
+          (immediate) {
+            if (immediate.value.value == 0) {
+              offsetOf0 = true;
+            }
+            return visitImmediate(immediate);
+          },
+        );
+        final w = i.writeAddressIntoBaseOrForceNonPrivilegedAccess ? '!' : '';
+        if (offsetOf0) {
+          address = '[${visitRegister(i.base)}]$w';
+        } else {
+          address = '[${visitRegister(i.base)},$operand]$w';
+        }
+      } else {
+        // Case 3 | P = 0 (Post-indexed)
+      }
+    }
+    return '$mnuemonic $d,$address';
   }
 
   @override
