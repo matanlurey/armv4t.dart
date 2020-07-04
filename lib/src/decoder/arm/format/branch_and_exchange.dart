@@ -15,4 +15,13 @@ class BranchAndExchange extends ArmFormat {
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitBranchAndExchange(this, context);
   }
+
+  @override
+  Map<String, int> _values() {
+    // CCCC_0001_0010_1111_1111_1111_0001_NNNN
+    return {
+      'c': condition.value,
+      'o': operand.value,
+    };
+  }
 }

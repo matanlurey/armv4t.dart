@@ -39,4 +39,19 @@ class BlockDataTransfer extends ArmFormat {
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitBlockDataTransfer(this, context);
   }
+
+  @override
+  Map<String, int> _values() {
+    // CCCC_100P_USWL_NNNN_RRRR_RRRR_RRRR_RRRR
+    return {
+      'c': condition.value,
+      'p': preIndexingBit ? 1 : 0,
+      'u': addOffsetBit ? 1 : 0,
+      's': loadPsrOrForceUserMode ? 1 : 0,
+      'w': writeAddressBit ? 1 : 0,
+      'l': loadMemoryBit ? 1 : 0,
+      'n': baseRegister.value,
+      'r': registerList.value,
+    };
+  }
 }

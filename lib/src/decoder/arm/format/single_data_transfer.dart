@@ -47,4 +47,21 @@ class SingleDataTransfer extends ArmFormat {
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitSingleDataTransfer(this, context);
   }
+
+  @override
+  Map<String, int> _values() {
+    // CCCC_01IP_UBWL_NNNN_DDDD_OOOO_OOOO_OOOO
+    return {
+      'c': condition.value,
+      'i': immediateOffset ? 1 : 0,
+      'p': preIndexingBit ? 1 : 0,
+      'u': addOffsetBit ? 1 : 0,
+      'b': byteQuantityBit ? 1 : 0,
+      'w': writeAddressBit ? 1 : 0,
+      'l': loadMemoryBit ? 1 : 0,
+      'n': baseRegister.value,
+      'd': sourceOrDestinationRegister.value,
+      'o': offset.value,
+    };
+  }
 }

@@ -35,4 +35,18 @@ class DataProcessingOrPsrTransfer extends ArmFormat {
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitDataProcessingOrPsrTransfer(this, context);
   }
+
+  @override
+  Map<String, int> _values() {
+    // CCCC_00IP_PPPS_NNNN_DDDD_OOOO_OOOO_OOOO
+    return {
+      'c': condition.value,
+      'i': immediateOperand ? 1 : 0,
+      'p': opCode.value,
+      's': setConditionCodes ? 1 : 0,
+      'n': operand1Register.value,
+      'd': destinationRegister.value,
+      'o': operand2.value,
+    };
+  }
 }

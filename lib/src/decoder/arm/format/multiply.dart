@@ -35,4 +35,18 @@ class Multiply extends ArmFormat {
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitMultiply(this, context);
   }
+
+  @override
+  Map<String, int> _values() {
+    // CCCC_0000_00AS_DDDD_NNNN_FFFF_1001_MMMM
+    return {
+      'c': condition.value,
+      'a': accumulate ? 1 : 0,
+      's': setConditionCodes ? 1 : 0,
+      'd': destinationRegister.value,
+      'n': operandRegister1.value,
+      'f': operandRegister2.value,
+      'm': operandRegister3.value,
+    };
+  }
 }

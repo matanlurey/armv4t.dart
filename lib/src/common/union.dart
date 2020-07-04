@@ -1,10 +1,10 @@
 /// Represents either [L] or [R], in a type-safe manner.
 abstract class Or2<L, R> {
   /// Creates initialized with a value of type [L].
-  const factory Or2.left(L value) = _Left2;
+  const factory Or2.left(L value) = _Left2<L, R>;
 
   /// Creates initialized with a value of type [R].
-  const factory Or2.right(R value) = _Right2;
+  const factory Or2.right(R value) = _Right2<L, R>;
 
   /// Given the initialized value, invokes either [ifLeft] or [ifRight].
   T pick<T>(
@@ -44,13 +44,13 @@ class _Right2<L, R> implements Or2<L, R> {
 /// Represents either [L], [M], or [R], in a type-safe manner.
 abstract class Or3<L, M, R> {
   /// Creates initialized with a value of type [L].
-  const factory Or3.left(L value) = _Left3;
+  const factory Or3.left(L value) = _Left3<L, M, R>;
 
   /// Creates initialized with a value of type [M].
-  const factory Or3.middle(M value) = _Middle3;
+  const factory Or3.middle(M value) = _Middle3<L, M, R>;
 
   /// Creates initialized with a value of type [R].
-  const factory Or3.right(R value) = _Right3;
+  const factory Or3.right(R value) = _Right3<L, M, R>;
 
   /// Given the initialized value, invokes either [ifLeft] or [ifRight].
   T pick<T>(

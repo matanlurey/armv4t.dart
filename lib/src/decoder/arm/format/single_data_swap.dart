@@ -27,4 +27,16 @@ class SingleDataSwap extends ArmFormat {
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitSingleDataSwap(this, context);
   }
+
+  @override
+  Map<String, int> _values() {
+    // CCCC_0001_0B00_NNNN_DDDD_0000_1001_MMMM
+    return {
+      'c': condition.value,
+      'b': swapByteQuantity ? 1 : 0,
+      'n': baseRegister.value,
+      'd': destinationRegister.value,
+      'm': sourceRegister.value,
+    };
+  }
 }

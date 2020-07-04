@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:armv4t/src/common/assert.dart';
 import 'package:armv4t/src/common/binary.dart';
 import 'package:binary/binary.dart';
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 part 'format/block_data_transfer.dart';
@@ -32,6 +34,38 @@ abstract class ArmFormat {
 
   /// Invokes a specific method of the provided [visitor].
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]);
+
+  @visibleForOverriding
+  Map<String, int> _values();
+
+  @override
+  int get hashCode => const MapEquality<Object, Object>().hash(_values());
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) {
+      return true;
+    }
+    if (o is ArmFormat && runtimeType == o.runtimeType) {
+      return const MapEquality<Object, Object>().equals(_values(), o._values());
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  String toString() {
+    if (assertionsEnabled) {
+      final output = StringBuffer();
+      output.writeln('$runtimeType:');
+      _values().forEach((key, value) {
+        output.writeln('  $key: $value');
+      });
+      return output.toString();
+    } else {
+      return super.toString();
+    }
+  }
 }
 
 /// Converts a known 32-bit integer into a partially decoded [ArmFormat].
@@ -41,7 +75,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
   ).build('DATA_PROCESSING_OR_PSR_TRANSFER');
 
   static final _multiply = BitPatternBuilder.parse(
-    'CCCC_0000_00AS_DDDD_NNNN_SSSS_1001_MMMM',
+    'CCCC_0000_00AS_DDDD_NNNN_FFFF_1001_MMMM',
   ).build('MULTIPLY');
 
   static final _multiplyLong = BitPatternBuilder.parse(
@@ -57,7 +91,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
   ).build('BRANCH_AND_EXCHANGE');
 
   static final _halfWordDataTransfer = BitPatternBuilder.parse(
-    'CCCC_000P_UIWL_NNNN_DDDD_0000_1HH1_MMMM',
+    'CCCC_000P_UIWL_NNNN_DDDD_JJJJ_1HH1_MMMM',
   ).build('HALF_WORD_DATA_TRANSFER');
 
   static final _singleDataTransfer = BitPatternBuilder.parse(
@@ -258,4 +292,268 @@ abstract class ArmFormatVisitor<R, C> {
     SoftwareInterrupt format, [
     C context,
   ]);
+}
+
+/// Converts an [ArmFormat] back to a [Uint32].
+abstract class ArmFormatEncoder implements Converter<ArmFormat, Uint32> {
+  const factory ArmFormatEncoder() = _ArmFormatEncoder;
+}
+
+class _ArmFormatEncoder
+    /***/ extends Converter<ArmFormat, Uint32>
+    /***/ implements
+        ArmFormatEncoder,
+        ArmFormatVisitor<Uint32, void> {
+  const _ArmFormatEncoder();
+
+  @override
+  Uint32 convert(ArmFormat format) => format.accept(this);
+
+  @override
+  Uint32 visitDataProcessingOrPsrTransfer(
+    DataProcessingOrPsrTransfer format, [
+    void _,
+  ]) =>
+      // CCCC_00IP_PPPS_NNNN_DDDD_OOOO_OOOO_OOOO
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 00
+            ..write('00')
+            // I
+            ..writeBool(format.immediateOperand)
+            // P_PPP
+            ..writeInt(format.opCode)
+            // S
+            ..writeBool(format.setConditionCodes)
+            // NNNN
+            ..writeInt(format.operand1Register)
+            // DDDD
+            ..writeInt(format.destinationRegister)
+            // OOOO_OOOO_OOOO
+            ..writeInt(format.operand2))
+          .build();
+
+  @override
+  Uint32 visitMultiply(
+    Multiply format, [
+    void _,
+  ]) =>
+      // CCCC_0000_00AS_DDDD_NNNN_FFFF_1001_MMMM
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 0000_00
+            ..write('0000' '00')
+            // A
+            ..writeBool(format.accumulate)
+            // S
+            ..writeBool(format.setConditionCodes)
+            // DDDD
+            ..writeInt(format.destinationRegister)
+            // NNNN
+            ..writeInt(format.operandRegister1)
+            // FFFF
+            ..writeInt(format.operandRegister2)
+            // 1001
+            ..write('1001')
+            // MMMM
+            ..writeInt(format.operandRegister3))
+          .build();
+
+  @override
+  Uint32 visitMultiplyLong(
+    MultiplyLong format, [
+    void _,
+  ]) =>
+      // CCCC_0000_1UAS_HHHH_LLLL_NNNN_1001_MMMM
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 0000_1
+            ..write('0000' '1')
+            // U (Ignored)
+            ..write('0')
+            // A
+            ..writeBool(format.accumulate)
+            // S
+            ..writeBool(format.setConditionCodes)
+            // H
+            ..writeInt(format.destinationRegisterHi)
+            // L
+            ..writeInt(format.destinationRegisterLo)
+            // N
+            ..writeInt(format.operandRegister1)
+            // 1001
+            ..write('1001')
+            // M
+            ..writeInt(format.operandRegister2))
+          .build();
+
+  @override
+  Uint32 visitSingleDataSwap(
+    SingleDataSwap format, [
+    void _,
+  ]) =>
+      // CCCC_0001_0B00_NNNN_DDDD_0000_1001_MMMM
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 0001_0
+            ..write('0001' '0')
+            // B
+            ..writeBool(format.swapByteQuantity)
+            // 00
+            ..write('00')
+            // NNNN
+            ..writeInt(format.baseRegister)
+            // DDDD
+            ..writeInt(format.destinationRegister)
+            // 0000_1001
+            ..write('0000' '1001')
+            // MMMM
+            ..writeInt(format.sourceRegister))
+          .build();
+
+  @override
+  Uint32 visitBranchAndExchange(
+    BranchAndExchange format, [
+    void _,
+  ]) =>
+      // CCCC_0001_0010_1111_1111_1111_0001_NNNN
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 0001_0010_1111_1111_1111_0001
+            ..write('0001' '0010' '1111' '1111' '1111' '0001')
+            // NNNN
+            ..writeInt(format.operand))
+          .build();
+
+  @override
+  Uint32 visitHalfwordDataTransfer(
+    HalfwordDataTransfer format, [
+    void _,
+  ]) =>
+      // CCCC_000P_UIWL_NNNN_DDDD_JJJJ_1HH1_MMMM
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 000
+            ..write('000')
+            // P
+            ..writeBool(format.preIndexingBit)
+            // U
+            ..writeBool(format.addOffsetBit)
+            // I
+            ..writeBool(format.immediateOffset)
+            // W
+            ..writeBool(format.writeAddressBit)
+            // L
+            ..writeBool(format.loadMemoryBit)
+            // NNNN
+            ..writeInt(format.baseRegister)
+            // DDDD
+            ..writeInt(format.sourceOrDestinationRegister)
+            // JJJJ
+            ..writeInt(format.offsetHiNibble)
+            // 1
+            ..write('1')
+            // HH
+            ..writeInt(format.opCode)
+            // 1
+            ..write('1')
+            // MMMM
+            ..writeInt(format.offsetLoNibble))
+          .build();
+
+  @override
+  Uint32 visitSingleDataTransfer(
+    SingleDataTransfer format, [
+    void _,
+  ]) =>
+      // CCCC_01IP_UBWL_NNNN_DDDD_OOOO_OOOO_OOOO
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 01
+            ..write('01')
+            // I
+            ..writeBool(!format.immediateOffset)
+            // P
+            ..writeBool(format.preIndexingBit)
+            // U
+            ..writeBool(format.addOffsetBit)
+            // B
+            ..writeBool(format.byteQuantityBit)
+            // W
+            ..writeBool(format.writeAddressBit)
+            // L
+            ..writeBool(format.loadMemoryBit)
+            // NNNN
+            ..writeInt(format.baseRegister)
+            // DDDD
+            ..writeInt(format.sourceOrDestinationRegister)
+            // OOOO
+            ..writeInt(format.offset))
+          .build();
+
+  @override
+  Uint32 visitBlockDataTransfer(
+    BlockDataTransfer format, [
+    void _,
+  ]) =>
+      // CCCC_100P_USWL_NNNN_RRRR_RRRR_RRRR_RRRR
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 100
+            ..write('100')
+            // P
+            ..writeBool(format.preIndexingBit)
+            // U
+            ..writeBool(format.addOffsetBit)
+            // S
+            ..writeBool(format.loadPsrOrForceUserMode)
+            // W
+            ..writeBool(format.writeAddressBit)
+            // L
+            ..writeBool(format.loadMemoryBit)
+            // NNNN
+            ..writeInt(format.baseRegister)
+            // RRRR_RRRR_RRRR_RRRR
+            ..writeInt(format.registerList))
+          .build();
+
+  @override
+  Uint32 visitBranch(
+    Branch format, [
+    void _,
+  ]) =>
+      // CCCC_101L_OOOO_OOOO_OOOO_OOOO_OOOO_OOOO
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 101
+            ..write('101')
+            // L
+            ..writeBool(format.link)
+            // OOOO_OOOO_OOOO_OOOO_OOOO_OOOO
+            ..writeInt(format.offset))
+          .build();
+
+  @override
+  Uint32 visitSoftwareInterrupt(
+    SoftwareInterrupt format, [
+    void _,
+  ]) =>
+      // CCCC_1111_XXXX_XXXX_XXXX_XXXX_XXXX_XXXX
+      (Uint32Builder()
+            // CCCC
+            ..writeInt(format.condition)
+            // 1111
+            ..write('1111')
+            // XXXX_XXXX_XXXX_XXXX_XXXX_XXXX
+            ..writeInt(format.comment))
+          .build();
 }

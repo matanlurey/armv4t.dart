@@ -15,4 +15,13 @@ class SoftwareInterrupt extends ArmFormat {
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitSoftwareInterrupt(this, context);
   }
+
+  @override
+  Map<String, int> _values() {
+    // CCCC_1111_XXXX_XXXX_XXXX_XXXX_XXXX_XXXX
+    return {
+      'c': condition.value,
+      'x': comment.value,
+    };
+  }
 }

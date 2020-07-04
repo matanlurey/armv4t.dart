@@ -39,4 +39,18 @@ class MultiplyLong extends ArmFormat {
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitMultiplyLong(this, context);
   }
+
+  @override
+  Map<String, int> _values() {
+    // CCCC_0000_00AS_DDDD_NNNN_FFFF_1001_MMMM
+    return {
+      'c': condition.value,
+      'a': accumulate ? 1 : 0,
+      's': setConditionCodes ? 1 : 0,
+      'd': destinationRegisterHi.value,
+      'n': destinationRegisterLo.value,
+      'f': operandRegister1.value,
+      'm': operandRegister2.value,
+    };
+  }
 }

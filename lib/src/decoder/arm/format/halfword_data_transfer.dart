@@ -56,4 +56,22 @@ class HalfwordDataTransfer extends ArmFormat {
   R accept<R, C>(ArmFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitHalfwordDataTransfer(this, context);
   }
+
+  @override
+  Map<String, int> _values() {
+    // CCCC_000P_UIWL_NNNN_DDDD_JJJJ_1HH1_MMMM
+    return {
+      'c': condition.value,
+      'p': preIndexingBit ? 1 : 0,
+      'u': addOffsetBit ? 1 : 0,
+      'i': immediateOffset ? 1 : 0,
+      'w': writeAddressBit ? 1 : 0,
+      'l': loadMemoryBit ? 1 : 0,
+      'n': baseRegister.value,
+      'd': sourceOrDestinationRegister.value,
+      'j': offsetHiNibble.value,
+      'h': opCode.value,
+      'm': offsetLoNibble.value,
+    };
+  }
 }
