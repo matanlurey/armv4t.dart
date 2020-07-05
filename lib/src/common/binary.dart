@@ -384,6 +384,29 @@ class Int24 extends Integral<Int24> {
   String toDebugString() => '$_name {$value}';
 }
 
+/// Allows incrementally building a [Uint16] from most to least significant.
+class Uint16Builder {
+  final _builder = StringBuffer();
+
+  /// Write a string-encoded binary number.
+  void write(String v) => _builder.write(v);
+
+  /// Write a bool-encoded bit.
+  void writeBool(bool v) => write(v ? '1' : '0');
+
+  /// Write a partial integer.
+  void writeInt(Integral<void> v) => write(v.toBinaryPadded());
+
+  /// Returns as a [Uint16].
+  Uint16 build() {
+    if (_builder.length != 16) {
+      throw RangeError.value(_builder.length);
+    } else {
+      return _builder.toString().parseBits().asUint16();
+    }
+  }
+}
+
 /// Allows incrementally building a [Uint32] from most to least significant.
 class Uint32Builder {
   final _builder = StringBuffer();

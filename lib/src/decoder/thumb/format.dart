@@ -36,7 +36,7 @@ part 'format/unconditional_branch.dart';
 abstract class ThumbFormat {
   const ThumbFormat._();
 
-  R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]);
+  R accept<R, C>(ThumbFormatVisitor<R, C> visitor, [C context]);
 
   @visibleForOverriding
   Map<String, int> _values();
@@ -305,7 +305,7 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
   }
 }
 
-abstract class ThumbInstructionVisitor<R, C> {
+abstract class ThumbFormatVisitor<R, C> {
   R visitAddOffsetToStackPointer(
     AddOffsetToStackPointerThumbFormat format, [
     C context,
@@ -395,4 +395,182 @@ abstract class ThumbInstructionVisitor<R, C> {
     UnconditionalBranchThumbFormat format, [
     C context,
   ]);
+}
+
+/// Converts a [ThumbFormat] back to a [Uint16].
+abstract class ThumbFormatEncoder implements Converter<ThumbFormat, Uint16> {
+  const factory ThumbFormatEncoder() = _ThumbFormatEncoder;
+}
+
+class _ThumbFormatEncoder
+    /***/ extends Converter<ThumbFormat, Uint16>
+    /***/ implements
+        ThumbFormatEncoder,
+        ThumbFormatVisitor<Uint16, void> {
+  const _ThumbFormatEncoder();
+
+  @override
+  Uint16 convert(ThumbFormat format) => format.accept(this);
+
+  @override
+  Uint16 visitAddOffsetToStackPointer(
+    AddOffsetToStackPointerThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitAddOffsetToStackPointer
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitAddOrSubtract(
+    AddOrSubtractThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitAddOrSubtract
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitAluOperation(
+    AluOperationThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitAluOperation
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitConditionalBranch(
+    ConditionalBranchThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitConditionalBranch
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitHiRegisterOperationsOrBranchExchange(
+    HiRegisterOperationsOrBranchExchangeThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitHiRegisterOperationsOrBranchExchange
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitLoadAddress(
+    LoadAddressThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitLoadAddress
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitLoadOrStoreHalfword(
+    LoadOrStoreHalfwordThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitLoadOrStoreHalfword
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitLoadOrStoreWithImmediateOffset(
+    LoadOrStoreWithImmediateOffsetThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitLoadOrStoreWithImmediateOffset
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitLoadOrStoreWithRegisterOffset(
+    LoadOrStoreWithRegisterOffsetThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitLoadOrStoreWithRegisterOffset
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitLongBranchWithLink(
+    LongBranchWithLinkThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitLongBranchWithLink
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitMoveOrCompareOrAddOrSubtractImmediate(
+    MoveOrCompareOrAddOrSubtractImmediateThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitMoveOrCompareOrAddOrSubtractImmediate
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitMoveShiftedRegister(
+    MoveShiftedRegisterThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitMoveShiftedRegister
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitMultipleLoadOrStore(
+    MultipleLoadOrStoreThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitMultipleLoadOrStore
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitPCRelativeLoad(
+    PCRelativeLoadThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitPCRelativeLoad
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitPushOrPopRegisters(
+    PushOrPopRegistersThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitPushOrPopRegisters
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitSPRelativeLoadOrStore(
+    SPRelativeLoadOrStoreThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitSPRelativeLoadOrStore
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitSoftwareInterrupt(
+    SoftwareInterruptThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitSoftwareInterrupt
+    throw UnimplementedError();
+  }
+
+  @override
+  Uint16 visitUnconditionalBranch(
+    UnconditionalBranchThumbFormat format, [
+    void _,
+  ]) {
+    // TODO: implement visitUnconditionalBranch
+    throw UnimplementedError();
+  }
 }

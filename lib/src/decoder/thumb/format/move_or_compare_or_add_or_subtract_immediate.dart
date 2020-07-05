@@ -12,7 +12,7 @@ class MoveOrCompareOrAddOrSubtractImmediateThumbFormat extends ThumbFormat {
   }) : super._();
 
   @override
-  R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
+  R accept<R, C>(ThumbFormatVisitor<R, C> visitor, [C context]) {
     return visitor.visitMoveOrCompareOrAddOrSubtractImmediate(this, context);
   }
 
