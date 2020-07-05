@@ -21,6 +21,18 @@ An emulator for the [ARMv4T instruction set][], written in Dart.
 
 [armv4t instruction set]: https://developer.arm.com/docs/dvi0025/latest/arm922t-with-ahb-system-on-chip-platform-os-processor/the-armv4t-architecture/the-armv4t-instruction-sets
 
+## Libraries
+
+### `armv4t.dart`
+
+A stub library (no symbols), intended to be the emulator and related components.
+
+### `decode.dart`
+
+Contains classes and data structures for decoding (and in some cases, encoding)
+`Uint32`-encoded binary instructions into their resulting `ArmFormat` and
+finally `ArmInstruction` data classes.
+
 ## Resources
 
 A few different resources and documents used to develop this package.

@@ -1,6 +1,8 @@
-export 'src/common/binary.dart' show Uint2, Uint12, Uint24, Int24;
-export 'src/common/union.dart' show Or2, Or3;
-export 'src/decoder/arm/condition.dart' show Condition;
-export 'src/decoder/arm/format.dart';
-export 'src/decoder/arm/instruction.dart';
-export 'src/decoder/arm/printer.dart';
+/// A stub library for the emulator.
+///
+/// This library currently does not export any symbols, and is a placeholder for
+/// the emulator components (e.g. what I suspect will be the most used part of
+/// this package).
+///
+/// For _decoding_, see `decoding.dart`.
+library armv4t;
