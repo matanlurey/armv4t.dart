@@ -467,12 +467,11 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
   ]) {
     // <LDM|STM>{cond}<FD|ED|FA|EA|IA|IB|DA|DB> Rn{!},<Rlist>{^}
     final mnuemonic = super.visitBlockDataTransfer(i);
-    final w = i.writeAddressIntoBase ? 'w' : '';
+    final w = i.writeAddressIntoBase ? '!' : '';
     final c = i.loadPsrOrForceUserMode ? '^' : '';
     return visitComponents([
-      mnuemonic,
-      '${visitRegister(i.base)}$w',
-      '${visitRegisterList(i.registerList)}$c',
+      '$mnuemonic ${visitRegister(i.base)}$w',
+      '{${visitRegisterList(i.registerList)}}$c',
     ]);
   }
 

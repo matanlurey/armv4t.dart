@@ -801,30 +801,79 @@ void main() {
           writeAddressBit: false,
           loadMemoryBit: true,
           baseRegister: Uint4(4),
-          registerList: Uint16(16),
+          registerList: Uint16(32),
         );
       }
 
       test('IB', () {
         expect(
           decode(encode(createLDM(preIndexingBit: true, addOffsetBit: true))),
-          '',
+          'ldmib r4, {r5}',
         );
       });
 
-      test('IA', () {});
+      test('IA', () {
+        expect(
+          decode(encode(createLDM(preIndexingBit: false, addOffsetBit: true))),
+          'ldmia r4, {r5}',
+        );
+      });
 
-      test('DB', () {});
+      test('DB', () {
+        expect(
+          decode(encode(createLDM(preIndexingBit: true, addOffsetBit: false))),
+          'ldmdb r4, {r5}',
+        );
+      });
 
-      test('DA', () {});
+      test('DA', () {
+        expect(
+          decode(encode(createLDM(preIndexingBit: false, addOffsetBit: false))),
+          'ldmda r4, {r5}',
+        );
+      });
     });
 
     group('STM', () {
-      test('w/ Write-Back', () {});
+      ArmFormat createSTM({
+        bool loadPsrOrForceUserMode = false,
+        bool writeAddressBit = false,
+        int registerList = 32,
+      }) {
+        return BlockDataTransfer(
+          condition: _always,
+          preIndexingBit: true,
+          addOffsetBit: true,
+          loadPsrOrForceUserMode: loadPsrOrForceUserMode,
+          writeAddressBit: writeAddressBit,
+          loadMemoryBit: false,
+          baseRegister: Uint4(4),
+          registerList: Uint16(registerList),
+        );
+      }
 
-      test('w/ Set S Bit', () {});
+      test('w/ Write-Back', () {
+        expect(
+          decode(encode(createSTM(writeAddressBit: true))),
+          'stmib r4!, {r5}',
+        );
+      });
 
-      test('Register Range', () {});
+      test('w/ Set S Bit', () {
+        expect(
+          decode(encode(createSTM(loadPsrOrForceUserMode: true))),
+          'stmib r4, {r5}^',
+        );
+      });
+
+      test('Register Range', () {
+        expect(
+          decode(encode(createSTM(
+            registerList: '0000' '0011' '0100' '1011'.parseBits(),
+          ))),
+          'stmib r4, {r0-r1, r3, r6, r8-r9}',
+        );
+      });
     });
   });
 }
