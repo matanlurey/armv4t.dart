@@ -4,22 +4,16 @@ import 'package:armv4t/src/decoder/arm/format.dart';
 import 'package:armv4t/src/decoder/arm/instruction.dart';
 import 'package:armv4t/src/decoder/arm/printer.dart';
 import 'package:binary/binary.dart';
+import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 final _always = Uint4(Condition.al.value);
 
 void main() {
-  ArmFormatDecoder formatDecoder;
-  ArmFormatEncoder formatEncoder;
-  ArmInstructionDecoder decoder;
-  ArmInstructionPrinter printer;
-
-  setUpAll(() {
-    formatDecoder = const ArmFormatDecoder();
-    formatEncoder = const ArmFormatEncoder();
-    decoder = const ArmInstructionDecoder();
-    printer = const ArmInstructionPrinter();
-  });
+  const formatDecoder = ArmFormatDecoder();
+  const formatEncoder = ArmFormatEncoder();
+  const decoder = ArmInstructionDecoder();
+  const printer = ArmInstructionPrinter();
 
   Uint32 encode(ArmFormat format) {
     return formatEncoder.convert(format);
@@ -124,18 +118,22 @@ void main() {
       final setS = {'tst', 'teq', 'cmp', 'cmn'};
       for (var i = 0; i < opCodes.length; i++) {
         final key = opCodes[i];
-        final format = DataProcessingOrPsrTransfer(
-          condition: _always,
-          immediateOperand: true,
-          opCode: Uint4(i),
-          setConditionCodes: !setS.contains(key),
-          operand1Register: Uint4(2),
-          destinationRegister: Uint4(3),
-          operand2: Uint12(4),
-        );
-        if (setS.contains(key)) {
-          expect(decode(encode(format)), '${key}s r3, r2, 4');
-        } else {}
+        test(key, () {
+          final format = DataProcessingOrPsrTransfer(
+            condition: _always,
+            immediateOperand: true,
+            opCode: Uint4(i),
+            setConditionCodes: !setS.contains(key),
+            operand1Register: Uint4(2),
+            destinationRegister: Uint4(3),
+            operand2: Uint12(4),
+          );
+          if (!setS.contains(key)) {
+            expect(decode(encode(format)), '${key}s r3, r2, 4');
+          } else {
+            // TODO: Test for ${key}p.
+          }
+        });
       }
     });
 
@@ -236,6 +234,60 @@ void main() {
           );
           expect(decode(encode(format)), 'and r3, r2, r8, ror r4');
         });
+      });
+    });
+  });
+
+  group('PSR Transfer', () {
+    group('MRS', () {
+      DataProcessingOrPsrTransfer create({@required bool useSPSR}) {
+        return DataProcessingOrPsrTransfer(
+          condition: _always,
+          immediateOperand: true,
+          opCode: Uint4(useSPSR ? 0xa : 0xb),
+          setConditionCodes: false,
+          operand1Register: Uint4(2),
+          destinationRegister: Uint4(3),
+          operand2: Uint12(0),
+        );
+      }
+
+      test('SPSR', () {
+        expect(decode(encode(create(useSPSR: true))), 'mrs r3, cpsr');
+      });
+
+      test('CPSR', () {
+        expect(decode(encode(create(useSPSR: false))), 'mrs r3, spsr');
+      });
+    });
+
+    group('MSR', () {
+      test('Register -> PSR', () {
+        final format = DataProcessingOrPsrTransfer(
+          condition: _always,
+          immediateOperand: true,
+          opCode: Uint4(0x8),
+          setConditionCodes: false,
+          operand1Register: Uint4(2),
+          destinationRegister: Uint4(0),
+          operand2: Uint12(0),
+        );
+        // TODO: Fix.
+        expect(decode(encode(format)), 'msr cpsr, r2');
+      });
+
+      test('Register or Immediate -> PSR Flag Bits', () {
+        final format = DataProcessingOrPsrTransfer(
+          condition: _always,
+          immediateOperand: true,
+          opCode: Uint4(0x8),
+          setConditionCodes: false,
+          operand1Register: Uint4(2),
+          destinationRegister: Uint4(0),
+          operand2: Uint12(0),
+        );
+        // TODO: Fix.
+        expect(decode(encode(format)), 'msr cpsr, r2');
       });
     });
   });

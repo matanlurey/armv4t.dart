@@ -616,6 +616,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     MRS i, [
     void _,
   ]) {
+    // MRS - transfer PSR contents to a register
     final mnuemonic = super.visitPsrTransfer(i);
     final d = visitRegister(i.destination);
     final psr = i.useSPSR ? 'spsr' : 'cpsr';

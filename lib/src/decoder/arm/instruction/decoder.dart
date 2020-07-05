@@ -12,30 +12,30 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     final opCode = _ALUOpCode.values[format.opCode.value];
     if (!format.setConditionCodes) {
       switch (opCode) {
-        //                               isMSR
+        //                               isMRS
         //                              V
         case _ALUOpCode.TST: // 0x8 | 1000 <-- useSPSR
           return _decodePsrTransfer(
             format,
             condition,
+            isMSR: true,
           );
         case _ALUOpCode.TEQ: // 0x9 | 1001
           return _decodePsrTransfer(
             format,
             condition,
             useSPSR: true,
+            isMSR: true,
           );
         case _ALUOpCode.CMP: // 0xa | 1010
           return _decodePsrTransfer(
             format,
             condition,
-            isMSR: true,
           );
         case _ALUOpCode.CMN: // 0xb | 1011
           return _decodePsrTransfer(
             format,
             condition,
-            isMSR: true,
             useSPSR: true,
           );
         default:
