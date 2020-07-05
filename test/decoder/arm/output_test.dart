@@ -102,6 +102,43 @@ void main() {
       }
     });
 
+    group('<Set Condition Code/Privileged Mode>', () {
+      final opCodes = [
+        'and',
+        'eor',
+        'sub',
+        'rsb',
+        'add',
+        'adc',
+        'sbc',
+        'rsc',
+        'tst',
+        'teq',
+        'cmp',
+        'cmn',
+        'orr',
+        'mov',
+        'bic',
+        'mvn',
+      ];
+      final setS = {'tst', 'teq', 'cmp', 'cmn'};
+      for (var i = 0; i < opCodes.length; i++) {
+        final key = opCodes[i];
+        final format = DataProcessingOrPsrTransfer(
+          condition: _always,
+          immediateOperand: true,
+          opCode: Uint4(i),
+          setConditionCodes: !setS.contains(key),
+          operand1Register: Uint4(2),
+          destinationRegister: Uint4(3),
+          operand2: Uint12(4),
+        );
+        if (setS.contains(key)) {
+          expect(decode(encode(format)), '${key}s r3, r2, 4');
+        } else {}
+      }
+    });
+
     group('<Shifted Register>', () {
       int encodeOp2ByRegister(int shiftR, ShiftType type, int operandR) {
         return [
