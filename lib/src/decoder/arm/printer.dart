@@ -442,7 +442,11 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
         shiftedImmediate,
       ),
     );
-    return visitComponents(['$mnuemonic $destination', register, operand2]);
+    if (i is MOV || i is MVN) {
+      return visitComponents(['$mnuemonic $destination', operand2]);
+    } else {
+      return visitComponents(['$mnuemonic $destination', register, operand2]);
+    }
   }
 
   @override
