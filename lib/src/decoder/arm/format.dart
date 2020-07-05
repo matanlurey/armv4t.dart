@@ -372,8 +372,8 @@ class _ArmFormatEncoder
             ..writeInt(format.condition)
             // 0000_1
             ..write('0000' '1')
-            // U (Ignored)
-            ..write('0')
+            // U
+            ..writeBool(format.signed)
             // A
             ..writeBool(format.accumulate)
             // S

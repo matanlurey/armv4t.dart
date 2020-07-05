@@ -314,7 +314,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       );
     } else {
       // A = 0
-      return MLA(
+      return MUL(
         condition: condition,
         setConditionCodes: setConditionCodes,
         operand1: operand1,
@@ -419,29 +419,52 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   ]) {
     final condition = Condition.parse(format.condition.value);
     final addOffsetBeforeTransfer = format.preIndexingBit;
+    final addOffsetToBase = format.addOffsetBit;
+    final writeAddressIntoBase = format.writeAddressBit;
+    final base = RegisterAny(format.baseRegister);
+    final source = RegisterAny(format.sourceOrDestinationRegister);
+
+    Or2<RegisterNotPC, Immediate<Uint8>> offset;
+    if (format.immediateOffset) {
+      final hiBits = format.offsetHiNibble.value << 4;
+      final loBits = format.offsetLoNibble.value;
+      offset = Or2.right(Immediate(Uint8(hiBits | loBits)));
+    } else {
+      offset = Or2.left(RegisterNotPC(format.offsetLoNibble));
+    }
 
     if (format.loadMemoryBit) {
-      // L = 1 (LDRSB, LDRSH)
+      // L = 1 (LDRH, LDRSB, LDRSH)
       switch (format.opCode.value) {
+        case 0x1:
+          return LDRH(
+            condition: condition,
+            addOffsetBeforeTransfer: addOffsetBeforeTransfer,
+            addOffsetToBase: addOffsetToBase,
+            writeAddressIntoBase: writeAddressIntoBase,
+            base: base,
+            source: source,
+            offset: offset,
+          );
         case 0x2:
           return LDRSB(
             condition: condition,
             addOffsetBeforeTransfer: addOffsetBeforeTransfer,
-            addOffsetToBase: null,
-            writeAddressIntoBase: null,
-            base: null,
-            source: null,
-            offset: null,
+            addOffsetToBase: addOffsetToBase,
+            writeAddressIntoBase: writeAddressIntoBase,
+            base: base,
+            source: source,
+            offset: offset,
           );
         case 0x3:
           return LDRSH(
             condition: condition,
             addOffsetBeforeTransfer: addOffsetBeforeTransfer,
-            addOffsetToBase: null,
-            writeAddressIntoBase: null,
-            base: null,
-            source: null,
-            offset: null,
+            addOffsetToBase: addOffsetToBase,
+            writeAddressIntoBase: writeAddressIntoBase,
+            base: base,
+            source: source,
+            offset: offset,
           );
         default:
           throw FormatException('Unexpected opCode: ${format.opCode.value}');
@@ -451,11 +474,11 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       return STRH(
         condition: condition,
         addOffsetBeforeTransfer: addOffsetBeforeTransfer,
-        addOffsetToBase: null,
-        writeAddressIntoBase: null,
-        base: null,
-        destination: null,
-        offset: null,
+        addOffsetToBase: addOffsetToBase,
+        writeAddressIntoBase: writeAddressIntoBase,
+        base: base,
+        destination: source,
+        offset: offset,
       );
     }
   }

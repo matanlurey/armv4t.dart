@@ -262,33 +262,528 @@ void main() {
     });
 
     group('MSR', () {
-      test('Register -> PSR', () {
+      test('Register -> [C]PSR', () {
         final format = DataProcessingOrPsrTransfer(
           condition: _always,
-          immediateOperand: true,
+          immediateOperand: false,
           opCode: Uint4(0x8),
           setConditionCodes: false,
           operand1Register: Uint4(2),
           destinationRegister: Uint4(0),
-          operand2: Uint12(0),
+          operand2: Uint12(2),
         );
-        // TODO: Fix.
         expect(decode(encode(format)), 'msr cpsr, r2');
       });
 
-      test('Register or Immediate -> PSR Flag Bits', () {
+      test('Register -> [S]PSR', () {
+        final format = DataProcessingOrPsrTransfer(
+          condition: _always,
+          immediateOperand: false,
+          opCode: Uint4(0x9),
+          setConditionCodes: false,
+          operand1Register: Uint4(2),
+          destinationRegister: Uint4(0),
+          operand2: Uint12(2),
+        );
+        expect(decode(encode(format)), 'msr spsr, r2');
+      });
+
+      test('Register -> [C]PSR Flag Bits', () {
+        final format = DataProcessingOrPsrTransfer(
+          condition: _always,
+          immediateOperand: false,
+          opCode: Uint4(0x8),
+          setConditionCodes: false,
+          operand1Register: Uint4('1000'.parseBits()),
+          destinationRegister: Uint4(0),
+          operand2: Uint12(2),
+        );
+        expect(decode(encode(format)), 'msr cpsr_flg, r2');
+      });
+
+      test('Register -> [S]PSR Flag Bits', () {
+        final format = DataProcessingOrPsrTransfer(
+          condition: _always,
+          immediateOperand: false,
+          opCode: Uint4(0x9),
+          setConditionCodes: false,
+          operand1Register: Uint4('1000'.parseBits()),
+          destinationRegister: Uint4(0),
+          operand2: Uint12(2),
+        );
+        expect(decode(encode(format)), 'msr spsr_flg, r2');
+      });
+
+      test('Immediate -> PSR Flag Bits', () {
         final format = DataProcessingOrPsrTransfer(
           condition: _always,
           immediateOperand: true,
           opCode: Uint4(0x8),
           setConditionCodes: false,
-          operand1Register: Uint4(2),
+          operand1Register: Uint4('1000'.parseBits()),
           destinationRegister: Uint4(0),
-          operand2: Uint12(0),
+          operand2: Uint12(2),
         );
-        // TODO: Fix.
-        expect(decode(encode(format)), 'msr cpsr, r2');
+        expect(decode(encode(format)), 'msr cpsr_flg, 2');
       });
+    });
+  });
+
+  group('Multiply and Multiply-Accumulate', () {
+    test('MUL', () {
+      final format = Multiply(
+        condition: _always,
+        accumulate: false,
+        setConditionCodes: false,
+        destinationRegister: Uint4(0),
+        operandRegister1: Uint4(1),
+        operandRegister2: Uint4(2),
+        operandRegister3: Uint4(3),
+      );
+      expect(decode(encode(format)), 'mul r0, r1, r2');
+    });
+
+    test('MLA', () {
+      final format = Multiply(
+        condition: _always,
+        accumulate: true,
+        setConditionCodes: false,
+        destinationRegister: Uint4(0),
+        operandRegister1: Uint4(1),
+        operandRegister2: Uint4(2),
+        operandRegister3: Uint4(3),
+      );
+      expect(decode(encode(format)), 'mla r0, r1, r2');
+    });
+  });
+
+  group('Multiply Long and Multiply-Accumulate Long', () {
+    test('UMULL', () {
+      final format = MultiplyLong(
+        condition: _always,
+        signed: false,
+        accumulate: false,
+        setConditionCodes: false,
+        destinationRegisterHi: Uint4(2),
+        destinationRegisterLo: Uint4(4),
+        operandRegister1: Uint4(6),
+        operandRegister2: Uint4(8),
+      );
+      expect(decode(encode(format)), 'umull r4, r2, r6, r8');
+    });
+
+    test('UMLAL', () {
+      final format = MultiplyLong(
+        condition: _always,
+        signed: false,
+        accumulate: true,
+        setConditionCodes: false,
+        destinationRegisterHi: Uint4(2),
+        destinationRegisterLo: Uint4(4),
+        operandRegister1: Uint4(6),
+        operandRegister2: Uint4(8),
+      );
+      expect(decode(encode(format)), 'umlal r4, r2, r6, r8');
+    });
+
+    test('SMULL', () {
+      final format = MultiplyLong(
+        condition: _always,
+        signed: true,
+        accumulate: false,
+        setConditionCodes: false,
+        destinationRegisterHi: Uint4(2),
+        destinationRegisterLo: Uint4(4),
+        operandRegister1: Uint4(6),
+        operandRegister2: Uint4(8),
+      );
+      expect(decode(encode(format)), 'smull r4, r2, r6, r8');
+    });
+
+    test('SMLAL', () {
+      final format = MultiplyLong(
+        condition: _always,
+        signed: true,
+        accumulate: true,
+        setConditionCodes: false,
+        destinationRegisterHi: Uint4(2),
+        destinationRegisterLo: Uint4(4),
+        operandRegister1: Uint4(6),
+        operandRegister2: Uint4(8),
+      );
+      expect(decode(encode(format)), 'smlal r4, r2, r6, r8');
+    });
+  });
+
+  group('Single Data Transfer', () {
+    group('STR', () {
+      test('Immediate <Address> w/ PC as Base', () {
+        final format = SingleDataTransfer(
+          condition: _always,
+          immediateOffset: true,
+          preIndexingBit: true,
+          addOffsetBit: true,
+          byteQuantityBit: false,
+          writeAddressBit: false,
+          loadMemoryBit: false,
+          baseRegister: Uint4(15),
+          sourceOrDestinationRegister: Uint4(4),
+          offset: Uint12(6),
+        );
+        expect(decode(encode(format)), 'str r4, 6');
+      });
+
+      group('Pre-Indexed', () {
+        test('offset of zero', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: true,
+            preIndexingBit: true,
+            addOffsetBit: true,
+            byteQuantityBit: false,
+            writeAddressBit: false,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12(0),
+          );
+          expect(decode(encode(format)), 'str r4, [r6]');
+        });
+
+        test('offset <expression> bytes', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: true,
+            preIndexingBit: true,
+            addOffsetBit: true,
+            byteQuantityBit: false,
+            writeAddressBit: false,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12(8),
+          );
+          expect(decode(encode(format)), 'str r4, [r6, 8]');
+        });
+
+        test('offset <expression> bytes w/ write-back', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: true,
+            preIndexingBit: true,
+            addOffsetBit: true,
+            byteQuantityBit: false,
+            writeAddressBit: true,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12(8),
+          );
+          expect(decode(encode(format)), 'str r4, [r6, 8]!');
+        });
+
+        test('offset of + contents, no shift', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: false,
+            preIndexingBit: true,
+            addOffsetBit: true,
+            byteQuantityBit: false,
+            writeAddressBit: false,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12(8),
+          );
+          expect(decode(encode(format)), 'str r4, [r6, r8]');
+        });
+
+        test('offset of - contents, no shift', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: false,
+            preIndexingBit: true,
+            addOffsetBit: false,
+            byteQuantityBit: false,
+            writeAddressBit: false,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12(8),
+          );
+          expect(decode(encode(format)), 'str r4, [r6, -r8]');
+        });
+
+        test('offset of + contents, shift, w/ write-back', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: false,
+            preIndexingBit: true,
+            addOffsetBit: true,
+            byteQuantityBit: false,
+            writeAddressBit: true,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12('0100' '0101' '0111'.parseBits()),
+          );
+          expect(decode(encode(format)), 'str r4, [r6, r7, asr 8]!');
+        });
+      });
+
+      group('Post-Indexed', () {
+        test('offset <expression> bytes', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: true,
+            preIndexingBit: false,
+            addOffsetBit: true,
+            byteQuantityBit: false,
+            writeAddressBit: false,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12(8),
+          );
+          expect(decode(encode(format)), 'str r4, [r6], 8');
+        });
+
+        test('offset <expression> bytes with non-privileged mode', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: true,
+            preIndexingBit: false,
+            addOffsetBit: true,
+            byteQuantityBit: false,
+            writeAddressBit: true,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12(8),
+          );
+          expect(decode(encode(format)), 'strt r4, [r6], 8');
+        });
+
+        test('offset of - contents', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: true,
+            preIndexingBit: false,
+            addOffsetBit: false,
+            byteQuantityBit: false,
+            writeAddressBit: false,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12(8),
+          );
+          expect(decode(encode(format)), 'str r4, [r6], -8');
+        });
+
+        test('offset of + contents with shift', () {
+          final format = SingleDataTransfer(
+            condition: _always,
+            immediateOffset: false,
+            preIndexingBit: false,
+            addOffsetBit: true,
+            byteQuantityBit: false,
+            writeAddressBit: false,
+            loadMemoryBit: false,
+            baseRegister: Uint4(6),
+            sourceOrDestinationRegister: Uint4(4),
+            offset: Uint12('0100' '0101' '0111'.parseBits()),
+          );
+          expect(decode(encode(format)), 'str r4, [r6], r7, asr 8');
+        });
+      });
+    });
+
+    group('LDR', () {
+      // Most of the serious test cases are handled by STR.
+      test('expression w/ byte transfer', () {
+        final format = SingleDataTransfer(
+          condition: _always,
+          immediateOffset: true,
+          preIndexingBit: true,
+          addOffsetBit: true,
+          byteQuantityBit: true,
+          writeAddressBit: false,
+          loadMemoryBit: false,
+          baseRegister: Uint4(15),
+          sourceOrDestinationRegister: Uint4(4),
+          offset: Uint12(6),
+        );
+        expect(decode(encode(format)), 'strb r4, 6');
+      });
+    });
+  });
+
+  group('Halfword Data Transfer', () {
+    group('LDRH', () {
+      ArmFormat createLDRH({
+        bool preIndexingBit = false,
+        bool addOffsetBit = true,
+        bool immediateOffset = false,
+        bool writeAddressBit = false,
+        bool loadMemoryBit = true,
+        int baseRegister = 1,
+        int immediateHiBits = 2,
+        int immediateLoBits = 4,
+        @required int opCode,
+      }) {
+        return HalfwordDataTransfer(
+          condition: _always,
+          preIndexingBit: preIndexingBit,
+          addOffsetBit: addOffsetBit,
+          immediateOffset: immediateOffset,
+          writeAddressBit: writeAddressBit,
+          loadMemoryBit: loadMemoryBit,
+          baseRegister: Uint4(baseRegister),
+          sourceOrDestinationRegister: Uint4(2),
+          offsetHiNibble: immediateOffset ? Uint4(immediateHiBits) : Uint4(0),
+          opCode: Uint2(opCode),
+          offsetLoNibble: Uint4(immediateLoBits),
+        );
+      }
+
+      test('<Immediate Offset>', () {
+        final format = createLDRH(
+          preIndexingBit: true,
+          immediateOffset: true,
+          baseRegister: 15,
+          opCode: 0x1,
+        );
+        expect(decode(encode(format)), 'ldrh r2, 36');
+      });
+
+      group('Pre-indexed', () {
+        test('<Offset of 0>', () {
+          final format = createLDRH(
+            preIndexingBit: true,
+            immediateOffset: true,
+            baseRegister: 4,
+            opCode: 0x1,
+            immediateHiBits: 0,
+            immediateLoBits: 0,
+          );
+          expect(decode(encode(format)), 'ldrh r2, [r4]');
+        });
+
+        test('Offset of <Expression> Bytes', () {
+          final format = createLDRH(
+            preIndexingBit: true,
+            immediateOffset: true,
+            baseRegister: 4,
+            opCode: 0x1,
+            immediateHiBits: 0,
+            immediateLoBits: 8,
+          );
+          expect(decode(encode(format)), 'ldrh r2, [r4, 8]');
+        });
+
+        test('Offset of <Expression> Bytes w/ Write-Back', () {
+          final format = createLDRH(
+            preIndexingBit: true,
+            immediateOffset: true,
+            baseRegister: 4,
+            opCode: 0x1,
+            writeAddressBit: true,
+            immediateHiBits: 0,
+            immediateLoBits: 8,
+          );
+          expect(decode(encode(format)), 'ldrh r2, [r4, 8]!');
+        });
+
+        test('Offset of + Contents of Index Register', () {
+          final format = createLDRH(
+            preIndexingBit: true,
+            immediateOffset: false,
+            baseRegister: 4,
+            opCode: 0x1,
+            immediateHiBits: 0,
+            immediateLoBits: 6,
+          );
+          expect(decode(encode(format)), 'ldrh r2, [r4, r6]');
+        });
+      });
+
+      group('Post-indexed', () {
+        test('Offset of <Expression> Bytes', () {
+          final format = createLDRH(
+            preIndexingBit: false,
+            immediateOffset: true,
+            baseRegister: 4,
+            opCode: 0x1,
+            immediateHiBits: 0,
+            immediateLoBits: 8,
+          );
+          expect(decode(encode(format)), 'ldrh r2, [r4], 8');
+        });
+
+        test('Offset of - Contents of Index Register', () {
+          final format = createLDRH(
+            preIndexingBit: false,
+            immediateOffset: false,
+            addOffsetBit: false,
+            baseRegister: 4,
+            opCode: 0x1,
+            immediateHiBits: 0,
+            immediateLoBits: 6,
+          );
+          expect(decode(encode(format)), 'ldrh r2, [r4], -r6');
+        });
+      });
+    });
+
+    test('STRH', () {
+      final format = HalfwordDataTransfer(
+        condition: _always,
+        preIndexingBit: true,
+        addOffsetBit: true,
+        immediateOffset: true,
+        writeAddressBit: false,
+        loadMemoryBit: false,
+        baseRegister: Uint4(15),
+        sourceOrDestinationRegister: Uint4(2),
+        offsetHiNibble: Uint4(6),
+        opCode: Uint2(0x0),
+        offsetLoNibble: Uint4(6),
+      );
+      expect(decode(encode(format)), 'strh r2, 102');
+    });
+
+    test('LDRSB', () {
+      final format = HalfwordDataTransfer(
+        condition: _always,
+        preIndexingBit: true,
+        addOffsetBit: true,
+        immediateOffset: true,
+        writeAddressBit: false,
+        loadMemoryBit: true,
+        baseRegister: Uint4(15),
+        sourceOrDestinationRegister: Uint4(2),
+        offsetHiNibble: Uint4(6),
+        opCode: Uint2(0x2),
+        offsetLoNibble: Uint4(6),
+      );
+      expect(decode(encode(format)), 'ldrsb r2, 102');
+    });
+
+    test('LDRSH', () {
+      final format = HalfwordDataTransfer(
+        condition: _always,
+        preIndexingBit: true,
+        addOffsetBit: true,
+        immediateOffset: true,
+        writeAddressBit: false,
+        loadMemoryBit: true,
+        baseRegister: Uint4(15),
+        sourceOrDestinationRegister: Uint4(2),
+        offsetHiNibble: Uint4(6),
+        opCode: Uint2(0x3),
+        offsetLoNibble: Uint4(6),
+      );
+      expect(decode(encode(format)), 'ldrsh r2, 102');
     });
   });
 }

@@ -129,7 +129,15 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
     String suffix = '',
   ]) {
     final b = i.transferByte ? 'b' : '';
-    final t = i.forceNonPrivilegedAccess ? 't' : '';
+    // T is present if the W-bit will be set in a post-indexed instruction,
+    // forcing non-privileged mode for the transfer cycle. T is not allowed when
+    // a pre-indexed addressing mode is specified or implied.
+    String t = '';
+    if (!i.addOffsetBeforeTransfer) {
+      if (i.writeAddressIntoBaseOrForceNonPrivilegedAccess) {
+        t = 't';
+      }
+    }
     return '$prefix${visitCondition(i.condition)}$b$t$suffix';
   }
 
@@ -150,7 +158,7 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
 
   @override
   String visitLDRSB(LDRSB i, [void _]) {
-    return 'ldr${visitCondition(i.condition)}h';
+    return 'ldr${visitCondition(i.condition)}sb';
   }
 
   @override
@@ -366,6 +374,8 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final operand = visitRegister(register.operand);
     if (register.type == ShiftType.RRX) {
       return visitComponents([operand, 'rrx']);
+    } else if (register.by.value.value == 0) {
+      return visitComponents([operand]);
     } else {
       final typeOf = visitShiftType(register.type);
       final shiftBy = visitImmediate(register.by);
@@ -472,8 +482,6 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     final mnuemonic = super.visitSingleDataTransfer(i);
-    final b = i.transferByte ? 'b' : '';
-    final t = i.forceNonPrivilegedAccess ? 't' : '';
     final d = visitRegister(i.sourceOrDestination);
     // <LDR|STR>{cond}{B}{T} Rd, <Address>
     //   Rd = Register (Destination)
@@ -510,6 +518,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
         throwInvalidCase,
       );
     } else {
+      final u = i.addOffsetToBase ? '' : '-';
       if (i.addOffsetBeforeTransfer) {
         // Case 2 | P = 1 (Pre-indexed)
         var offsetOf0 = false;
@@ -526,7 +535,10 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
         if (offsetOf0) {
           address = '[${visitRegister(i.base)}]$w';
         } else {
-          address = '[${visitComponents([visitRegister(i.base), operand])}]$w';
+          address = '[${visitComponents([
+            visitRegister(i.base),
+            '$u$operand',
+          ])}]$w';
         }
       } else {
         // Case 3 | P = 0 (Post-indexed)
@@ -534,10 +546,13 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
           visitImmediate,
           visitShiftedRegisterByImmediate,
         );
-        address = visitComponents(['[${visitRegister(i.base)}]', operand]);
+        address = visitComponents([
+          '[${visitRegister(i.base)}]',
+          '$u$operand',
+        ]);
       }
     }
-    return visitComponents(['$mnuemonic$b$t', d, address]);
+    return visitComponents(['$mnuemonic $d', address]);
   }
 
   @override
@@ -547,6 +562,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
   ]) {
     final mnuemonic = super.visitHalfwordDataTransfer(i);
     final d = visitRegister(i.sourceOrDestination);
+    final u = i.addOffsetToBase ? '' : '-';
     // Similar to "visitSingleDataTransfer", but a bit simpler.
     String address = '';
     if (i.base.isProgramCounter) {
@@ -572,7 +588,10 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
         if (offsetOf0) {
           address = '[${visitRegister(i.base)}]$w';
         } else {
-          address = '[${visitComponents([visitRegister(i.base), operand])}]$w';
+          address = '[${visitComponents([
+            visitRegister(i.base),
+            '$u$operand',
+          ])}]$w';
         }
       } else {
         // Case 3 | P = 0 (Post-indexed)
@@ -580,7 +599,10 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
           visitRegister,
           visitImmediate,
         );
-        address = visitComponents(['[${visitRegister(i.base)}]', operand]);
+        address = visitComponents([
+          '[${visitRegister(i.base)}]',
+          '$u$operand',
+        ]);
       }
     }
     return visitComponents(['$mnuemonic $d', address]);
