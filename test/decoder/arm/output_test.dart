@@ -786,4 +786,45 @@ void main() {
       expect(decode(encode(format)), 'ldrsh r2, 102');
     });
   });
+
+  group('Block Data Transfer', () {
+    group('LDM', () {
+      ArmFormat createLDM({
+        @required bool preIndexingBit,
+        @required bool addOffsetBit,
+      }) {
+        return BlockDataTransfer(
+          condition: _always,
+          preIndexingBit: preIndexingBit,
+          addOffsetBit: addOffsetBit,
+          loadPsrOrForceUserMode: false,
+          writeAddressBit: false,
+          loadMemoryBit: true,
+          baseRegister: Uint4(4),
+          registerList: Uint16(16),
+        );
+      }
+
+      test('IB', () {
+        expect(
+          decode(encode(createLDM(preIndexingBit: true, addOffsetBit: true))),
+          '',
+        );
+      });
+
+      test('IA', () {});
+
+      test('DB', () {});
+
+      test('DA', () {});
+    });
+
+    group('STM', () {
+      test('w/ Write-Back', () {});
+
+      test('w/ Set S Bit', () {});
+
+      test('Register Range', () {});
+    });
+  });
 }
