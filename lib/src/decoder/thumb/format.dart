@@ -417,8 +417,11 @@ class _ThumbFormatEncoder
     AddOffsetToStackPointerThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitAddOffsetToStackPointer
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('1001' '0000')
+          ..writeBool(format.sBit)
+          ..writeInt(format.word))
+        .build();
   }
 
   @override
@@ -426,8 +429,14 @@ class _ThumbFormatEncoder
     AddOrSubtractThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitAddOrSubtract
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('0001' '1')
+          ..writeBool(format.immediateBit)
+          ..writeBool(format.opCode)
+          ..writeInt(format.baseOrOffset3)
+          ..writeInt(format.source)
+          ..writeInt(format.destination))
+        .build();
   }
 
   @override
@@ -435,8 +444,12 @@ class _ThumbFormatEncoder
     AluOperationThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitAluOperation
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('0100' '00')
+          ..writeInt(format.opCode)
+          ..writeInt(format.source)
+          ..writeInt(format.destination))
+        .build();
   }
 
   @override
@@ -444,8 +457,11 @@ class _ThumbFormatEncoder
     ConditionalBranchThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitConditionalBranch
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('1101')
+          ..writeInt(format.condition)
+          ..writeInt(format.offset))
+        .build();
   }
 
   @override
@@ -453,8 +469,13 @@ class _ThumbFormatEncoder
     HiRegisterOperationsOrBranchExchangeThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitHiRegisterOperationsOrBranchExchange
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('0100' '01')
+          ..writeInt(format.opCode)
+          ..writeInt(format.hCodes)
+          ..writeInt(format.source)
+          ..writeInt(format.destination))
+        .build();
   }
 
   @override
@@ -462,8 +483,12 @@ class _ThumbFormatEncoder
     LoadAddressThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitLoadAddress
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('1010')
+          ..writeBool(format.stackPointerBit)
+          ..writeInt(format.destination)
+          ..writeInt(format.word))
+        .build();
   }
 
   @override
@@ -471,8 +496,12 @@ class _ThumbFormatEncoder
     LoadOrStoreHalfwordThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitLoadOrStoreHalfword
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('1000')
+          ..writeBool(format.loadBit)
+          ..writeInt(format.destination)
+          ..writeInt(format.word))
+        .build();
   }
 
   @override
@@ -480,8 +509,14 @@ class _ThumbFormatEncoder
     LoadOrStoreWithImmediateOffsetThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitLoadOrStoreWithImmediateOffset
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('011')
+          ..writeBool(format.byteBit)
+          ..writeBool(format.loadBit)
+          ..writeInt(format.offset)
+          ..writeInt(format.base)
+          ..writeInt(format.destination))
+        .build();
   }
 
   @override
@@ -489,8 +524,14 @@ class _ThumbFormatEncoder
     LoadOrStoreWithRegisterOffsetThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitLoadOrStoreWithRegisterOffset
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('0101')
+          ..writeBool(format.loadBit)
+          ..writeBool(format.byteBit)
+          ..writeInt(format.offset)
+          ..writeInt(format.base)
+          ..writeInt(format.destination))
+        .build();
   }
 
   @override
@@ -498,8 +539,11 @@ class _ThumbFormatEncoder
     LongBranchWithLinkThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitLongBranchWithLink
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('1111')
+          ..writeBool(format.hBit)
+          ..writeInt(format.offset))
+        .build();
   }
 
   @override
@@ -507,8 +551,12 @@ class _ThumbFormatEncoder
     MoveOrCompareOrAddOrSubtractImmediateThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitMoveOrCompareOrAddOrSubtractImmediate
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('001')
+          ..writeInt(format.opCode)
+          ..writeInt(format.destination)
+          ..writeInt(format.offset))
+        .build();
   }
 
   @override
@@ -516,8 +564,13 @@ class _ThumbFormatEncoder
     MoveShiftedRegisterThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitMoveShiftedRegister
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('000')
+          ..writeInt(format.opCode)
+          ..writeInt(format.offset)
+          ..writeInt(format.source)
+          ..writeInt(format.destination))
+        .build();
   }
 
   @override
@@ -525,8 +578,12 @@ class _ThumbFormatEncoder
     MultipleLoadOrStoreThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitMultipleLoadOrStore
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('1100')
+          ..writeBool(format.loadBit)
+          ..writeInt(format.base)
+          ..writeInt(format.registerList))
+        .build();
   }
 
   @override
@@ -534,8 +591,11 @@ class _ThumbFormatEncoder
     PCRelativeLoadThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitPCRelativeLoad
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('0100' '1')
+          ..writeInt(format.destination)
+          ..writeInt(format.word))
+        .build();
   }
 
   @override
@@ -543,17 +603,12 @@ class _ThumbFormatEncoder
     PushOrPopRegistersThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitPushOrPopRegisters
-    throw UnimplementedError();
-  }
-
-  @override
-  Uint16 visitSPRelativeLoadOrStore(
-    SPRelativeLoadOrStoreThumbFormat format, [
-    void _,
-  ]) {
-    // TODO: implement visitSPRelativeLoadOrStore
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('1011')
+          ..writeBool(format.loadBit)
+          ..writeBool(format.rBit)
+          ..writeInt(format.registerList))
+        .build();
   }
 
   @override
@@ -561,8 +616,22 @@ class _ThumbFormatEncoder
     SoftwareInterruptThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitSoftwareInterrupt
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('1101' '1111')
+          ..writeInt(format.value))
+        .build();
+  }
+
+  @override
+  Uint16 visitSPRelativeLoadOrStore(
+    SPRelativeLoadOrStoreThumbFormat format, [
+    void _,
+  ]) {
+    return (Uint16Builder()
+          ..write('1001')
+          ..writeInt(format.destination)
+          ..writeInt(format.word))
+        .build();
   }
 
   @override
@@ -570,7 +639,9 @@ class _ThumbFormatEncoder
     UnconditionalBranchThumbFormat format, [
     void _,
   ]) {
-    // TODO: implement visitUnconditionalBranch
-    throw UnimplementedError();
+    return (Uint16Builder()
+          ..write('1110' '0')
+          ..writeInt(format.offset))
+        .build();
   }
 }
