@@ -364,9 +364,13 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     ShiftedRegister<Immediate<Integral<void>>, Register<void>> register,
   ) {
     final operand = visitRegister(register.operand);
-    final typeOf = visitShiftType(register.type);
-    final shiftBy = visitImmediate(register.by);
-    return visitComponents([operand, '$typeOf $shiftBy']);
+    if (register.type == ShiftType.RRX) {
+      return visitComponents([operand, 'rrx']);
+    } else {
+      final typeOf = visitShiftType(register.type);
+      final shiftBy = visitImmediate(register.by);
+      return visitComponents([operand, '$typeOf $shiftBy']);
+    }
   }
 
   @protected
@@ -387,15 +391,15 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
   String visitShiftType(ShiftType type) {
     switch (type) {
       case ShiftType.LSL:
-        return 'LSL';
+        return 'lsl';
       case ShiftType.LSR:
-        return 'LSR';
+        return 'lsr';
       case ShiftType.ASR:
-        return 'ASR';
+        return 'asr';
       case ShiftType.ROR:
-        return 'ROR';
+        return 'ror';
       case ShiftType.RRX:
-        return 'RRX';
+        return 'rrx';
       default:
         throw StateError('Unexpected shiftType: $type.');
     }

@@ -61,10 +61,26 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     } else {
       // I = 0
       final shiftByRegister = format.operand2.isSet(4);
-      final shiftType = ShiftType.values[format.operand2.bitRange(6, 5).value];
       final shiftOperand = RegisterAny(
         format.operand2.bitRange(3, 0).value.asUint4(),
       );
+      final shiftType = ShiftType.values[format.operand2.bitRange(6, 5).value];
+      // Shift By Immediate
+      //           Operand2 Register
+      //           vvvv
+      // AAAA_ATT0_RRRR
+      // ^^^^ ^^^
+      // ^^^^ ^ ^ Shift Type
+      // Shift Amount (5-bit unsigned int).
+      //
+      // - OR -
+      //
+      //           Operand2 Register
+      //           vvvv
+      // SSSS_0TT1_RRRR
+      // ^^^^  ^^
+      // ^^^^  Shift Type
+      // Shift Register
       if (shiftByRegister) {
         // R = 1
         final shiftRegister = format.operand2.bitRange(11, 8).value.asUint4();
@@ -81,7 +97,9 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         operand2 = Or3.left(
           ShiftedRegister(
             shiftOperand,
-            shiftType,
+            shiftType == ShiftType.ROR && shiftAmount.value == 0
+                ? ShiftType.RRX
+                : shiftType,
             Immediate(shiftAmount),
           ),
         );

@@ -205,18 +205,18 @@ class ShiftedRegister<T extends Shiftable<T>, R extends Register<R>> {
 
 /// Represents types of shifts that can be applied.
 enum ShiftType {
-  /// Logical shift-left (`<<`).
+  /// `0x0`: Logical shift-left (`<<`).
   LSL,
 
-  /// Logical shift-right (`>>`).
+  /// `0x1:` Logical shift-right (`>>`).
   LSR,
 
-  /// Arithmetic shift-right (`>>>`).
+  /// `0x2:` Arithmetic shift-right (`>>>`).
   ASR,
 
-  /// Rotate right.
+  /// `0x3`: Rotate right.
   ROR,
 
-  /// Rotate right with extend.
+  /// Special cased; Rotate right with extend.
   RRX,
 }
