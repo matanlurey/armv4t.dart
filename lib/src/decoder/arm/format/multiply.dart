@@ -2,7 +2,7 @@ part of '../format.dart';
 
 /// A decoded _Multiply/Multiply-Accumulate_ instruction _format_.
 @sealed
-class Multiply extends ArmFormat {
+class MultiplyArmFormat extends ArmFormat {
   /// Whether to multiply and accumulate (`1`) or multiply only (`0`).
   final bool accumulate;
 
@@ -21,7 +21,7 @@ class Multiply extends ArmFormat {
   /// Third operand register.
   final Uint4 operandRegister3;
 
-  const Multiply({
+  const MultiplyArmFormat({
     @required Uint4 condition,
     @required this.accumulate,
     @required this.setConditionCodes,

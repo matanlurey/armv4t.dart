@@ -133,7 +133,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
     final pattern = _allKnownPatterns.match(input.value);
     final capture = pattern?.capture(input.value) ?? const [];
     if (identical(pattern, _dataProcessingOrPsrTransfer)) {
-      return DataProcessingOrPsrTransfer(
+      return DataProcessingOrPsrTransferArmFormat(
         condition: capture[0].asUint4(),
         immediateOperand: capture[1] == 1,
         opCode: capture[2].asUint4(),
@@ -143,7 +143,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
         operand2: Uint12(capture[6]),
       );
     } else if (identical(pattern, _multiply)) {
-      return Multiply(
+      return MultiplyArmFormat(
         condition: capture[0].asUint4(),
         accumulate: capture[1] == 1,
         setConditionCodes: capture[2] == 1,
@@ -153,7 +153,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
         operandRegister3: capture[6].asUint4(),
       );
     } else if (identical(pattern, _multiplyLong)) {
-      return MultiplyLong(
+      return MultiplyLongArmFormat(
         condition: capture[0].asUint4(),
         signed: capture[1] == 1,
         accumulate: capture[2] == 1,
@@ -164,7 +164,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
         operandRegister2: capture[7].asUint4(),
       );
     } else if (identical(pattern, _singleDataSwap)) {
-      return SingleDataSwap(
+      return SingleDataSwapArmFormat(
         condition: capture[0].asUint4(),
         swapByteQuantity: capture[1] == 1,
         baseRegister: capture[2].asUint4(),
@@ -172,12 +172,12 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
         sourceRegister: capture[4].asUint4(),
       );
     } else if (identical(pattern, _branchAndExchange)) {
-      return BranchAndExchange(
+      return BranchAndExchangeArmFormat(
         condition: capture[0].asUint4(),
         operand: capture[1].asUint4(),
       );
     } else if (identical(pattern, _halfWordDataTransfer)) {
-      return HalfwordDataTransfer(
+      return HalfwordDataTransferArmFormat(
         condition: capture[0].asUint4(),
         preIndexingBit: capture[1] == 1,
         addOffsetBit: capture[2] == 1,
@@ -191,7 +191,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
         offsetLoNibble: capture[10].asUint4(),
       );
     } else if (identical(pattern, _singleDataTransfer)) {
-      return SingleDataTransfer(
+      return SingleDataTransferArmFormat(
         condition: capture[0].asUint4(),
         immediateOffset: capture[1] == 0,
         preIndexingBit: capture[2] == 1,
@@ -204,7 +204,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
         offset: Uint12(capture[9]),
       );
     } else if (identical(pattern, _blockDataTransfer)) {
-      return BlockDataTransfer(
+      return BlockDataTransferArmFormat(
         condition: capture[0].asUint4(),
         preIndexingBit: capture[1] == 1,
         addOffsetBit: capture[2] == 1,
@@ -215,13 +215,13 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
         registerList: capture[7].asUint16(),
       );
     } else if (identical(pattern, _branch)) {
-      return Branch(
+      return BranchArmFormat(
         condition: capture[0].asUint4(),
         link: capture[1] == 1,
         offset: Uint24(capture[2]),
       );
     } else if (identical(pattern, _softwareInterrupt)) {
-      return SoftwareInterrupt(
+      return SoftwareInterruptArmFormat(
         condition: capture[0].asUint4(),
         comment: Uint24(capture[1]),
       );
@@ -233,63 +233,63 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
 
 /// Visits all known implementations of [ArmFormat].
 abstract class ArmFormatVisitor<R, C> {
-  /// Invoked by [DataProcessingOrPsrTransfer.accept].
+  /// Invoked by [DataProcessingOrPsrTransferArmFormat.accept].
   R visitDataProcessingOrPsrTransfer(
-    DataProcessingOrPsrTransfer format, [
+    DataProcessingOrPsrTransferArmFormat format, [
     C context,
   ]);
 
-  /// Invoked by [Multiply.accept].
+  /// Invoked by [MultiplyArmFormat.accept].
   R visitMultiply(
-    Multiply format, [
+    MultiplyArmFormat format, [
     C context,
   ]);
 
-  /// Invoked by [MultiplyLong.accept].
+  /// Invoked by [MultiplyLongArmFormat.accept].
   R visitMultiplyLong(
-    MultiplyLong format, [
+    MultiplyLongArmFormat format, [
     C context,
   ]);
 
-  /// Invoked by [SingleDataSwap.accept].
+  /// Invoked by [SingleDataSwapArmFormat.accept].
   R visitSingleDataSwap(
-    SingleDataSwap format, [
+    SingleDataSwapArmFormat format, [
     C context,
   ]);
 
-  /// Invoked by [BranchAndExchange.accept].
+  /// Invoked by [BranchAndExchangeArmFormat.accept].
   R visitBranchAndExchange(
-    BranchAndExchange format, [
+    BranchAndExchangeArmFormat format, [
     C context,
   ]);
 
-  /// Invoked by [HalfwordDataTransfer.accept].
+  /// Invoked by [HalfwordDataTransferArmFormat.accept].
   R visitHalfwordDataTransfer(
-    HalfwordDataTransfer format, [
+    HalfwordDataTransferArmFormat format, [
     C context,
   ]);
 
-  /// Invoked by [SingleDataTransfer.accept].
+  /// Invoked by [SingleDataTransferArmFormat.accept].
   R visitSingleDataTransfer(
-    SingleDataTransfer format, [
+    SingleDataTransferArmFormat format, [
     C context,
   ]);
 
-  /// Invoked by [BlockDataTransfer.accept].
+  /// Invoked by [BlockDataTransferArmFormat.accept].
   R visitBlockDataTransfer(
-    BlockDataTransfer format, [
+    BlockDataTransferArmFormat format, [
     C context,
   ]);
 
-  /// Invoked by [Branch.accept].
+  /// Invoked by [BranchArmFormat.accept].
   R visitBranch(
-    Branch format, [
+    BranchArmFormat format, [
     C context,
   ]);
 
-  /// Invoked by [SoftwareInterrupt.accept].
+  /// Invoked by [SoftwareInterruptArmFormat.accept].
   R visitSoftwareInterrupt(
-    SoftwareInterrupt format, [
+    SoftwareInterruptArmFormat format, [
     C context,
   ]);
 }
@@ -311,7 +311,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitDataProcessingOrPsrTransfer(
-    DataProcessingOrPsrTransfer format, [
+    DataProcessingOrPsrTransferArmFormat format, [
     void _,
   ]) =>
       // CCCC_00IP_PPPS_NNNN_DDDD_OOOO_OOOO_OOOO
@@ -336,7 +336,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitMultiply(
-    Multiply format, [
+    MultiplyArmFormat format, [
     void _,
   ]) =>
       // CCCC_0000_00AS_DDDD_NNNN_FFFF_1001_MMMM
@@ -363,7 +363,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitMultiplyLong(
-    MultiplyLong format, [
+    MultiplyLongArmFormat format, [
     void _,
   ]) =>
       // CCCC_0000_1UAS_HHHH_LLLL_NNNN_1001_MMMM
@@ -392,7 +392,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitSingleDataSwap(
-    SingleDataSwap format, [
+    SingleDataSwapArmFormat format, [
     void _,
   ]) =>
       // CCCC_0001_0B00_NNNN_DDDD_0000_1001_MMMM
@@ -417,7 +417,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitBranchAndExchange(
-    BranchAndExchange format, [
+    BranchAndExchangeArmFormat format, [
     void _,
   ]) =>
       // CCCC_0001_0010_1111_1111_1111_0001_NNNN
@@ -432,7 +432,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitHalfwordDataTransfer(
-    HalfwordDataTransfer format, [
+    HalfwordDataTransferArmFormat format, [
     void _,
   ]) =>
       // CCCC_000P_UIWL_NNNN_DDDD_JJJJ_1HH1_MMMM
@@ -469,7 +469,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitSingleDataTransfer(
-    SingleDataTransfer format, [
+    SingleDataTransferArmFormat format, [
     void _,
   ]) =>
       // CCCC_01IP_UBWL_NNNN_DDDD_OOOO_OOOO_OOOO
@@ -500,7 +500,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitBlockDataTransfer(
-    BlockDataTransfer format, [
+    BlockDataTransferArmFormat format, [
     void _,
   ]) =>
       // CCCC_100P_USWL_NNNN_RRRR_RRRR_RRRR_RRRR
@@ -527,7 +527,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitBranch(
-    Branch format, [
+    BranchArmFormat format, [
     void _,
   ]) =>
       // CCCC_101L_OOOO_OOOO_OOOO_OOOO_OOOO_OOOO
@@ -544,7 +544,7 @@ class _ArmFormatEncoder
 
   @override
   Uint32 visitSoftwareInterrupt(
-    SoftwareInterrupt format, [
+    SoftwareInterruptArmFormat format, [
     void _,
   ]) =>
       // CCCC_1111_XXXX_XXXX_XXXX_XXXX_XXXX_XXXX

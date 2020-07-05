@@ -5,7 +5,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   ArmInstruction visitDataProcessingOrPsrTransfer(
-    DataProcessingOrPsrTransfer format, [
+    DataProcessingOrPsrTransferArmFormat format, [
     void _,
   ]) {
     final condition = Condition.parse(format.condition.value);
@@ -241,7 +241,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   }
 
   PsrTransferArmInstruction _decodePsrTransfer(
-    DataProcessingOrPsrTransfer format,
+    DataProcessingOrPsrTransferArmFormat format,
     Condition condition, {
     bool isMSR = false,
     bool useSPSR = false,
@@ -294,7 +294,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   MultiplyAndMultiplyLongArmInstruction visitMultiply(
-    Multiply format, [
+    MultiplyArmFormat format, [
     void _,
   ]) {
     final condition = Condition.parse(format.condition.value);
@@ -326,7 +326,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   MultiplyAndMultiplyLongArmInstruction visitMultiplyLong(
-    MultiplyLong format, [
+    MultiplyLongArmFormat format, [
     void _,
   ]) {
     final condition = Condition.parse(format.condition.value);
@@ -389,7 +389,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   SWP visitSingleDataSwap(
-    SingleDataSwap format, [
+    SingleDataSwapArmFormat format, [
     void _,
   ]) {
     return SWP(
@@ -403,7 +403,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   BX visitBranchAndExchange(
-    BranchAndExchange format, [
+    BranchAndExchangeArmFormat format, [
     void _,
   ]) {
     return BX(
@@ -414,7 +414,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   HalfwordDataTransferArmInstruction visitHalfwordDataTransfer(
-    HalfwordDataTransfer format, [
+    HalfwordDataTransferArmFormat format, [
     void _,
   ]) {
     final condition = Condition.parse(format.condition.value);
@@ -485,7 +485,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   SingleDataTransferArmInstruction visitSingleDataTransfer(
-    SingleDataTransfer format, [
+    SingleDataTransferArmFormat format, [
     void _,
   ]) {
     final condition = Condition.parse(format.condition.value);
@@ -541,7 +541,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   BlockDataTransferArmInstruction visitBlockDataTransfer(
-    BlockDataTransfer format, [
+    BlockDataTransferArmFormat format, [
     void _,
   ]) {
     final condition = Condition.parse(format.condition.value);
@@ -580,7 +580,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   ArmInstruction visitBranch(
-    Branch format, [
+    BranchArmFormat format, [
     void _,
   ]) {
     final condition = Condition.parse(format.condition.value);
@@ -603,7 +603,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
   @override
   SWI visitSoftwareInterrupt(
-    SoftwareInterrupt format, [
+    SoftwareInterruptArmFormat format, [
     void _,
   ]) {
     return SWI(

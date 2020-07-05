@@ -1,13 +1,15 @@
 import 'dart:typed_data';
 
+import 'package:armv4t/src/common/assert.dart';
 import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/common/union.dart';
-import 'package:armv4t/src/decoder/arm/format.dart';
 import 'package:binary/binary.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import 'condition.dart';
+import 'format.dart';
+import 'printer.dart';
 
 part 'instruction/arithmetic.dart';
 part 'instruction/arithmetic/adc.dart';
@@ -86,4 +88,13 @@ abstract class ArmInstruction {
   @protected
   @visibleForOverriding
   List<Object> _values();
+
+  @override
+  String toString() {
+    if (assertionsEnabled) {
+      return accept(const ArmInstructionPrinter());
+    } else {
+      return super.toString();
+    }
+  }
 }

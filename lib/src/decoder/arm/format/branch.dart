@@ -2,7 +2,7 @@ part of '../format.dart';
 
 /// A decoded _Branch instruction _format_.
 @sealed
-class Branch extends ArmFormat {
+class BranchArmFormat extends ArmFormat {
   /// Link bit.
   ///
   /// - 0 = Branch
@@ -12,7 +12,7 @@ class Branch extends ArmFormat {
   /// Offset value.
   final Uint24 offset;
 
-  const Branch({
+  const BranchArmFormat({
     @required Uint4 condition,
     @required this.link,
     @required this.offset,

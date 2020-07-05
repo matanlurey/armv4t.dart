@@ -3,7 +3,7 @@ part of '../format.dart';
 /// A decoded _Halfword and Signed Data Transfer_ instruction _format_.
 @immutable
 @sealed
-class HalfwordDataTransfer extends ArmFormat {
+class HalfwordDataTransferArmFormat extends ArmFormat {
   /// Whether to add offset before transfer (`1`) or after (`0`).
   final bool preIndexingBit;
 
@@ -38,7 +38,7 @@ class HalfwordDataTransfer extends ArmFormat {
   /// Offset (either immedaite low nibble, or register).
   final Uint4 offsetLoNibble;
 
-  const HalfwordDataTransfer({
+  const HalfwordDataTransferArmFormat({
     @required Uint4 condition,
     @required this.preIndexingBit,
     @required this.addOffsetBit,

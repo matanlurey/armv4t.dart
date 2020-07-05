@@ -2,7 +2,7 @@ part of '../format.dart';
 
 /// A decoded _Single Data Swap_ instruction _format_.
 @sealed
-class SingleDataSwap extends ArmFormat {
+class SingleDataSwapArmFormat extends ArmFormat {
   /// Whether to swap a byte quantity (`1`) or word quantity (`0`).
   final bool swapByteQuantity;
 
@@ -15,7 +15,7 @@ class SingleDataSwap extends ArmFormat {
   /// Source register.
   final Uint4 sourceRegister;
 
-  const SingleDataSwap({
+  const SingleDataSwapArmFormat({
     @required Uint4 condition,
     @required this.swapByteQuantity,
     @required this.baseRegister,

@@ -26,7 +26,7 @@ void main() {
 
   group('Branch and Exchange', () {
     test('BX', () async {
-      final format = BranchAndExchange(
+      final format = BranchAndExchangeArmFormat(
         condition: _always,
         operand: Uint4(8),
       );
@@ -36,7 +36,7 @@ void main() {
 
   group('Branch and Link', () {
     test('B', () async {
-      final format = Branch(
+      final format = BranchArmFormat(
         condition: _always,
         link: false,
         offset: Uint24(4096),
@@ -45,7 +45,7 @@ void main() {
     });
 
     test('BL', () async {
-      final format = Branch(
+      final format = BranchArmFormat(
         condition: _always,
         link: true,
         offset: Uint24(4096),
@@ -75,10 +75,11 @@ void main() {
         'mvn',
       ];
       final setS = {'tst', 'teq', 'cmp', 'cmn'};
+      final noRn = {'mov', 'mvn'};
       for (var i = 0; i < opCodes.length; i++) {
         final key = opCodes[i];
         test('$key', () async {
-          final format = DataProcessingOrPsrTransfer(
+          final format = DataProcessingOrPsrTransferArmFormat(
             condition: _always,
             immediateOperand: true,
             opCode: Uint4(i),
@@ -89,6 +90,8 @@ void main() {
           );
           if (setS.contains(key)) {
             expect(decode(encode(format)), '$key r2, 4');
+          } else if (noRn.contains(key)) {
+            expect(decode(encode(format)), '$key r3, 4');
           } else {
             expect(decode(encode(format)), '$key r3, r2, 4');
           }
@@ -116,10 +119,11 @@ void main() {
         'mvn',
       ];
       final setS = {'tst', 'teq', 'cmp', 'cmn'};
+      final noRn = {'mov', 'mvn'};
       for (var i = 0; i < opCodes.length; i++) {
         final key = opCodes[i];
         test(key, () {
-          final format = DataProcessingOrPsrTransfer(
+          final format = DataProcessingOrPsrTransferArmFormat(
             condition: _always,
             immediateOperand: true,
             opCode: Uint4(i),
@@ -129,7 +133,11 @@ void main() {
             operand2: Uint12(4),
           );
           if (!setS.contains(key)) {
-            expect(decode(encode(format)), '${key}s r3, r2, 4');
+            if (noRn.contains(key)) {
+              expect(decode(encode(format)), '${key}s r3, 4');
+            } else {
+              expect(decode(encode(format)), '${key}s r3, r2, 4');
+            }
           }
         });
       }
@@ -156,7 +164,7 @@ void main() {
       }
 
       ArmFormat createInstruction(int operand2) {
-        return DataProcessingOrPsrTransfer(
+        return DataProcessingOrPsrTransferArmFormat(
           condition: _always,
           immediateOperand: false,
           opCode: Uint4(0),
@@ -238,8 +246,8 @@ void main() {
 
   group('PSR Transfer', () {
     group('MRS', () {
-      DataProcessingOrPsrTransfer create({@required bool useSPSR}) {
-        return DataProcessingOrPsrTransfer(
+      DataProcessingOrPsrTransferArmFormat create({@required bool useSPSR}) {
+        return DataProcessingOrPsrTransferArmFormat(
           condition: _always,
           immediateOperand: true,
           opCode: Uint4(useSPSR ? 0xa : 0xb),
@@ -261,7 +269,7 @@ void main() {
 
     group('MSR', () {
       test('Register -> [C]PSR', () {
-        final format = DataProcessingOrPsrTransfer(
+        final format = DataProcessingOrPsrTransferArmFormat(
           condition: _always,
           immediateOperand: false,
           opCode: Uint4(0x8),
@@ -274,7 +282,7 @@ void main() {
       });
 
       test('Register -> [S]PSR', () {
-        final format = DataProcessingOrPsrTransfer(
+        final format = DataProcessingOrPsrTransferArmFormat(
           condition: _always,
           immediateOperand: false,
           opCode: Uint4(0x9),
@@ -287,7 +295,7 @@ void main() {
       });
 
       test('Register -> [C]PSR Flag Bits', () {
-        final format = DataProcessingOrPsrTransfer(
+        final format = DataProcessingOrPsrTransferArmFormat(
           condition: _always,
           immediateOperand: false,
           opCode: Uint4(0x8),
@@ -300,7 +308,7 @@ void main() {
       });
 
       test('Register -> [S]PSR Flag Bits', () {
-        final format = DataProcessingOrPsrTransfer(
+        final format = DataProcessingOrPsrTransferArmFormat(
           condition: _always,
           immediateOperand: false,
           opCode: Uint4(0x9),
@@ -313,7 +321,7 @@ void main() {
       });
 
       test('Immediate -> PSR Flag Bits', () {
-        final format = DataProcessingOrPsrTransfer(
+        final format = DataProcessingOrPsrTransferArmFormat(
           condition: _always,
           immediateOperand: true,
           opCode: Uint4(0x8),
@@ -329,7 +337,7 @@ void main() {
 
   group('Multiply and Multiply-Accumulate', () {
     test('MUL', () {
-      final format = Multiply(
+      final format = MultiplyArmFormat(
         condition: _always,
         accumulate: false,
         setConditionCodes: false,
@@ -342,7 +350,7 @@ void main() {
     });
 
     test('MLA', () {
-      final format = Multiply(
+      final format = MultiplyArmFormat(
         condition: _always,
         accumulate: true,
         setConditionCodes: false,
@@ -357,7 +365,7 @@ void main() {
 
   group('Multiply Long and Multiply-Accumulate Long', () {
     test('UMULL', () {
-      final format = MultiplyLong(
+      final format = MultiplyLongArmFormat(
         condition: _always,
         signed: false,
         accumulate: false,
@@ -371,7 +379,7 @@ void main() {
     });
 
     test('UMLAL', () {
-      final format = MultiplyLong(
+      final format = MultiplyLongArmFormat(
         condition: _always,
         signed: false,
         accumulate: true,
@@ -385,7 +393,7 @@ void main() {
     });
 
     test('SMULL', () {
-      final format = MultiplyLong(
+      final format = MultiplyLongArmFormat(
         condition: _always,
         signed: true,
         accumulate: false,
@@ -399,7 +407,7 @@ void main() {
     });
 
     test('SMLAL', () {
-      final format = MultiplyLong(
+      final format = MultiplyLongArmFormat(
         condition: _always,
         signed: true,
         accumulate: true,
@@ -416,7 +424,7 @@ void main() {
   group('Single Data Transfer', () {
     group('STR', () {
       test('Immediate <Address> w/ PC as Base', () {
-        final format = SingleDataTransfer(
+        final format = SingleDataTransferArmFormat(
           condition: _always,
           immediateOffset: true,
           preIndexingBit: true,
@@ -433,7 +441,7 @@ void main() {
 
       group('Pre-Indexed', () {
         test('offset of zero', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: true,
             preIndexingBit: true,
@@ -449,7 +457,7 @@ void main() {
         });
 
         test('offset <expression> bytes', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: true,
             preIndexingBit: true,
@@ -465,7 +473,7 @@ void main() {
         });
 
         test('offset <expression> bytes w/ write-back', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: true,
             preIndexingBit: true,
@@ -481,7 +489,7 @@ void main() {
         });
 
         test('offset of + contents, no shift', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: false,
             preIndexingBit: true,
@@ -497,7 +505,7 @@ void main() {
         });
 
         test('offset of - contents, no shift', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: false,
             preIndexingBit: true,
@@ -513,7 +521,7 @@ void main() {
         });
 
         test('offset of + contents, shift, w/ write-back', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: false,
             preIndexingBit: true,
@@ -531,7 +539,7 @@ void main() {
 
       group('Post-Indexed', () {
         test('offset <expression> bytes', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: true,
             preIndexingBit: false,
@@ -547,7 +555,7 @@ void main() {
         });
 
         test('offset <expression> bytes with non-privileged mode', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: true,
             preIndexingBit: false,
@@ -563,7 +571,7 @@ void main() {
         });
 
         test('offset of - contents', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: true,
             preIndexingBit: false,
@@ -579,7 +587,7 @@ void main() {
         });
 
         test('offset of + contents with shift', () {
-          final format = SingleDataTransfer(
+          final format = SingleDataTransferArmFormat(
             condition: _always,
             immediateOffset: false,
             preIndexingBit: false,
@@ -599,7 +607,7 @@ void main() {
     group('LDR', () {
       // Most of the serious test cases are handled by STR.
       test('expression w/ byte transfer', () {
-        final format = SingleDataTransfer(
+        final format = SingleDataTransferArmFormat(
           condition: _always,
           immediateOffset: true,
           preIndexingBit: true,
@@ -629,7 +637,7 @@ void main() {
         int immediateLoBits = 4,
         @required int opCode,
       }) {
-        return HalfwordDataTransfer(
+        return HalfwordDataTransferArmFormat(
           condition: _always,
           preIndexingBit: preIndexingBit,
           addOffsetBit: addOffsetBit,
@@ -734,7 +742,7 @@ void main() {
     });
 
     test('STRH', () {
-      final format = HalfwordDataTransfer(
+      final format = HalfwordDataTransferArmFormat(
         condition: _always,
         preIndexingBit: true,
         addOffsetBit: true,
@@ -751,7 +759,7 @@ void main() {
     });
 
     test('LDRSB', () {
-      final format = HalfwordDataTransfer(
+      final format = HalfwordDataTransferArmFormat(
         condition: _always,
         preIndexingBit: true,
         addOffsetBit: true,
@@ -768,7 +776,7 @@ void main() {
     });
 
     test('LDRSH', () {
-      final format = HalfwordDataTransfer(
+      final format = HalfwordDataTransferArmFormat(
         condition: _always,
         preIndexingBit: true,
         addOffsetBit: true,
@@ -791,7 +799,7 @@ void main() {
         @required bool preIndexingBit,
         @required bool addOffsetBit,
       }) {
-        return BlockDataTransfer(
+        return BlockDataTransferArmFormat(
           condition: _always,
           preIndexingBit: preIndexingBit,
           addOffsetBit: addOffsetBit,
@@ -838,7 +846,7 @@ void main() {
         bool writeAddressBit = false,
         int registerList = 32,
       }) {
-        return BlockDataTransfer(
+        return BlockDataTransferArmFormat(
           condition: _always,
           preIndexingBit: true,
           addOffsetBit: true,
@@ -877,7 +885,7 @@ void main() {
 
   group('Single Data Swap', () {
     ArmFormat createSWP({bool swapByteQuantity = false}) {
-      return SingleDataSwap(
+      return SingleDataSwapArmFormat(
         condition: _always,
         swapByteQuantity: swapByteQuantity,
         baseRegister: Uint4(2),
@@ -903,7 +911,7 @@ void main() {
 
   group('Software Interrupt', () {
     test('SWI', () {
-      final format = SoftwareInterrupt(
+      final format = SoftwareInterruptArmFormat(
         condition: _always,
         comment: Uint24(1024),
       );

@@ -2,7 +2,7 @@ part of '../format.dart';
 
 /// A decoded _Data Processing_ or _PSR Transfer_ instruction _format_.
 @sealed
-class DataProcessingOrPsrTransfer extends ArmFormat {
+class DataProcessingOrPsrTransferArmFormat extends ArmFormat {
   /// Whether [operand2] is an immediate value (`1`) or a register (`0`).
   final bool immediateOperand;
 
@@ -21,7 +21,7 @@ class DataProcessingOrPsrTransfer extends ArmFormat {
   /// Second operand (see [immediateOperand]).
   final Uint12 operand2;
 
-  const DataProcessingOrPsrTransfer({
+  const DataProcessingOrPsrTransferArmFormat({
     @required Uint4 condition,
     @required this.immediateOperand,
     @required this.opCode,

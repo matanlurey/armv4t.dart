@@ -2,7 +2,7 @@ part of '../format.dart';
 
 /// A decoded _Block Data Transfer_ instruction _format_.
 @sealed
-class BlockDataTransfer extends ArmFormat {
+class BlockDataTransferArmFormat extends ArmFormat {
   /// Whether to add offset before transfer (`1`) or after (`0`).
   final bool preIndexingBit;
 
@@ -24,7 +24,7 @@ class BlockDataTransfer extends ArmFormat {
   /// Register list.
   final Uint16 registerList;
 
-  const BlockDataTransfer({
+  const BlockDataTransferArmFormat({
     @required Uint4 condition,
     @required this.preIndexingBit,
     @required this.addOffsetBit,

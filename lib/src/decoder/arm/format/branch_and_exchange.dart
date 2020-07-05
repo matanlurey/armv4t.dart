@@ -2,11 +2,11 @@ part of '../format.dart';
 
 /// A decoded _Branch and Exchange_ (`BX`) instruction _format_.
 @sealed
-class BranchAndExchange extends ArmFormat {
+class BranchAndExchangeArmFormat extends ArmFormat {
   /// Operand register.
   final Uint4 operand;
 
-  const BranchAndExchange({
+  const BranchAndExchangeArmFormat({
     @required Uint4 condition,
     @required this.operand,
   }) : super._(condition: condition);

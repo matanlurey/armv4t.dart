@@ -2,7 +2,7 @@ part of '../format.dart';
 
 /// A decoded _Single Data Transfer_ instruction _format_.
 @sealed
-class SingleDataTransfer extends ArmFormat {
+class SingleDataTransferArmFormat extends ArmFormat {
   /// Whether [offset] is an immediate value (`0`) or a regsiter (`1`).
   final bool immediateOffset;
 
@@ -30,7 +30,7 @@ class SingleDataTransfer extends ArmFormat {
   /// 12-bit [immediateOffset] or register.
   final Uint12 offset;
 
-  const SingleDataTransfer({
+  const SingleDataTransferArmFormat({
     @required Uint4 condition,
     @required this.immediateOffset,
     @required this.preIndexingBit,

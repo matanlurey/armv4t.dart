@@ -2,7 +2,7 @@ part of '../format.dart';
 
 /// A decoded _Multiply Long/Multiply-Accumulate Long_ instruction _format_.
 @sealed
-class MultiplyLong extends ArmFormat {
+class MultiplyLongArmFormat extends ArmFormat {
   /// Whether to perform a signed (`1`) or unsigned (`0`) instruction.
   final bool signed;
 
@@ -24,7 +24,7 @@ class MultiplyLong extends ArmFormat {
   /// Second operand register.
   final Uint4 operandRegister2;
 
-  const MultiplyLong({
+  const MultiplyLongArmFormat({
     @required Uint4 condition,
     @required this.signed,
     @required this.accumulate,

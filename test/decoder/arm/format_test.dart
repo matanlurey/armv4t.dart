@@ -26,7 +26,7 @@ void main() {
   });
 
   test('DataProcessingOrPsrTransfer', () {
-    a = DataProcessingOrPsrTransfer(
+    a = DataProcessingOrPsrTransferArmFormat(
       condition: Uint4('1000'.parseBits()),
       immediateOperand: true,
       opCode: Uint4('1010'.parseBits()),
@@ -38,7 +38,7 @@ void main() {
   });
 
   test('Multiply', () {
-    a = Multiply(
+    a = MultiplyArmFormat(
       condition: Uint4('1000'.parseBits()),
       accumulate: true,
       setConditionCodes: true,
@@ -50,7 +50,7 @@ void main() {
   });
 
   test('MultiplyLong', () {
-    a = MultiplyLong(
+    a = MultiplyLongArmFormat(
       condition: Uint4('1000'.parseBits()),
       signed: true,
       accumulate: true,
@@ -63,7 +63,7 @@ void main() {
   });
 
   test('SingleDataSwap', () {
-    a = SingleDataSwap(
+    a = SingleDataSwapArmFormat(
       condition: Uint4('1000'.parseBits()),
       swapByteQuantity: true,
       baseRegister: Uint4('1100'.parseBits()),
@@ -73,14 +73,14 @@ void main() {
   });
 
   test('BranchAndExchange', () {
-    a = BranchAndExchange(
+    a = BranchAndExchangeArmFormat(
       condition: Uint4('1000'.parseBits()),
       operand: Uint4('0101'.parseBits()),
     );
   });
 
   test('HalfwordDataTransfer', () {
-    a = HalfwordDataTransfer(
+    a = HalfwordDataTransferArmFormat(
       condition: Uint4('1000'.parseBits()),
       preIndexingBit: true,
       addOffsetBit: true,
@@ -96,7 +96,7 @@ void main() {
   });
 
   test('SingleDataTransfer', () {
-    a = SingleDataTransfer(
+    a = SingleDataTransferArmFormat(
       condition: Uint4('1000'.parseBits()),
       immediateOffset: true,
       preIndexingBit: true,
@@ -111,7 +111,7 @@ void main() {
   });
 
   test('BlockDataTransfer', () {
-    a = BlockDataTransfer(
+    a = BlockDataTransferArmFormat(
       condition: Uint4('1000'.parseBits()),
       preIndexingBit: true,
       addOffsetBit: true,
@@ -124,7 +124,7 @@ void main() {
   });
 
   test('Branch', () {
-    a = Branch(
+    a = BranchArmFormat(
       condition: Uint4('1000'.parseBits()),
       link: true,
       offset: Uint24('0000' '1010' '0101' '1100'.parseBits()),
@@ -132,7 +132,7 @@ void main() {
   });
 
   test('SoftwareInterrupt', () {
-    a = SoftwareInterrupt(
+    a = SoftwareInterruptArmFormat(
       condition: Uint4('1000'.parseBits()),
       comment: Uint24('0000' '1010' '0101' '1100'.parseBits()),
     );
