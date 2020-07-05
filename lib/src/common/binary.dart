@@ -48,6 +48,174 @@ class Uint2 extends Integral<Uint2> {
   String toDebugString() => '$_name {$value}';
 }
 
+/// Encapsulates an unsigned 3-bit aggregation.
+@sealed
+class Uint3 extends Integral<Uint3> {
+  /// Returns [value] if in range, otherwise throws [RangeError].
+  static int checkRange(int value) => Uint3(value).value;
+
+  /// Returns [value].
+  ///
+  /// When assertions are enabled, throws a [RangeError].
+  static int assertRange(int value) {
+    return assertionsEnabled ? checkRange(value) : value;
+  }
+
+  static const _name = 'Uint3';
+  static const _size = 2;
+  static const _signed = false;
+
+  /// A pre-computed instance of `Uint3(0)`.
+  static const zero = Uint3._(0);
+
+  /// Wraps a [value] that is otherwise a valid 3-bit unsigned integer.
+  Uint3(int value)
+      : super.checked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  const Uint3._(int value)
+      : super.unchecked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  @override
+  Uint3 wrapSafeValue(int value) => Uint3(value);
+
+  @override
+  String toDebugString() => '$_name {$value}';
+}
+
+/// Encapsulates an unsigned 5-bit aggregation.
+@sealed
+class Uint5 extends Integral<Uint5> {
+  /// Returns [value] if in range, otherwise throws [RangeError].
+  static int checkRange(int value) => Uint5(value).value;
+
+  /// Returns [value].
+  ///
+  /// When assertions are enabled, throws a [RangeError].
+  static int assertRange(int value) {
+    return assertionsEnabled ? checkRange(value) : value;
+  }
+
+  static const _name = 'Uint5';
+  static const _size = 2;
+  static const _signed = false;
+
+  /// A pre-computed instance of `Uint5(0)`.
+  static const zero = Uint5._(0);
+
+  /// Wraps a [value] that is otherwise a valid 5-bit unsigned integer.
+  Uint5(int value)
+      : super.checked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  const Uint5._(int value)
+      : super.unchecked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  @override
+  Uint5 wrapSafeValue(int value) => Uint5(value);
+
+  @override
+  String toDebugString() => '$_name {$value}';
+}
+
+/// Encapsulates an unsigned 10-bit aggregation.
+@sealed
+class Uint10 extends Integral<Uint10> {
+  /// Returns [value] if in range, otherwise throws [RangeError].
+  static int checkRange(int value) => Uint10(value).value;
+
+  /// Returns [value].
+  ///
+  /// When assertions are enabled, throws a [RangeError].
+  static int assertRange(int value) {
+    return assertionsEnabled ? checkRange(value) : value;
+  }
+
+  static const _name = 'Uint10';
+  static const _size = 12;
+  static const _signed = false;
+
+  /// A pre-computed instance of `Uint10(0)`.
+  static const zero = Uint10._(0);
+
+  /// Wraps a [value] that is otherwise a valid 10-bit unsigned integer.
+  Uint10(int value)
+      : super.checked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  const Uint10._(int value)
+      : super.unchecked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  @override
+  Uint10 wrapSafeValue(int value) => Uint10(value);
+
+  @override
+  String toDebugString() => '$_name {$value}';
+}
+
+/// Encapsulates an unsigned 11-bit aggregation.
+@sealed
+class Uint11 extends Integral<Uint11> {
+  /// Returns [value] if in range, otherwise throws [RangeError].
+  static int checkRange(int value) => Uint11(value).value;
+
+  /// Returns [value].
+  ///
+  /// When assertions are enabled, throws a [RangeError].
+  static int assertRange(int value) {
+    return assertionsEnabled ? checkRange(value) : value;
+  }
+
+  static const _name = 'Uint11';
+  static const _size = 12;
+  static const _signed = false;
+
+  /// A pre-computed instance of `Uint11(0)`.
+  static const zero = Uint11._(0);
+
+  /// Wraps a [value] that is otherwise a valid 11-bit unsigned integer.
+  Uint11(int value)
+      : super.checked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  const Uint11._(int value)
+      : super.unchecked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  @override
+  Uint11 wrapSafeValue(int value) => Uint11(value);
+
+  @override
+  String toDebugString() => '$_name {$value}';
+}
+
 /// Encapsulates an unsigned 12-bit aggregation.
 @sealed
 class Uint12 extends Integral<Uint12> {
