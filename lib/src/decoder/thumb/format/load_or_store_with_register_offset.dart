@@ -17,7 +17,7 @@ class LoadOrStoreWithRegisterOffsetThumbFormat extends ThumbFormat {
 
   @override
   R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitLoadOrStoreWithRegisterOffset(this, context);
   }
 
   @override

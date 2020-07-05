@@ -62,7 +62,7 @@ class Uint3 extends Integral<Uint3> {
   }
 
   static const _name = 'Uint3';
-  static const _size = 2;
+  static const _size = 3;
   static const _signed = false;
 
   /// A pre-computed instance of `Uint3(0)`.
@@ -104,7 +104,7 @@ class Uint5 extends Integral<Uint5> {
   }
 
   static const _name = 'Uint5';
-  static const _size = 2;
+  static const _size = 5;
   static const _signed = false;
 
   /// A pre-computed instance of `Uint5(0)`.
@@ -132,6 +132,48 @@ class Uint5 extends Integral<Uint5> {
   String toDebugString() => '$_name {$value}';
 }
 
+/// Encapsulates an unsigned 7-bit aggregation.
+@sealed
+class Uint7 extends Integral<Uint7> {
+  /// Returns [value] if in range, otherwise throws [RangeError].
+  static int checkRange(int value) => Uint7(value).value;
+
+  /// Returns [value].
+  ///
+  /// When assertions are enabled, throws a [RangeError].
+  static int assertRange(int value) {
+    return assertionsEnabled ? checkRange(value) : value;
+  }
+
+  static const _name = 'Uint7';
+  static const _size = 7;
+  static const _signed = false;
+
+  /// A pre-computed instance of `Uint7(0)`.
+  static const zero = Uint7._(0);
+
+  /// Wraps a [value] that is otherwise a valid 7-bit unsigned integer.
+  Uint7(int value)
+      : super.checked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  const Uint7._(int value)
+      : super.unchecked(
+          value: value,
+          signed: _signed,
+          size: _size,
+        );
+
+  @override
+  Uint7 wrapSafeValue(int value) => Uint7(value);
+
+  @override
+  String toDebugString() => '$_name {$value}';
+}
+
 /// Encapsulates an unsigned 10-bit aggregation.
 @sealed
 class Uint10 extends Integral<Uint10> {
@@ -146,7 +188,7 @@ class Uint10 extends Integral<Uint10> {
   }
 
   static const _name = 'Uint10';
-  static const _size = 12;
+  static const _size = 10;
   static const _signed = false;
 
   /// A pre-computed instance of `Uint10(0)`.
@@ -188,7 +230,7 @@ class Uint11 extends Integral<Uint11> {
   }
 
   static const _name = 'Uint11';
-  static const _size = 12;
+  static const _size = 11;
   static const _signed = false;
 
   /// A pre-computed instance of `Uint11(0)`.

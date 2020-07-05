@@ -1,7 +1,7 @@
 part of '../format.dart';
 
 class AluOperationThumbFormat extends ThumbFormat {
-  final Uint4 opCode;
+  final Uint3 opCode;
   final Uint3 source;
   final Uint3 destination;
 
@@ -13,7 +13,7 @@ class AluOperationThumbFormat extends ThumbFormat {
 
   @override
   R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitAluOperation(this, context);
   }
 
   @override

@@ -2,7 +2,7 @@ part of '../format.dart';
 
 class LongBranchWithLinkThumbFormat extends ThumbFormat {
   final bool hBit;
-  final Uint10 offset;
+  final Uint11 offset;
 
   const LongBranchWithLinkThumbFormat({
     @required this.hBit,
@@ -11,7 +11,7 @@ class LongBranchWithLinkThumbFormat extends ThumbFormat {
 
   @override
   R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitLongBranchWithLink(this, context);
   }
 
   @override

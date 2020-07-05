@@ -17,7 +17,7 @@ class LoadOrStoreWithImmediateOffsetThumbFormat extends ThumbFormat {
 
   @override
   R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitLoadOrStoreWithImmediateOffset(this, context);
   }
 
   @override

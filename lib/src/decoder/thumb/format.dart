@@ -74,8 +74,8 @@ abstract class ThumbFormat {
 /// Converts a known 16-bit integr into a partially decodd [ThumbFormat].
 class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
   static final _addOffsetToStackPointer = BitPatternBuilder.parse(
-    '',
-  ).build();
+    '1011_0000_SWWW_WWWW',
+  ).build('ADD_OFFSET_TO_STACK_POINTER');
 
   static final _addOrSubtract = BitPatternBuilder.parse(
     '0001_1IPN_NNSS_SDDD',
@@ -130,7 +130,7 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
   ).build('PC_RELATIVE_LOAD');
 
   static final _pushOrPopRegisters = BitPatternBuilder.parse(
-    '1011_L10R_LLLL_LLLL',
+    '1011_L10R_KKKK_KKKK',
   ).build('PUSH_OR_POP_REGISTERS');
 
   static final _softwareInterrupt = BitPatternBuilder.parse(
@@ -174,45 +174,225 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
     final pattern = _allKnownPatterns.match(input.value);
     final capture = pattern?.capture(input.value) ?? const [];
     if (identical(pattern, _addOffsetToStackPointer)) {
-      throw UnimplementedError();
+      // 1011_0000_SWWW_WWWW
+      return AddOffsetToStackPointerThumbFormat(
+        sBit: capture[0] == 1,
+        word: Uint7(capture[1]),
+      );
     } else if (identical(pattern, _addOrSubtract)) {
-      throw UnimplementedError();
+      // 0001_1IPN_NNSS_SDDD
+      return AddOrSubtractThumbFormat(
+        immediateBit: capture[0] == 1,
+        opCode: capture[1] == 1,
+        baseOrOffset3: Uint3(capture[2]),
+        source: Uint3(capture[3]),
+        destination: Uint3(capture[4]),
+      );
     } else if (identical(pattern, _aluOperations)) {
-      throw UnimplementedError();
+      // 0100_00PP_PSSS_DDDD
+      return AluOperationThumbFormat(
+        opCode: Uint3(capture[0]),
+        source: Uint3(capture[1]),
+        destination: Uint3(capture[2]),
+      );
     } else if (identical(pattern, _conditionalBranch)) {
-      throw UnimplementedError();
+      // 1101_CCCC_OOOO_OOOO
+      return ConditionalBranchThumbFormat(
+        condition: Uint4(capture[0]),
+        offset: Uint8(capture[1]),
+      );
     } else if (identical(pattern, _hiRgisterOperationsOrBranchExchange)) {
-      throw UnimplementedError();
+      // 0100_01PP_HHSS_SDDD
+      return HiRegisterOperationsOrBranchExchangeThumbFormat(
+        opCode: Uint2(capture[0]),
+        hCodes: Uint2(capture[1]),
+        source: Uint3(capture[2]),
+        destination: Uint3(capture[3]),
+      );
     } else if (identical(pattern, _loadAddress)) {
-      throw UnimplementedError();
+      // 1010_SDDD_WWWW_WWWW
+      return LoadAddressThumbFormat(
+        stackPointerBit: capture[0] == 1,
+        destination: Uint3(capture[1]),
+        word: Uint8(capture[2]),
+      );
     } else if (identical(pattern, _loadOrStoreHalfword)) {
-      throw UnimplementedError();
+      // 1000_LOOO_OOBB_BDDD
+      return LoadOrStoreHalfwordThumbFormat(
+        loadBit: capture[0] == 1,
+        destination: Uint3(capture[1]),
+        word: Uint8(capture[2]),
+      );
     } else if (identical(pattern, _loadOrStoreWithImmediateOffset)) {
-      throw UnimplementedError();
+      // 011B_LOOO_OOBB_BDDD
+      return LoadOrStoreWithImmediateOffsetThumbFormat(
+        byteBit: capture[0] == 1,
+        loadBit: capture[1] == 1,
+        offset: Uint5(capture[2]),
+        base: Uint3(capture[3]),
+        destination: Uint3(capture[4]),
+      );
     } else if (identical(pattern, _loadOrStoreWithRegisterOffset)) {
-      throw UnimplementedError();
+      // 0101_LB0O_OOBB_BDDD
+      return LoadOrStoreWithRegisterOffsetThumbFormat(
+        loadBit: capture[0] == 1,
+        byteBit: capture[1] == 1,
+        offset: Uint3(capture[2]),
+        base: Uint3(capture[3]),
+        destination: Uint3(capture[4]),
+      );
     } else if (identical(pattern, _longBranchWithLink)) {
-      throw UnimplementedError();
+      // 1111_HOOO_OOOO_OOOO
+      return LongBranchWithLinkThumbFormat(
+        hBit: capture[0] == 1,
+        offset: Uint11(capture[1]),
+      );
     } else if (identical(pattern, _moveOrCompareOrAddOrSubtractImmediate)) {
-      throw UnimplementedError();
+      // 001P_PDDD_OOOO_OOOO
+      return MoveOrCompareOrAddOrSubtractImmediateThumbFormat(
+        opCode: Uint2(capture[0]),
+        destination: Uint3(capture[1]),
+        offset: Uint8(capture[2]),
+      );
     } else if (identical(pattern, _moveShiftedRegister)) {
-      throw UnimplementedError();
+      // 000P_POOO_OOSS_SDDD
+      return MoveShiftedRegisterThumbFormat(
+        opCode: Uint2(capture[0]),
+        offset: Uint5(capture[1]),
+        source: Uint3(capture[2]),
+        destination: Uint3(capture[3]),
+      );
     } else if (identical(pattern, _multipleLoadOrStore)) {
-      throw UnimplementedError();
+      // 1100_LBBB_RRRR_RRRR
+      return MultipleLoadOrStoreThumbFormat(
+        loadBit: capture[0] == 1,
+        base: Uint3(capture[1]),
+        registerList: Uint8(capture[2]),
+      );
     } else if (identical(pattern, _pcRelativeLoad)) {
-      throw UnimplementedError();
+      // 0100_1DDD_WWWW_WWWW
+      return PCRelativeLoadThumbFormat(
+        destination: Uint3(capture[0]),
+        word: Uint8(capture[1]),
+      );
     } else if (identical(pattern, _pushOrPopRegisters)) {
-      throw UnimplementedError();
+      // 1011_L10R_KKKK_KKKK
+      return PushOrPopRegistersThumbFormat(
+        loadBit: capture[0] == 1,
+        rBit: capture[1] == 1,
+        registerList: Uint8(capture[2]),
+      );
     } else if (identical(pattern, _softwareInterrupt)) {
-      throw UnimplementedError();
+      // 1101_1111_VVVV_VVVV
+      return SoftwareInterruptThumbFormat(
+        value: Uint8(capture[0]),
+      );
     } else if (identical(pattern, _spRelativeLoadOrStore)) {
-      throw UnimplementedError();
+      // 1001_LDDD_WWWW_WWWW
+      return SPRelativeLoadOrStoreThumbFormat(
+        loadBit: capture[0] == 1,
+        destination: Uint3(capture[1]),
+        word: Uint8(capture[2]),
+      );
     } else if (identical(pattern, _unconditionalBranch)) {
-      throw UnimplementedError();
+      // 1110_0OOO_OOOO_OOOO
+      return UnconditionalBranchThumbFormat(
+        offset: Uint11(capture[0]),
+      );
     } else {
       throw FormatException('Unknown format: ${input.value.toRadixString(16)}');
     }
   }
 }
 
-abstract class ThumbInstructionVisitor<R, C> {}
+abstract class ThumbInstructionVisitor<R, C> {
+  R visitAddOffsetToStackPointer(
+    AddOffsetToStackPointerThumbFormat format, [
+    C context,
+  ]);
+
+  R vsiitAddOrSubtract(
+    AddOrSubtractThumbFormat format, [
+    C context,
+  ]);
+
+  R visitAluOperation(
+    AluOperationThumbFormat format, [
+    C context,
+  ]);
+
+  R visitConditionalBranch(
+    ConditionalBranchThumbFormat format, [
+    C context,
+  ]);
+
+  R visitHiRegisterOperationsOrBranchExchange(
+    HiRegisterOperationsOrBranchExchangeThumbFormat format, [
+    C context,
+  ]);
+
+  R visitLoadAddress(
+    LoadAddressThumbFormat format, [
+    C context,
+  ]);
+
+  R visitLoadOrStoreHalfword(
+    LoadOrStoreHalfwordThumbFormat format, [
+    C context,
+  ]);
+
+  R visitLoadOrStoreWithImmediateOffset(
+    LoadOrStoreWithImmediateOffsetThumbFormat format, [
+    C context,
+  ]);
+
+  R visitLoadOrStoreWithRegisterOffset(
+    LoadOrStoreWithRegisterOffsetThumbFormat format, [
+    C context,
+  ]);
+
+  R visitLongBranchWithLink(
+    LongBranchWithLinkThumbFormat format, [
+    C context,
+  ]);
+
+  R visitMoveOrCompareOrAddOrSubtractImmediate(
+    MoveOrCompareOrAddOrSubtractImmediateThumbFormat format, [
+    C context,
+  ]);
+
+  R visitMoveShiftedRegister(
+    MoveShiftedRegisterThumbFormat format, [
+    C context,
+  ]);
+
+  R visitMultipleLoadOrStore(
+    MultipleLoadOrStoreThumbFormat format, [
+    C context,
+  ]);
+
+  R visitPCRelativeLoad(
+    PCRelativeLoadThumbFormat format, [
+    C context,
+  ]);
+
+  R visitPushOrPopRegisters(
+    PushOrPopRegistersThumbFormat format, [
+    C context,
+  ]);
+
+  R visitSoftwareInterrupt(
+    SoftwareInterruptThumbFormat format, [
+    C context,
+  ]);
+
+  R visitSPRelativeLoadOrStore(
+    SPRelativeLoadOrStoreThumbFormat format, [
+    C context,
+  ]);
+
+  R visitUnconditionalBranch(
+    UnconditionalBranchThumbFormat format, [
+    C context,
+  ]);
+}

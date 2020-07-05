@@ -13,15 +13,15 @@ class PushOrPopRegistersThumbFormat extends ThumbFormat {
 
   @override
   R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitPushOrPopRegisters(this, context);
   }
 
   @override
   Map<String, int> _values() {
     return {
       'l': loadBit ? 1 : 0,
-      'b': rBit ? 1 : 0,
-      'r': registerList.value,
+      'r': rBit ? 1 : 0,
+      'k': registerList.value,
     };
   }
 }

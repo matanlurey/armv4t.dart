@@ -11,7 +11,7 @@ class ConditionalBranchThumbFormat extends ThumbFormat {
 
   @override
   R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitConditionalBranch(this, context);
   }
 
   @override

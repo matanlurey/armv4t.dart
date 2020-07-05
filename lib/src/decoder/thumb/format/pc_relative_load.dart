@@ -11,7 +11,7 @@ class PCRelativeLoadThumbFormat extends ThumbFormat {
 
   @override
   R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitPCRelativeLoad(this, context);
   }
 
   @override

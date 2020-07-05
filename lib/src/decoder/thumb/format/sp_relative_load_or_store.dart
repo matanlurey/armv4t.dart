@@ -13,7 +13,7 @@ class SPRelativeLoadOrStoreThumbFormat extends ThumbFormat {
 
   @override
   R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitSPRelativeLoadOrStore(this, context);
   }
 
   @override

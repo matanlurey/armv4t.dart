@@ -13,7 +13,7 @@ class LoadOrStoreHalfwordThumbFormat extends ThumbFormat {
 
   @override
   R accept<R, C>(ThumbInstructionVisitor<R, C> visitor, [C context]) {
-    throw UnimplementedError();
+    return visitor.visitLoadOrStoreHalfword(this, context);
   }
 
   @override
