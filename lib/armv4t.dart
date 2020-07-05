@@ -1,6 +1,8 @@
-/// An emulator for the [ARMv4T instruction set][], written in Dart.
+/// A stub library for the emulator.
 ///
-/// [armv4t instruction set]: https://developer.arm.com/docs/dvi0025/latest/arm922t-with-ahb-system-on-chip-platform-os-processor/the-armv4t-architecture/the-armv4t-instruction-sets
+/// This library currently does not export any symbols, and is a placeholder for
+/// the emulator components (e.g. what I suspect will be the most used part of
+/// this package).
 ///
-/// > **NOTE**: This library is a stub and currently has no public APIs.
+/// For _decoding_, see `decoding.dart`.
 library armv4t;

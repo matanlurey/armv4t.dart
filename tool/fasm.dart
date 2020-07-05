@@ -37,14 +37,78 @@ final _tool = (() {
 })();
 
 final _build = {
+  // test/decoder/arm/fasmarm/arithmetic.asm
   path.join(
-    'third_party',
+    'test',
+    'decoder',
+    'arm',
     'fasmarm',
-    'ARMDOC',
-    'InstructionFormatsARM.asm',
+    'arithmetic.asm',
   ): path.join(
     'test',
-    '_data',
-    'InstructionFormatsARM.bin',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'arithmetic.bin',
+  ),
+
+  // test/decoder/arm/fasmarm/logical.asm
+  path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'logical.asm',
+  ): path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'logical.bin',
+  ),
+
+  // test/decoder/asm/fasmarm/memory.asm
+  path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'memory.asm',
+  ): path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'memory.bin',
+  ),
+
+  // test/decoder/asm/fasmarm/multiply.asm
+  path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'multiply.asm',
+  ): path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'multiply.bin',
+  ),
+
+  // test/decoder/asm/fasmarm/others.asm
+  path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'others.asm',
+  ): path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'others.bin',
   ),
 };
