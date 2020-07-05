@@ -876,4 +876,20 @@ void main() {
       });
     });
   });
+
+  group('Single Data Swap', () {
+    ArmFormat createSWP({bool swapByteQuantity = false}) {
+      return SingleDataSwap(
+        condition: _always,
+        swapByteQuantity: swapByteQuantity,
+        baseRegister: Uint4(2),
+        destinationRegister: Uint4(4),
+        sourceRegister: Uint4(6),
+      );
+    }
+
+    test('SWP', () {});
+
+    test('SWPB', () {});
+  });
 }
