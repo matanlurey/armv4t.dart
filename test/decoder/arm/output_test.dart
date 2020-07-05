@@ -130,8 +130,6 @@ void main() {
           );
           if (!setS.contains(key)) {
             expect(decode(encode(format)), '${key}s r3, r2, 4');
-          } else {
-            // TODO: Test for ${key}p.
           }
         });
       }
