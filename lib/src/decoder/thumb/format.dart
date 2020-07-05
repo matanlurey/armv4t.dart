@@ -311,7 +311,7 @@ abstract class ThumbInstructionVisitor<R, C> {
     C context,
   ]);
 
-  R vsiitAddOrSubtract(
+  R visitAddOrSubtract(
     AddOrSubtractThumbFormat format, [
     C context,
   ]);
