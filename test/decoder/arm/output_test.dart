@@ -888,8 +888,28 @@ void main() {
       );
     }
 
-    test('SWP', () {});
+    test('SWP', () {
+      expect(
+        decode(encode(createSWP())),
+        'swp r4, r6, [r2]',
+      );
+    });
 
-    test('SWPB', () {});
+    test('SWPB', () {
+      expect(
+        decode(encode(createSWP(swapByteQuantity: true))),
+        'swpb r4, r6, [r2]',
+      );
+    });
+  });
+
+  group('Software Interrupt', () {
+    test('SWI', () {
+      final format = SoftwareInterrupt(
+        condition: _always,
+        comment: Uint24(1024),
+      );
+      expect(decode(encode(format)), 'swi 1024');
+    });
   });
 }
