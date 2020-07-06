@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZc-`.
 @immutable
 @sealed
-class AND extends DataProcessingArmInstruction {
-  AND({
+class AND$Arm extends DataProcessing$Arm {
+  AND$Arm({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

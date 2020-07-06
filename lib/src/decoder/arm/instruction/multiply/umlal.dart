@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZx-`.
 @immutable
 @sealed
-class UMLAL extends MultiplyLongArmInstruction {
-  UMLAL({
+class UMLAL$Arm extends MultiplyLong$Arm {
+  UMLAL$Arm({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterNotPC operand1,

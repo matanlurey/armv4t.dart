@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZCV`.
 @immutable
 @sealed
-class SUB extends DataProcessingArmInstruction {
-  SUB({
+class SUB$Arm extends DataProcessing$Arm {
+  SUB$Arm({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

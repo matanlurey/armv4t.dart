@@ -9,8 +9,8 @@ part of '../../instruction.dart';
 /// ## Cycles
 ///
 /// `(n-1)S+2N`.
-class STM extends BlockDataTransferArmInstruction {
-  STM({
+class STM$Arm extends BlockDataTransfer$Arm {
+  STM$Arm({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,

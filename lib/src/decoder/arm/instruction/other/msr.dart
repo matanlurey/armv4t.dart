@@ -15,14 +15,14 @@ part of '../../instruction.dart';
 /// `1S`.
 @immutable
 @sealed
-class MSR extends PsrTransferArmInstruction {
+class MSR$Arm extends PsrTransfer$Arm {
   /// Which field, if any, to write to - may be `null`.
   final MSRWriteField writeToField;
 
   /// Either the source register or an unsigend 8-bit shifted immediate.
   final Or2<RegisterAny, ShiftedImmediate<Uint8>> sourceOrImmediate;
 
-  MSR({
+  MSR$Arm({
     @required Condition condition,
     @required bool useSPSR,
     @required this.writeToField,

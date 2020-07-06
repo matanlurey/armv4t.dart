@@ -1,5 +1,6 @@
 part of '../format.dart';
 
+/// A decoded _Add Offset To Stack Pointer_ THUMB _Format_.
 class AddOffsetToStackPointerThumbFormat extends ThumbFormat {
   final bool sBit;
   final Uint7 word;

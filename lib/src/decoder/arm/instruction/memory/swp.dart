@@ -11,7 +11,7 @@ part of '../../instruction.dart';
 /// `1S+2N+1I`.
 @immutable
 @sealed
-class SWP
+class SWP$Arm
     /**/ extends ArmInstruction
     /**/ implements
         HasTransferByte {
@@ -28,7 +28,7 @@ class SWP
   /// Source register.
   final RegisterNotPC source;
 
-  SWP({
+  SWP$Arm({
     @required Condition condition,
     @required this.transferByte,
     @required this.base,

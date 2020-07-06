@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZc-`.
 @immutable
 @sealed
-class MVN extends DataProcessingArmInstruction {
-  MVN({
+class MVN$Arm extends DataProcessing$Arm {
+  MVN$Arm({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,
