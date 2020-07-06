@@ -55,14 +55,14 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
     if (format.immediateOperand) {
       // I = 1
-      final rorShift = format.operand2.bitRange(11, 8).value.asUint4();
-      final immediate = format.operand2.bitRange(7, 0).value.asUint8();
+      final rorShift = Uint4(format.operand2.bitRange(11, 8).value);
+      final immediate = Uint8(format.operand2.bitRange(7, 0).value);
       operand2 = Or3.right(ShiftedImmediate(rorShift, Immediate(immediate)));
     } else {
       // I = 0
       final shiftByRegister = format.operand2.isSet(4);
       final shiftOperand = RegisterAny(
-        format.operand2.bitRange(3, 0).value.asUint4(),
+        Uint4(format.operand2.bitRange(3, 0).value),
       );
       final shiftType = ShiftType.values[format.operand2.bitRange(6, 5).value];
       // Shift By Immediate
@@ -83,7 +83,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       // Shift Register
       if (shiftByRegister) {
         // R = 1
-        final shiftRegister = format.operand2.bitRange(11, 8).value.asUint4();
+        final shiftRegister = Uint4(format.operand2.bitRange(11, 8).value);
         operand2 = Or3.middle(
           ShiftedRegister(
             shiftOperand,
@@ -93,7 +93,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         );
       } else {
         // R = 0
-        final shiftAmount = format.operand2.bitRange(11, 7).value.asUint4();
+        final shiftAmount = Uint4(format.operand2.bitRange(11, 7).value);
         operand2 = Or3.left(
           ShiftedRegister(
             shiftOperand,
@@ -254,14 +254,14 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         // I = 1
         sourceOrImmediate = Or2.right(
           ShiftedImmediate(
-            format.operand2.bitRange(11, 8).value.asUint4(),
-            Immediate(format.operand2.bitRange(7, 0).value.asUint8()),
+            Uint4(format.operand2.bitRange(11, 8).value),
+            Immediate(Uint8(format.operand2.bitRange(7, 0).value)),
           ),
         );
       } else {
         // I = 0
         sourceOrImmediate = Or2.left(
-          RegisterAny(format.operand2.bitRange(3, 0).value.asUint4()),
+          RegisterAny(Uint4(format.operand2.bitRange(3, 0).value)),
         );
       }
 
@@ -506,9 +506,9 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       // I = 1
       // format.offset.bitRange(11, 7).value.asUint4(),
       offset = Or2.right(ShiftedRegister(
-        RegisterNotPC(format.offset.bitRange(3, 0).value.asUint4()),
+        RegisterNotPC(Uint4(format.offset.bitRange(3, 0).value)),
         ShiftType.values[format.offset.bitRange(6, 5).value],
-        Immediate(format.offset.bitRange(11, 7).value.asUint4()),
+        Immediate(Uint4(format.offset.bitRange(11, 7).value)),
       ));
     }
 

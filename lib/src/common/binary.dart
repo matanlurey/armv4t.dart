@@ -402,7 +402,7 @@ class Uint16Builder {
     if (_builder.length != 16) {
       throw RangeError.value(_builder.length);
     } else {
-      return _builder.toString().parseBits().asUint16();
+      return Uint16(_builder.toString().bits);
     }
   }
 }
@@ -425,7 +425,7 @@ class Uint32Builder {
     if (_builder.length != 32) {
       throw RangeError.value(_builder.length);
     } else {
-      return _builder.toString().parseBits().asUint32();
+      return Uint32(_builder.toString().bits);
     }
   }
 }

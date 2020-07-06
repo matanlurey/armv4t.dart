@@ -10,7 +10,7 @@ environment:
   sdk: ">=2.8.0 <3.0.0"
 
 dependencies:
-  binary: ^1.3.0
+  binary: ^1.4.0
   collection: ^1.14.12
   meta: ^1.1.8
 

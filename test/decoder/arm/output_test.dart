@@ -151,7 +151,7 @@ void main() {
           '${type.index.toBinaryPadded(2)}',
           '1',
           '${operandR.toBinaryPadded(4)}',
-        ].join('').parseBits();
+        ].join('').bits;
       }
 
       int encodeOp2ByImmediate(int shiftV, ShiftType type, int operandR) {
@@ -160,7 +160,7 @@ void main() {
           '${type.index.toBinaryPadded(2)}',
           '0',
           '${operandR.toBinaryPadded(4)}',
-        ].join('').parseBits();
+        ].join('').bits;
       }
 
       ArmFormat createInstruction(int operand2) {
@@ -300,7 +300,7 @@ void main() {
           immediateOperand: false,
           opCode: Uint4(0x8),
           setConditionCodes: false,
-          operand1Register: Uint4('1000'.parseBits()),
+          operand1Register: Uint4('1000'.bits),
           destinationRegister: Uint4(0),
           operand2: Uint12(2),
         );
@@ -313,7 +313,7 @@ void main() {
           immediateOperand: false,
           opCode: Uint4(0x9),
           setConditionCodes: false,
-          operand1Register: Uint4('1000'.parseBits()),
+          operand1Register: Uint4('1000'.bits),
           destinationRegister: Uint4(0),
           operand2: Uint12(2),
         );
@@ -326,7 +326,7 @@ void main() {
           immediateOperand: true,
           opCode: Uint4(0x8),
           setConditionCodes: false,
-          operand1Register: Uint4('1000'.parseBits()),
+          operand1Register: Uint4('1000'.bits),
           destinationRegister: Uint4(0),
           operand2: Uint12(2),
         );
@@ -531,7 +531,7 @@ void main() {
             loadMemoryBit: false,
             baseRegister: Uint4(6),
             sourceOrDestinationRegister: Uint4(4),
-            offset: Uint12('0100' '0101' '0111'.parseBits()),
+            offset: Uint12('0100' '0101' '0111'.bits),
           );
           expect(decode(encode(format)), 'str r4, [r6, r7, asr 8]!');
         });
@@ -597,7 +597,7 @@ void main() {
             loadMemoryBit: false,
             baseRegister: Uint4(6),
             sourceOrDestinationRegister: Uint4(4),
-            offset: Uint12('0100' '0101' '0111'.parseBits()),
+            offset: Uint12('0100' '0101' '0111'.bits),
           );
           expect(decode(encode(format)), 'str r4, [r6], r7, asr 8');
         });
@@ -875,7 +875,7 @@ void main() {
       test('Register Range', () {
         expect(
           decode(encode(createSTM(
-            registerList: '0000' '0011' '0100' '1011'.parseBits(),
+            registerList: '0000' '0011' '0100' '1011'.bits,
           ))),
           'stmib r4, {r0-r1, r3, r6, r8-r9}',
         );

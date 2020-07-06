@@ -143,7 +143,7 @@ class RegisterList<R extends Register<R>> {
     } else {
       create = (value) => RegisterAny(value) as R;
     }
-    return _values.map((value) => create(value.asUint4()));
+    return _values.map((value) => create(Uint4(value)));
   }
 }
 
