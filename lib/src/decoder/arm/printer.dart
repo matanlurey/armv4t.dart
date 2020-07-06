@@ -1,5 +1,6 @@
 import 'package:armv4t/src/decoder/arm/condition.dart';
 import 'package:armv4t/src/decoder/arm/instruction.dart';
+import 'package:armv4t/src/decoder/common.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 

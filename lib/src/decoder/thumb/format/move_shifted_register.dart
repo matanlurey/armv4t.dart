@@ -1,16 +1,28 @@
 part of '../format.dart';
 
+/// A decoded _Move Shifted Register_ THUMB _format_.
 class MoveShiftedRegisterThumbFormat extends ThumbFormat {
+  /// OpCode:
+  ///
+  /// - 0x0: `LSL`
+  /// - 0x1: `LSR`
+  /// - 0x2: `ASR`
   final Uint2 opCode;
-  final Uint5 offset;
-  final Uint3 source;
-  final Uint3 destination;
+
+  /// Immediate value.
+  final Uint5 immediate;
+
+  /// Source register.
+  final Uint3 sourceRegister;
+
+  /// Destination register.
+  final Uint3 destinationRegister;
 
   const MoveShiftedRegisterThumbFormat({
     @required this.opCode,
-    @required this.offset,
-    @required this.source,
-    @required this.destination,
+    @required this.immediate,
+    @required this.sourceRegister,
+    @required this.destinationRegister,
   }) : super._();
 
   @override
@@ -22,9 +34,9 @@ class MoveShiftedRegisterThumbFormat extends ThumbFormat {
   Map<String, int> _values() {
     return {
       'p': opCode.value,
-      'o': offset.value,
-      's': source.value,
-      'd': destination.value,
+      'o': immediate.value,
+      's': sourceRegister.value,
+      'd': destinationRegister.value,
     };
   }
 }

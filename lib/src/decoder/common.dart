@@ -1,9 +1,9 @@
-part of '../instruction.dart';
+import 'dart:typed_data';
 
-abstract class MaySetConditionCodes implements ArmInstruction {
-  /// Whether to set condition codes on the PSR.
-  bool get setConditionCodes;
-}
+import 'package:armv4t/src/common/binary.dart';
+import 'package:binary/binary.dart';
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 
 /// Represents a comment-field that is not significant to the processor.
 @immutable
@@ -45,7 +45,9 @@ class Immediate<T extends Integral<T>> implements Shiftable<Immediate<T>> {
 @immutable
 @sealed
 abstract class Register<R extends Register<R>>
-    implements Comparable<Register<R>>, Shiftable<R> {
+    implements
+        /**/ Comparable<Register<R>>,
+        /**/ Shiftable<R> {
   /// A register that is zero-filled (`0000`).
   static final filledWith0s = RegisterAny(Uint4.zero);
 
@@ -85,6 +87,13 @@ class RegisterNotPC extends Register<RegisterNotPC> {
       throw RangeError.range(index.value, 0, 14);
     }
   }
+}
+
+/// A register that has a maximum value of `7`.
+@immutable
+@sealed
+class RegisterLo extends Register<RegisterLo> {
+  RegisterLo(Uint3 index) : super._(Uint4(index.value));
 }
 
 /// A list of registers, normally parsed from a mask.

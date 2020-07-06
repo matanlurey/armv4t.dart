@@ -182,11 +182,11 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
     } else if (identical(pattern, _addOrSubtract)) {
       // 0001_1IPN_NNSS_SDDD
       return AddOrSubtractThumbFormat(
-        immediateBit: capture[0] == 1,
+        immediateOperandBit: capture[0] == 1,
         opCode: capture[1] == 1,
-        baseOrOffset3: Uint3(capture[2]),
-        source: Uint3(capture[3]),
-        destination: Uint3(capture[4]),
+        baseRegisterOrImmediate: Uint3(capture[2]),
+        sourceRegister: Uint3(capture[3]),
+        destinationRegister: Uint3(capture[4]),
       );
     } else if (identical(pattern, _aluOperations)) {
       // 0100_00PP_PSSS_DDDD
@@ -258,9 +258,9 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
       // 000P_POOO_OOSS_SDDD
       return MoveShiftedRegisterThumbFormat(
         opCode: Uint2(capture[0]),
-        offset: Uint5(capture[1]),
-        source: Uint3(capture[2]),
-        destination: Uint3(capture[3]),
+        immediate: Uint5(capture[1]),
+        sourceRegister: Uint3(capture[2]),
+        destinationRegister: Uint3(capture[3]),
       );
     } else if (identical(pattern, _multipleLoadOrStore)) {
       // 1100_LBBB_RRRR_RRRR
@@ -431,11 +431,11 @@ class _ThumbFormatEncoder
   ]) {
     return (Uint16Builder()
           ..write('0001' '1')
-          ..writeBool(format.immediateBit)
+          ..writeBool(format.immediateOperandBit)
           ..writeBool(format.opCode)
-          ..writeInt(format.baseOrOffset3)
-          ..writeInt(format.source)
-          ..writeInt(format.destination))
+          ..writeInt(format.baseRegisterOrImmediate)
+          ..writeInt(format.sourceRegister)
+          ..writeInt(format.destinationRegister))
         .build();
   }
 
@@ -567,9 +567,9 @@ class _ThumbFormatEncoder
     return (Uint16Builder()
           ..write('000')
           ..writeInt(format.opCode)
-          ..writeInt(format.offset)
-          ..writeInt(format.source)
-          ..writeInt(format.destination))
+          ..writeInt(format.immediate)
+          ..writeInt(format.sourceRegister)
+          ..writeInt(format.destinationRegister))
         .build();
   }
 

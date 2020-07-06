@@ -1,18 +1,28 @@
 part of '../format.dart';
 
+/// A decoded _Add or Subtract_ THUMB _format_.
 class AddOrSubtractThumbFormat extends ThumbFormat {
-  final bool immediateBit;
-  final bool opCode;
-  final Uint3 baseOrOffset3;
-  final Uint3 source;
-  final Uint3 destination;
+  /// Whether [baseRegisterOrImmediate] is an immediate (`1`) or register (`0`).
+  final bool immediateOperandBit;
+
+  /// OpCode referers to `SUB` (`1`) otherwise `ADD` (`0`).
+  final bool opCode$SUB;
+
+  /// Register or immediate value.
+  final Uint3 baseRegisterOrImmediate;
+
+  /// Source register.
+  final Uint3 sourceRegister;
+
+  /// Destination register.
+  final Uint3 destinationRegister;
 
   const AddOrSubtractThumbFormat({
-    @required this.immediateBit,
-    @required this.opCode,
-    @required this.baseOrOffset3,
-    @required this.source,
-    @required this.destination,
+    @required this.immediateOperandBit,
+    @required this.opCode$SUB,
+    @required this.baseRegisterOrImmediate,
+    @required this.sourceRegister,
+    @required this.destinationRegister,
   }) : super._();
 
   @override
@@ -23,11 +33,11 @@ class AddOrSubtractThumbFormat extends ThumbFormat {
   @override
   Map<String, int> _values() {
     return {
-      'i': immediateBit ? 1 : 0,
-      'p': opCode ? 1 : 0,
-      'n': baseOrOffset3.value,
-      's': source.value,
-      'd': destination.value,
+      'i': immediateOperandBit ? 1 : 0,
+      'p': opCode$SUB ? 1 : 0,
+      'n': baseRegisterOrImmediate.value,
+      's': sourceRegister.value,
+      'd': destinationRegister.value,
     };
   }
 }

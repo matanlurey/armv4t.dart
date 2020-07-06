@@ -1,8 +1,7 @@
-import 'dart:typed_data';
-
 import 'package:armv4t/src/common/assert.dart';
 import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/common/union.dart';
+import 'package:armv4t/src/decoder/common.dart';
 import 'package:binary/binary.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
@@ -20,7 +19,6 @@ part 'instruction/arithmetic/rsb.dart';
 part 'instruction/arithmetic/rsc.dart';
 part 'instruction/arithmetic/sbc.dart';
 part 'instruction/arithmetic/sub.dart';
-part 'instruction/common.dart';
 part 'instruction/decoder.dart';
 part 'instruction/logical/and.dart';
 part 'instruction/logical/bic.dart';
@@ -97,4 +95,9 @@ abstract class ArmInstruction {
       return super.toString();
     }
   }
+}
+
+abstract class MaySetConditionCodes implements ArmInstruction {
+  /// Whether to set condition codes on the PSR.
+  bool get setConditionCodes;
 }
