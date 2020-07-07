@@ -67,7 +67,7 @@ final _build = {
     'logical.bin',
   ),
 
-  // test/decoder/asm/fasmarm/memory.asm
+  // test/decoder/arm/fasmarm/memory.asm
   path.join(
     'test',
     'decoder',
@@ -82,7 +82,7 @@ final _build = {
     'memory.bin',
   ),
 
-  // test/decoder/asm/fasmarm/multiply.asm
+  // test/decoder/arm/fasmarm/multiply.asm
   path.join(
     'test',
     'decoder',
@@ -97,7 +97,7 @@ final _build = {
     'multiply.bin',
   ),
 
-  // test/decoder/asm/fasmarm/others.asm
+  // test/decoder/arm/fasmarm/others.asm
   path.join(
     'test',
     'decoder',
@@ -110,5 +110,18 @@ final _build = {
     'arm',
     'fasmarm',
     'others.bin',
+  ),
+
+  // test/decoder/thumb/fasmarm_test.asm
+  path.join(
+    'test',
+    'decoder',
+    'thumb',
+    'fasmarm_test.asm',
+  ): path.join(
+    'test',
+    'decoder',
+    'thumb',
+    'fasmarm_test.bin',
   ),
 };

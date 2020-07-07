@@ -44,6 +44,7 @@ processor CPU32_V4T
   bx r0           ; -> BX Rs
   bx r8           ; -> BX Hs
 
+processor CPU32_7M
   ldr r0, [PC, 1] ; -> LDR Rd, [R15, #Imm]
 
   str  r0, [r1, r2] ; -> STR  Rd, [Rb, Ro]
@@ -51,10 +52,11 @@ processor CPU32_V4T
   ldr  r0, [r1, r2] ; -> LDR  Rd, [Rb, Ro]
   ldrb r0, [r1, r2] ; -> LDRB Rd, [Rb, Ro]
 
-  strh r0, [r1, r2] ; -> STRH Rd, [Rb, Ro]
-  ldrh r0, [r1, r2] ; -> LDRH Rd, [Rb, Ro]
-  ldsb r0, [r1, r2] ; -> LDSB Rd, [Rb, Ro]
-  ldsh r0, [r1, r2] ; -> LDSH Rd, [Rb, Ro]
+  strh r0, [r1, r2] ; -> STRH  Rd, [Rb, Ro]
+  ldrh r0, [r1, r2] ; -> LDRH  Rd, [Rb, Ro]
+  ;TODO: Figure out what is needed to compile these.
+  ;ldsb r0, [r1, r2] ; -> LDRSB Rd, [Rb, Ro]
+  ;ldsh r0, [r1, r2] ; -> LDRSH Rd, [Rb, Ro]
 
   str  r0, [r1, 2]  ; -> STR  Rd, [Rb, #Imm]
   ldr  r0, [r1, 2]  ; -> LDR  Rd, [Rb, #Imm]
@@ -62,7 +64,8 @@ processor CPU32_V4T
   ldrb r0, [r1, 2]  ; -> LDRB Rd, [Rb, #Imm]
 
   strh r0, [r1, 2]  ; -> STRH Rd, [Rb, #Imm]
-  lrdh r0, [r1, 2]  ; -> LDRH Rd, [Rb, #Imm]
+  ;TODO: Figure out what is needed to compile these.
+  ;lrdh r0, [r1, 2]  ; -> LDRH Rd, [Rb, #Imm]
 
   str  r0, [sp, 1]  ; -> STR  Rd, [R13, #Imm]
   ldr  r0, [sp, 1]  ; -> LDR  Rd, [R13, #Imm]
@@ -81,21 +84,22 @@ processor CPU32_V4T
   stmia r0!, {r1}   ; -> STMIA Rb!, { Rlist }
   ldmia r0!, {r1}   ; -> LDMIA Rb!, { Rlist }
 
-  beq 1
-  bne 2
-  bcs 3
-  bcc 4
-  bmi 5
-  bpl 6
-  bvs 7
-  bvc 8
-  bhi 9
-  bls 10
-  bge 11
-  blt 12
-  bgt 13
-  ble 14
+  beq 84
+  bne 84
+  bcs 84
+  bcc 84
+  bmi 84
+  bpl 84
+  bvs 84
+  bvc 84
+  bhi 84
+  bls 84
+  bge 84
+  blt 84
+  bgt 84
+  ble 84
 
+processor CPU32_V4T
   swi 1
 
-  b 1
+  b 84

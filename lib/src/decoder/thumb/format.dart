@@ -107,11 +107,11 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
   ).build('LOAD_OR_STORE_SIGN_EXTENDED_BYTE_OR_HALFWORD');
 
   static final _loadOrStoreWithImmediateOffset = BitPatternBuilder.parse(
-    '011B_LOOO_OOBB_BDDD',
+    '011B_LOOO_OONN_NDDD',
   ).build('LOAD_OR_STORE_IMMEDIATE_OFFSET');
 
   static final _loadOrStoreWithRegisterOffset = BitPatternBuilder.parse(
-    '0101_LB0O_OOBB_BDDD',
+    '0101_LB0O_OONN_NDDD',
   ).build('LOAD_OR_STORE_WITH_REGISTER_OFFSET');
 
   static final _longBranchWithLink = BitPatternBuilder.parse(

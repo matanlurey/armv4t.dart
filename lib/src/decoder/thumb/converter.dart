@@ -479,7 +479,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         switch (format.hCodes.value) {
           // THUMB: MOV Rd, Hs
           // ARM:   MOV Rd, Hs
-          case 0x0: // 00
+          case 0x1: // 00
             return MOVArmInstruction(
               condition: _always,
               setConditionCodes: false,
@@ -495,7 +495,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
             );
           // THUMB: MOV Hd, Rs
           // ARM:   MOV Hd, Rs
-          case 0x1: // 01
+          case 0x2: // 01
             return MOVArmInstruction(
               condition: _always,
               setConditionCodes: false,
@@ -511,7 +511,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
             );
           // THUMB: MOV Hd, Hs
           // ARM:   MOV Hd, Hs
-          case 0x2:
+          case 0x3:
             return MOVArmInstruction(
               condition: _always,
               setConditionCodes: false,
@@ -752,8 +752,11 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     LongBranchWithLinkThumbFormat format, [
     void _,
   ]) {
-    // TODO: Implement BL.
-    throw UnimplementedError();
+    // TODO: Correctly implement BL.
+    return BLArmInstruction(
+      condition: _always,
+      offset: Uint24(format.offset.value),
+    );
   }
 
   @override

@@ -29,8 +29,8 @@ void main() {
         '$key.bin',
       )).readAsBytes();
 
-      final instr = Uint32List.view(bytes.buffer);
-      final output = instr
+      final input = Uint32List.view(bytes.buffer);
+      final output = input
           .map((b) => Uint32(b))
           .map((i) => ''
               '${disassemble(i).padRight(32, ' ')} '
