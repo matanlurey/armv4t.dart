@@ -752,6 +752,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     LongBranchWithLinkThumbFormat format, [
     void _,
   ]) {
+    // TODO: Implement BL.
     throw UnimplementedError();
   }
 
