@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZCV`.
 @immutable
 @sealed
-class CMP$Arm extends DataProcessing$Arm {
-  CMP$Arm({
+class CMPArmInstruction extends DataProcessingArmInstruction {
+  CMPArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

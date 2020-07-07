@@ -108,7 +108,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
     switch (opCode) {
       case _ALUOpCode.AND:
-        return AND$Arm(
+        return ANDArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -116,7 +116,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.EOR:
-        return EOR$Arm(
+        return EORArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -124,7 +124,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.SUB:
-        return SUB$Arm(
+        return SUBArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -132,7 +132,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.RSB:
-        return RSB$Arm(
+        return RSBArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -140,7 +140,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.ADD:
-        return ADD$Arm(
+        return ADDArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -148,7 +148,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.ADC:
-        return ADC$Arm(
+        return ADCArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -156,7 +156,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.SBC:
-        return SBC$Arm(
+        return SBCArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -164,7 +164,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.RSC:
-        return RSC$Arm(
+        return RSCArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -172,7 +172,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.TST:
-        return TST$Arm(
+        return TSTArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -180,7 +180,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.TEQ:
-        return TEQ$Arm(
+        return TEQArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -188,7 +188,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.CMP:
-        return CMP$Arm(
+        return CMPArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -196,7 +196,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.CMN:
-        return CMN$Arm(
+        return CMNArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -204,7 +204,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.ORR:
-        return ORR$Arm(
+        return ORRArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -212,7 +212,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.MOV:
-        return MOV$Arm(
+        return MOVArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -220,7 +220,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.BIC:
-        return BIC$Arm(
+        return BICArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -228,7 +228,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
           operand2: operand2,
         );
       case _ALUOpCode.MVN:
-        return MVN$Arm(
+        return MVNArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -240,7 +240,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     }
   }
 
-  PsrTransfer$Arm _decodePsrTransfer(
+  PsrTransferArmInstruction _decodePsrTransfer(
     DataProcessingOrPsrTransferArmFormat format,
     Condition condition, {
     bool isMSR = false,
@@ -277,14 +277,14 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         writeTo = MSRWriteField.control;
       }
 
-      return MSR$Arm(
+      return MSRArmInstruction(
         condition: condition,
         useSPSR: useSPSR,
         writeToField: writeTo,
         sourceOrImmediate: sourceOrImmediate,
       );
     } else {
-      return MRS$Arm(
+      return MRSArmInstruction(
         condition: condition,
         useSPSR: useSPSR,
         destination: RegisterNotPC(format.destinationRegister),
@@ -293,7 +293,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   }
 
   @override
-  MultiplyAndMultiplyLong$Arm visitMultiply(
+  MultiplyAndMultiplyLongArmInstruction visitMultiply(
     MultiplyArmFormat format, [
     void _,
   ]) {
@@ -305,7 +305,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
     if (format.accumulate) {
       // A = 1
-      return MLA$Arm(
+      return MLAArmInstruction(
         condition: condition,
         setConditionCodes: setConditionCodes,
         operand1: operand1,
@@ -314,7 +314,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       );
     } else {
       // A = 0
-      return MUL$Arm(
+      return MULArmInstruction(
         condition: condition,
         setConditionCodes: setConditionCodes,
         operand1: operand1,
@@ -325,7 +325,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   }
 
   @override
-  MultiplyAndMultiplyLong$Arm visitMultiplyLong(
+  MultiplyAndMultiplyLongArmInstruction visitMultiplyLong(
     MultiplyLongArmFormat format, [
     void _,
   ]) {
@@ -341,7 +341,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       // UMLAL or SMLAL
       if (format.signed) {
         // S = 1
-        return SMLAL$Arm(
+        return SMLALArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -351,7 +351,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         );
       } else {
         // S = 0
-        return UMLAL$Arm(
+        return UMLALArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -365,7 +365,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       // UMULL or SMULL
       if (format.signed) {
         // S = 1
-        return SMULL$Arm(
+        return SMULLArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -375,7 +375,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         );
       } else {
         // S = 0
-        return UMULL$Arm(
+        return UMULLArmInstruction(
           condition: condition,
           setConditionCodes: setConditionCodes,
           operand1: operand1,
@@ -388,11 +388,11 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   }
 
   @override
-  SWP$Arm visitSingleDataSwap(
+  SWPArmInstruction visitSingleDataSwap(
     SingleDataSwapArmFormat format, [
     void _,
   ]) {
-    return SWP$Arm(
+    return SWPArmInstruction(
       condition: Condition.parse(format.condition.value),
       transferByte: format.swapByteQuantity,
       base: RegisterNotPC(format.baseRegister),
@@ -402,18 +402,18 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   }
 
   @override
-  BX$Arm visitBranchAndExchange(
+  BXArmInstruction visitBranchAndExchange(
     BranchAndExchangeArmFormat format, [
     void _,
   ]) {
-    return BX$Arm(
+    return BXArmInstruction(
       condition: Condition.parse(format.condition.value),
       operand: RegisterNotPC(format.operand),
     );
   }
 
   @override
-  HalfwordDataTransfer$Arm visitHalfwordDataTransfer(
+  HalfwordDataTransferArmInstruction visitHalfwordDataTransfer(
     HalfwordDataTransferArmFormat format, [
     void _,
   ]) {
@@ -437,7 +437,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       // L = 1 (LDRH, LDRSB, LDRSH)
       switch (format.opCode.value) {
         case 0x1:
-          return LDRH$Arm(
+          return LDRHArmInstruction(
             condition: condition,
             addOffsetBeforeTransfer: addOffsetBeforeTransfer,
             addOffsetToBase: addOffsetToBase,
@@ -447,7 +447,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
             offset: offset,
           );
         case 0x2:
-          return LDRSB$Arm(
+          return LDRSBArmInstruction(
             condition: condition,
             addOffsetBeforeTransfer: addOffsetBeforeTransfer,
             addOffsetToBase: addOffsetToBase,
@@ -457,7 +457,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
             offset: offset,
           );
         case 0x3:
-          return LDRSH$Arm(
+          return LDRSHArmInstruction(
             condition: condition,
             addOffsetBeforeTransfer: addOffsetBeforeTransfer,
             addOffsetToBase: addOffsetToBase,
@@ -471,7 +471,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       }
     } else {
       // L = 0 (STRH)
-      return STRH$Arm(
+      return STRHArmInstruction(
         condition: condition,
         addOffsetBeforeTransfer: addOffsetBeforeTransfer,
         addOffsetToBase: addOffsetToBase,
@@ -484,7 +484,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   }
 
   @override
-  SingleDataTransfer$Arm visitSingleDataTransfer(
+  SingleDataTransferArmInstruction visitSingleDataTransfer(
     SingleDataTransferArmFormat format, [
     void _,
   ]) {
@@ -514,7 +514,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
     if (format.loadMemoryBit) {
       // L = 1
-      return LDR$Arm(
+      return LDRArmInstruction(
         condition: condition,
         addOffsetBeforeTransfer: addOffsetBeforeTransfer,
         addOffsetToBase: addOffsetToBase,
@@ -526,7 +526,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       );
     } else {
       // L = 0
-      return STR$Arm(
+      return STRArmInstruction(
         condition: condition,
         addOffsetBeforeTransfer: addOffsetBeforeTransfer,
         addOffsetToBase: addOffsetToBase,
@@ -540,7 +540,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   }
 
   @override
-  BlockDataTransfer$Arm visitBlockDataTransfer(
+  BlockDataTransferArmInstruction visitBlockDataTransfer(
     BlockDataTransferArmFormat format, [
     void _,
   ]) {
@@ -555,7 +555,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
     if (format.loadMemoryBit) {
       // L = 1
-      return LDM$Arm(
+      return LDMArmInstruction(
         condition: condition,
         addOffsetBeforeTransfer: addOffsetBeforeTransfer,
         addOffsetToBase: addOffsetToBase,
@@ -566,7 +566,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       );
     } else {
       // L = 0
-      return STM$Arm(
+      return STMArmInstruction(
         condition: condition,
         addOffsetBeforeTransfer: addOffsetBeforeTransfer,
         addOffsetToBase: addOffsetToBase,
@@ -588,13 +588,13 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
 
     if (format.link) {
       // L = 1
-      return BL$Arm(
+      return BLArmInstruction(
         condition: condition,
         offset: offset,
       );
     } else {
       // L = 0
-      return B$Arm(
+      return BArmInstruction(
         condition: condition,
         offset: offset,
       );
@@ -602,11 +602,11 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   }
 
   @override
-  SWI$Arm visitSoftwareInterrupt(
+  SWIArmInstruction visitSoftwareInterrupt(
     SoftwareInterruptArmFormat format, [
     void _,
   ]) {
-    return SWI$Arm(
+    return SWIArmInstruction(
       condition: Condition.parse(format.condition.value),
       comment: Comment(format.comment),
     );

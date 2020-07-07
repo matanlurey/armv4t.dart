@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZc-`.
 @immutable
 @sealed
-class EOR$Arm extends DataProcessing$Arm {
-  EOR$Arm({
+class EORArmInstruction extends DataProcessingArmInstruction {
+  EORArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

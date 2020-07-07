@@ -1,6 +1,6 @@
 part of '../instruction.dart';
 
-abstract class DataTransfer$Arm extends ArmInstruction {
+abstract class DataTransferArmInstruction extends ArmInstruction {
   /// `P`: Whether to add offset before transfer (`1`), otherwise after (`0`).
   final bool addOffsetBeforeTransfer;
 
@@ -19,7 +19,7 @@ abstract class DataTransfer$Arm extends ArmInstruction {
   /// Base register.
   final RegisterAny base;
 
-  DataTransfer$Arm._({
+  DataTransferArmInstruction._({
     @required Condition condition,
     @required this.addOffsetBeforeTransfer,
     @required this.addOffsetToBase,
@@ -28,7 +28,7 @@ abstract class DataTransfer$Arm extends ArmInstruction {
   }) : super._(condition: condition);
 }
 
-mixin HasWriteBackOnly on DataTransfer$Arm {
+mixin HasWriteBackOnly on DataTransferArmInstruction {
   /// `W`: Whether to write address into base (`1`), otherwise (`0`).
   ///
   /// > If [addOffsetBeforeTransfer] is set, this is _always_ `true`.
@@ -44,8 +44,8 @@ abstract class HasTransferByte implements ArmInstruction {
 
 @immutable
 @sealed
-abstract class SingleDataTransfer$Arm
-    /**/ extends DataTransfer$Arm
+abstract class SingleDataTransferArmInstruction
+    /**/ extends DataTransferArmInstruction
     /**/ implements
         HasTransferByte {
   /// `B`: Whether to transfer a byte (8-bits, `1`) otherwise a word (32, `0`).
@@ -59,7 +59,7 @@ abstract class SingleDataTransfer$Arm
   final Or2<Immediate<Uint12>, ShiftedRegister<Immediate<Uint4>, RegisterNotPC>>
       offset;
 
-  SingleDataTransfer$Arm._({
+  SingleDataTransferArmInstruction._({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,
@@ -121,8 +121,8 @@ abstract class SingleDataTransfer$Arm
 
 @immutable
 @sealed
-abstract class HalfwordDataTransfer$Arm
-    /**/ extends DataTransfer$Arm
+abstract class HalfwordDataTransferArmInstruction
+    /**/ extends DataTransferArmInstruction
     /**/ with
         HasWriteBackOnly {
   /// Source or destination register (`Rd`).
@@ -131,7 +131,7 @@ abstract class HalfwordDataTransfer$Arm
   /// Either an offset register or 8-bit immediate offset.
   final Or2<RegisterNotPC, Immediate<Uint8>> offset;
 
-  HalfwordDataTransfer$Arm._({
+  HalfwordDataTransferArmInstruction._({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,
@@ -163,8 +163,8 @@ abstract class HalfwordDataTransfer$Arm
 
 @immutable
 @sealed
-abstract class BlockDataTransfer$Arm
-    /**/ extends DataTransfer$Arm
+abstract class BlockDataTransferArmInstruction
+    /**/ extends DataTransferArmInstruction
     /**/ with
         HasWriteBackOnly {
   /// Register list.
@@ -173,7 +173,7 @@ abstract class BlockDataTransfer$Arm
   /// `S`: Whether to load PSR or force user mode (`1`) or not.
   final bool loadPsrOrForceUserMode;
 
-  BlockDataTransfer$Arm._({
+  BlockDataTransferArmInstruction._({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,

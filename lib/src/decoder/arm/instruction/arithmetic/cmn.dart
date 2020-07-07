@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZCV`.
 @immutable
 @sealed
-class CMN$Arm extends DataProcessing$Arm {
-  CMN$Arm({
+class CMNArmInstruction extends DataProcessingArmInstruction {
+  CMNArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

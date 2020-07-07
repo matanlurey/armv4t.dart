@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZc-`.
 @immutable
 @sealed
-class TST$Arm extends DataProcessing$Arm {
-  TST$Arm({
+class TSTArmInstruction extends DataProcessingArmInstruction {
+  TSTArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

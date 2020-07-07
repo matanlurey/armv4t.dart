@@ -1,6 +1,6 @@
 part of '../instruction.dart';
 
-abstract class MultiplyAndMultiplyLong$Arm
+abstract class MultiplyAndMultiplyLongArmInstruction
     /**/ extends ArmInstruction
     /**/ implements
         MaySetConditionCodes {
@@ -16,7 +16,7 @@ abstract class MultiplyAndMultiplyLong$Arm
   /// Second operand register.
   final RegisterNotPC operand2;
 
-  const MultiplyAndMultiplyLong$Arm._({
+  const MultiplyAndMultiplyLongArmInstruction._({
     @required Condition condition,
     @required this.setConditionCodes,
     @required this.operand1,
@@ -24,11 +24,12 @@ abstract class MultiplyAndMultiplyLong$Arm
   }) : super._(condition: condition);
 }
 
-abstract class Multiply$Arm extends MultiplyAndMultiplyLong$Arm {
+abstract class MultiplyArmInstruction
+    extends MultiplyAndMultiplyLongArmInstruction {
   /// Destination register.
   final RegisterNotPC destination;
 
-  const Multiply$Arm._({
+  const MultiplyArmInstruction._({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterNotPC operand1,
@@ -53,14 +54,15 @@ abstract class Multiply$Arm extends MultiplyAndMultiplyLong$Arm {
   }
 }
 
-abstract class MultiplyLong$Arm extends MultiplyAndMultiplyLong$Arm {
+abstract class MultiplyLongArmInstruction
+    extends MultiplyAndMultiplyLongArmInstruction {
   /// Destination register (Hi bits).
   final RegisterNotPC destinationHiBits;
 
   /// Destination register (Lo bits).
   final RegisterNotPC destinationLoBits;
 
-  const MultiplyLong$Arm._({
+  const MultiplyLongArmInstruction._({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterNotPC operand1,

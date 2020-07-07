@@ -9,11 +9,11 @@ part of '../../instruction.dart';
 /// ## Cycles
 ///
 /// `2S+1N`.
-class BX$Arm extends ArmInstruction {
+class BXArmInstruction extends ArmInstruction {
   /// Operand register.
   final RegisterNotPC operand;
 
-  BX$Arm({
+  BXArmInstruction({
     @required Condition condition,
     @required this.operand,
   }) : super._(condition: condition);

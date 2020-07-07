@@ -71,7 +71,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       if (format.opCode$SUB) {
         // THUMB: SUB Rd, Rs, #Offset3
         // ARM:   SUBS Rd, Rs, #Offset3
-        return SUB$Arm(
+        return SUBArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: operand1,
@@ -81,7 +81,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       } else {
         // THUMB: ADD Rd, Rs, #Offset3
         // ARM:   ADDS Rd, Rs, #Offset3
-        return ADD$Arm(
+        return ADDArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: operand1,
@@ -94,7 +94,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       if (format.opCode$SUB) {
         // THUMB:  SUB Rd, Rs, Rn
         // ARM:    SUBS Rd, Rs, Rn
-        return SUB$Arm(
+        return SUBArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: operand1,
@@ -110,7 +110,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       } else {
         // THUMB:  ADD Rd, Rs, Rn
         // ARM:    ADDS Rd, Rs, Rn
-        return ADD$Arm(
+        return ADDArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: operand1,
@@ -132,6 +132,8 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     AluOperationThumbFormat format, [
     void _,
   ]) {
+    final destination = format.destination.toAnyRegister();
+    final source = format.source.toAnyRegister();
     switch (format.opCode.value) {
       // THUMB: AND  Rd, Rs
       // ARM:   ANDS Rd, Rd, Rs
@@ -269,7 +271,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // THUMB: MOV Rd, #Offset8
       // ARM:   MOVS Rd, #Offset8
       case 0x0:
-        return MOV$Arm(
+        return MOVArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: Register.filledWith0s,
@@ -279,7 +281,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // THUMB: CMP Rd, #Offset8
       // ARM:   CMPS Rd, #Offset8
       case 0x1:
-        return CMP$Arm(
+        return CMPArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: destination,
@@ -289,7 +291,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // THUMB: ADD Rd, #Offset8
       // ARM:   ADDS Rd, #Offset8
       case 0x2:
-        return ADD$Arm(
+        return ADDArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: destination,
@@ -299,7 +301,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // THUMB: SUB Rd, #Offset8
       // ARM:   SUBS Rd, #Offset8
       case 0x3:
-        return SUB$Arm(
+        return SUBArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: destination,
@@ -328,7 +330,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // THUMB: LSL  Rd, Rs, #Offset5
       // ARM:   MOVS Rd, Rs, LSL #Offset5
       case 0x0:
-        return MOV$Arm(
+        return MOVArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: Register.filledWith0s,
@@ -344,7 +346,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // THUMB: LSR  Rd, Rs, #Offset5
       // ARM:   MOVS Rd, Rs, LSr #Offset5
       case 0x1:
-        return MOV$Arm(
+        return MOVArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: Register.filledWith0s,
@@ -360,7 +362,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // THUMB: ASR  Rd, Rs, #Offset5
       // ARM:   MOVS Rd, Rs, ASR #Offset5
       case 0x2:
-        return MOV$Arm(
+        return MOVArmInstruction(
           condition: _always,
           setConditionCodes: true,
           operand1: Register.filledWith0s,

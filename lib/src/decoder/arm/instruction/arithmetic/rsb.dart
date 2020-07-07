@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZCV`.
 @immutable
 @sealed
-class RSB$Arm extends DataProcessing$Arm {
-  RSB$Arm({
+class RSBArmInstruction extends DataProcessingArmInstruction {
+  RSBArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

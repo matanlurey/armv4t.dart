@@ -2,7 +2,7 @@ part of '../instruction.dart';
 
 @immutable
 @sealed
-abstract class DataProcessing$Arm
+abstract class DataProcessingArmInstruction
     /**/ extends ArmInstruction
     /**/ implements
         MaySetConditionCodes {
@@ -33,7 +33,7 @@ abstract class DataProcessing$Arm
       /**/
       > operand2;
 
-  DataProcessing$Arm._({
+  DataProcessingArmInstruction._({
     @required Condition condition,
     @required this.setConditionCodes,
     @required this.operand1,

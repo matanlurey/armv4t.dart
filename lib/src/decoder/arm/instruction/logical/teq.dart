@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZc-`.
 @immutable
 @sealed
-class TEQ$Arm extends DataProcessing$Arm {
-  TEQ$Arm({
+class TEQArmInstruction extends DataProcessingArmInstruction {
+  TEQArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

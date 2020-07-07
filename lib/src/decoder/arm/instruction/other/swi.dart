@@ -9,10 +9,10 @@ part of '../../instruction.dart';
 /// ## Cycles
 ///
 /// `2S+1N`.
-class SWI$Arm extends ArmInstruction {
+class SWIArmInstruction extends ArmInstruction {
   final Comment comment;
 
-  SWI$Arm({
+  SWIArmInstruction({
     @required Condition condition,
     @required this.comment,
   }) : super._(condition: condition);
