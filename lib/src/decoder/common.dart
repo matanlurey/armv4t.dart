@@ -89,13 +89,6 @@ class RegisterNotPC extends Register<RegisterNotPC> {
   }
 }
 
-/// A register that has a maximum value of `7`.
-@immutable
-@sealed
-class RegisterLo extends Register<RegisterLo> {
-  RegisterLo(Uint3 index) : super._(Uint4(index.value));
-}
-
 /// A list of registers, normally parsed from a mask.
 ///
 /// If `R == RegisterNotPC`, the register `r15` (`PC`) cannot be referenced.

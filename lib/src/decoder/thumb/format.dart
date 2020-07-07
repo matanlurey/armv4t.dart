@@ -82,7 +82,7 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
   ).build('ADD_OR_SUBTRACT');
 
   static final _aluOperations = BitPatternBuilder.parse(
-    '0100_00PP_PSSS_DDDD',
+    '0100_00PP_PPSS_SDDD',
   ).build('ALU_OPERATIONS');
 
   static final _conditionalBranch = BitPatternBuilder.parse(
@@ -183,15 +183,15 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
       // 0001_1IPN_NNSS_SDDD
       return AddOrSubtractThumbFormat(
         immediateOperandBit: capture[0] == 1,
-        opCode: capture[1] == 1,
+        opCode$SUB: capture[1] == 1,
         baseRegisterOrImmediate: Uint3(capture[2]),
         sourceRegister: Uint3(capture[3]),
         destinationRegister: Uint3(capture[4]),
       );
     } else if (identical(pattern, _aluOperations)) {
-      // 0100_00PP_PSSS_DDDD
+      // 0100_00PP_PPSS_SDDD
       return AluOperationThumbFormat(
-        opCode: Uint3(capture[0]),
+        opCode: Uint4(capture[0]),
         source: Uint3(capture[1]),
         destination: Uint3(capture[2]),
       );
@@ -432,7 +432,7 @@ class _ThumbFormatEncoder
     return (Uint16Builder()
           ..write('0001' '1')
           ..writeBool(format.immediateOperandBit)
-          ..writeBool(format.opCode)
+          ..writeBool(format.opCode$SUB)
           ..writeInt(format.baseRegisterOrImmediate)
           ..writeInt(format.sourceRegister)
           ..writeInt(format.destinationRegister))
