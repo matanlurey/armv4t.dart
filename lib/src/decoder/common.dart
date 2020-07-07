@@ -75,6 +75,15 @@ abstract class Register<R extends Register<R>>
 @immutable
 @sealed
 class RegisterAny extends Register<RegisterAny> {
+  /// Stack pointer (`RegisterAny(Uint4(13))`).
+  static final sp = RegisterAny(Uint4(13));
+
+  /// Link register (`RegisterAny(Uint4(14))`).
+  static final lr = RegisterAny(Uint4(14));
+
+  /// Program counter (`RegisterAny(Uint4(15))`).
+  static final pc = RegisterAny(Uint4(15));
+
   RegisterAny(Uint4 index) : super._(index);
 }
 
@@ -82,6 +91,12 @@ class RegisterAny extends Register<RegisterAny> {
 @immutable
 @sealed
 class RegisterNotPC extends Register<RegisterNotPC> {
+  /// Link register (`RegisterNotPC(Uint4(14))`).
+  static final lr = RegisterNotPC(Uint4(14));
+
+  /// Stack pointer (`RegisterNotPC(Uint4(15))`).
+  static final sp = RegisterNotPC(Uint4(15));
+
   RegisterNotPC(Uint4 index) : super._(index) {
     if (index.value == 15) {
       throw RangeError.range(index.value, 0, 14);

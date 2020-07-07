@@ -2,12 +2,12 @@ part of '../format.dart';
 
 class PushOrPopRegistersThumbFormat extends ThumbFormat {
   final bool loadBit;
-  final bool rBit;
+  final bool pcOrLrBit;
   final Uint8 registerList;
 
   const PushOrPopRegistersThumbFormat({
     @required this.loadBit,
-    @required this.rBit,
+    @required this.pcOrLrBit,
     @required this.registerList,
   }) : super._();
 
@@ -20,7 +20,7 @@ class PushOrPopRegistersThumbFormat extends ThumbFormat {
   Map<String, int> _values() {
     return {
       'l': loadBit ? 1 : 0,
-      'r': rBit ? 1 : 0,
+      'r': pcOrLrBit ? 1 : 0,
       'k': registerList.value,
     };
   }

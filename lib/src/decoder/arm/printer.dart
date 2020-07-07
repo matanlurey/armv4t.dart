@@ -433,15 +433,9 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final destination = visitRegister(i.destination);
     final register = visitRegister(i.operand1);
     final operand2 = i.operand2.pick(
-      (shiftedRegisterByImmediate) => visitShiftedRegisterByImmediate(
-        shiftedRegisterByImmediate,
-      ),
-      (shiftedRegisterByRegister) => visitShiftedRegisterByRegister(
-        shiftedRegisterByRegister,
-      ),
-      (shiftedImmediate) => visitShiftedImmediate(
-        shiftedImmediate,
-      ),
+      visitShiftedRegisterByImmediate,
+      visitShiftedRegisterByRegister,
+      visitShiftedImmediate,
     );
     if (i is MOVArmInstruction || i is MVNArmInstruction) {
       return visitComponents(['$mnuemonic $destination', operand2]);

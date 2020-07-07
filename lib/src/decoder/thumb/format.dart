@@ -14,6 +14,7 @@ part 'format/conditional_branch.dart';
 part 'format/hi_register_operations_or_branch_exchange.dart';
 part 'format/load_address.dart';
 part 'format/load_or_store_halfword.dart';
+part 'format/load_or_store_sign_extended_byte_or_halfword.dart';
 part 'format/load_or_store_with_immediate_offset.dart';
 part 'format/load_or_store_with_register_offset.dart';
 part 'format/long_branch_with_link.dart';
@@ -101,6 +102,10 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
     '1000_LOOO_OOBB_BDDD',
   ).build('LOAD_OR_STORE_HALFWORD');
 
+  static final _loadOrStoreSignExtendedByteOrHalfword = BitPatternBuilder.parse(
+    '0101_HS1O_OOBB_BDDD',
+  ).build('LOAD_OR_STORE_SIGN_EXTENDED_BYTE_OR_HALFWORD');
+
   static final _loadOrStoreWithImmediateOffset = BitPatternBuilder.parse(
     '011B_LOOO_OOBB_BDDD',
   ).build('LOAD_OR_STORE_IMMEDIATE_OFFSET');
@@ -153,6 +158,7 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
     _hiRgisterOperationsOrBranchExchange,
     _loadAddress,
     _loadOrStoreHalfword,
+    _loadOrStoreSignExtendedByteOrHalfword,
     _loadOrStoreWithImmediateOffset,
     _loadOrStoreWithRegisterOffset,
     _longBranchWithLink,
@@ -223,6 +229,15 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
         destination: Uint3(capture[1]),
         word: Uint8(capture[2]),
       );
+    } else if (identical(pattern, _loadOrStoreSignExtendedByteOrHalfword)) {
+      // 0101_HS1O_OOBB_BDDD
+      return LoadOrStoreSignExtendedByteOrHalfword(
+        hBit: capture[0] == 1,
+        sBit: capture[1] == 1,
+        offsetRegister: Uint3(capture[2]),
+        baseRegister: Uint3(capture[3]),
+        sourceOrdestinationRegister: Uint3(capture[4]),
+      );
     } else if (identical(pattern, _loadOrStoreWithImmediateOffset)) {
       // 011B_LOOO_OOBB_BDDD
       return LoadOrStoreWithImmediateOffsetThumbFormat(
@@ -279,7 +294,7 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
       // 1011_L10R_KKKK_KKKK
       return PushOrPopRegistersThumbFormat(
         loadBit: capture[0] == 1,
-        rBit: capture[1] == 1,
+        pcOrLrBit: capture[1] == 1,
         registerList: Uint8(capture[2]),
       );
     } else if (identical(pattern, _softwareInterrupt)) {
@@ -338,6 +353,11 @@ abstract class ThumbFormatVisitor<R, C> {
 
   R visitLoadOrStoreHalfword(
     LoadOrStoreHalfwordThumbFormat format, [
+    C context,
+  ]);
+
+  R visitLoadOrStoreSignExtendedByteOrHalfword(
+    LoadOrStoreSignExtendedByteOrHalfword format, [
     C context,
   ]);
 
@@ -505,6 +525,22 @@ class _ThumbFormatEncoder
   }
 
   @override
+  Uint16 visitLoadOrStoreSignExtendedByteOrHalfword(
+    LoadOrStoreSignExtendedByteOrHalfword format, [
+    void _,
+  ]) {
+    return (Uint16Builder()
+          ..write('0101')
+          ..writeBool(format.hBit)
+          ..writeBool(format.sBit)
+          ..write('1')
+          ..writeInt(format.offsetRegister)
+          ..writeInt(format.baseRegister)
+          ..writeInt(format.sourceOrdestinationRegister))
+        .build();
+  }
+
+  @override
   Uint16 visitLoadOrStoreWithImmediateOffset(
     LoadOrStoreWithImmediateOffsetThumbFormat format, [
     void _,
@@ -606,7 +642,7 @@ class _ThumbFormatEncoder
     return (Uint16Builder()
           ..write('1011')
           ..writeBool(format.loadBit)
-          ..writeBool(format.rBit)
+          ..writeBool(format.pcOrLrBit)
           ..writeInt(format.registerList))
         .build();
   }
