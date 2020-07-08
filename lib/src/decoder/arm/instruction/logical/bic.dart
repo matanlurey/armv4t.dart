@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZc-`.
 @immutable
 @sealed
-class BIC extends DataProcessingArmInstruction {
-  BIC({
+class BICArmInstruction extends DataProcessingArmInstruction {
+  BICArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

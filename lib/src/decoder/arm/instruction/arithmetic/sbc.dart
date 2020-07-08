@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZCV`.
 @immutable
 @sealed
-class SBC extends DataProcessingArmInstruction {
-  SBC({
+class SBCArmInstruction extends DataProcessingArmInstruction {
+  SBCArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterAny operand1,

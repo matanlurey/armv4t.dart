@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZx-`.
 @immutable
 @sealed
-class MUL extends MultiplyArmInstruction {
-  MUL({
+class MULArmInstruction extends MultiplyArmInstruction {
+  MULArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterNotPC operand1,

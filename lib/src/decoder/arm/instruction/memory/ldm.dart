@@ -9,8 +9,8 @@ part of '../../instruction.dart';
 /// ## Cycles
 ///
 /// `nS+1N+1I+y`.
-class LDM extends BlockDataTransferArmInstruction {
-  LDM({
+class LDMArmInstruction extends BlockDataTransferArmInstruction {
+  LDMArmInstruction({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,

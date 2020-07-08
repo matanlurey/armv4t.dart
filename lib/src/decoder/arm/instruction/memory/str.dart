@@ -9,8 +9,8 @@ part of '../../instruction.dart';
 /// ## Cycles
 ///
 /// `2N`.
-class STR extends SingleDataTransferArmInstruction {
-  STR({
+class STRArmInstruction extends SingleDataTransferArmInstruction {
+  STRArmInstruction({
     @required Condition condition,
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,

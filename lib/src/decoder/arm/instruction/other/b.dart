@@ -9,10 +9,10 @@ part of '../../instruction.dart';
 /// ## Cycles
 ///
 /// `2S+1N`.
-class B extends ArmInstruction {
+class BArmInstruction extends ArmInstruction {
   final Uint24 offset;
 
-  B({
+  BArmInstruction({
     @required Condition condition,
     @required this.offset,
   }) : super._(condition: condition);

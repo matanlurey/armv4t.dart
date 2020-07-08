@@ -1,5 +1,6 @@
 import 'package:armv4t/src/decoder/arm/condition.dart';
 import 'package:armv4t/src/decoder/arm/instruction.dart';
+import 'package:armv4t/src/decoder/common.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -32,62 +33,62 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
   }
 
   @override
-  String visitADC(ADC i, [void _]) {
+  String visitADC(ADCArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('adc', i);
   }
 
   @override
-  String visitADD(ADD i, [void _]) {
+  String visitADD(ADDArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('add', i);
   }
 
   @override
-  String visitRSB(RSB i, [void _]) {
+  String visitRSB(RSBArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('rsb', i);
   }
 
   @override
-  String visitRSC(RSC i, [void _]) {
+  String visitRSC(RSCArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('rsc', i);
   }
 
   @override
-  String visitSBC(SBC i, [void _]) {
+  String visitSBC(SBCArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('sbc', i);
   }
 
   @override
-  String visitSUB(SUB i, [void _]) {
+  String visitSUB(SUBArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('sub', i);
   }
 
   @override
-  String visitAND(AND i, [void _]) {
+  String visitAND(ANDArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('and', i);
   }
 
   @override
-  String visitBIC(BIC i, [void _]) {
+  String visitBIC(BICArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('bic', i);
   }
 
   @override
-  String visitEOR(EOR i, [void _]) {
+  String visitEOR(EORArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('eor', i);
   }
 
   @override
-  String visitMOV(MOV i, [void _]) {
+  String visitMOV(MOVArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('mov', i);
   }
 
   @override
-  String visitMVN(MVN i, [void _]) {
+  String visitMVN(MVNArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('mvn', i);
   }
 
   @override
-  String visitORR(ORR i, [void _]) {
+  String visitORR(ORRArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('orr', i);
   }
 
@@ -103,22 +104,22 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
   }
 
   @override
-  String visitCMN(CMN i, [void _]) {
+  String visitCMN(CMNArmInstruction i, [void _]) {
     return visitDataProcessingWithVoidDestination('cmn', i);
   }
 
   @override
-  String visitCMP(CMP i, [void _]) {
+  String visitCMP(CMPArmInstruction i, [void _]) {
     return visitDataProcessingWithVoidDestination('cmp', i);
   }
 
   @override
-  String visitTEQ(TEQ i, [void _]) {
+  String visitTEQ(TEQArmInstruction i, [void _]) {
     return visitDataProcessingWithVoidDestination('teq', i);
   }
 
   @override
-  String visitTST(TST i, [void _]) {
+  String visitTST(TSTArmInstruction i, [void _]) {
     return visitDataProcessingWithVoidDestination('tst', i);
   }
 
@@ -142,32 +143,32 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
   }
 
   @override
-  String visitSTR(STR i, [void _]) {
+  String visitSTR(STRArmInstruction i, [void _]) {
     return visitSingleDataTransfer('str', i);
   }
 
   @override
-  String visitLDR(LDR i, [void _]) {
+  String visitLDR(LDRArmInstruction i, [void _]) {
     return visitSingleDataTransfer('ldr', i);
   }
 
   @override
-  String visitLDRH(LDRH i, [void _]) {
+  String visitLDRH(LDRHArmInstruction i, [void _]) {
     return 'ldr${visitCondition(i.condition)}h';
   }
 
   @override
-  String visitLDRSB(LDRSB i, [void _]) {
+  String visitLDRSB(LDRSBArmInstruction i, [void _]) {
     return 'ldr${visitCondition(i.condition)}sb';
   }
 
   @override
-  String visitLDRSH(LDRSH i, [void _]) {
+  String visitLDRSH(LDRSHArmInstruction i, [void _]) {
     return 'ldr${visitCondition(i.condition)}sh';
   }
 
   @override
-  String visitSTRH(STRH i, [void _]) {
+  String visitSTRH(STRHArmInstruction i, [void _]) {
     return 'str${visitCondition(i.condition)}h';
   }
 
@@ -199,78 +200,78 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
   }
 
   @override
-  String visitLDM(LDM i, [void _]) {
+  String visitLDM(LDMArmInstruction i, [void _]) {
     return visitBlockDataTransfer('ldm', i);
   }
 
   @override
-  String visitSTM(STM i, [void _]) {
+  String visitSTM(STMArmInstruction i, [void _]) {
     return visitBlockDataTransfer('stm', i);
   }
 
   @override
-  String visitSWP(SWP i, [void _]) {
+  String visitSWP(SWPArmInstruction i, [void _]) {
     final b = i.transferByte ? 'b' : '';
     return 'swp${visitCondition(i.condition)}$b';
   }
 
   @override
-  String visitMLA(MLA i, [void _]) {
+  String visitMLA(MLAArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('mla', i);
   }
 
   @override
-  String visitMUL(MUL i, [void _]) {
+  String visitMUL(MULArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('mul', i);
   }
 
   @override
-  String visitSMLAL(SMLAL i, [void _]) {
+  String visitSMLAL(SMLALArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('smlal', i);
   }
 
   @override
-  String visitSMULL(SMULL i, [void _]) {
+  String visitSMULL(SMULLArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('smull', i);
   }
 
   @override
-  String visitUMLAL(UMLAL i, [void _]) {
+  String visitUMLAL(UMLALArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('umlal', i);
   }
 
   @override
-  String visitUMULL(UMULL i, [void _]) {
+  String visitUMULL(UMULLArmInstruction i, [void _]) {
     return visitMaySetConditionCodes('umull', i);
   }
 
   @override
-  String visitB(B i, [void _]) {
+  String visitB(BArmInstruction i, [void _]) {
     return 'b${visitCondition(i.condition)}';
   }
 
   @override
-  String visitBL(BL i, [void _]) {
+  String visitBL(BLArmInstruction i, [void _]) {
     return 'bl${visitCondition(i.condition)}';
   }
 
   @override
-  String visitBX(BX i, [void _]) {
+  String visitBX(BXArmInstruction i, [void _]) {
     return 'bx${visitCondition(i.condition)}';
   }
 
   @override
-  String visitMRS(MRS i, [void _]) {
+  String visitMRS(MRSArmInstruction i, [void _]) {
     return 'mrs${visitCondition(i.condition)}';
   }
 
   @override
-  String visitMSR(MSR i, [void _]) {
+  String visitMSR(MSRArmInstruction i, [void _]) {
     return 'msr${visitCondition(i.condition)}';
   }
 
   @override
-  String visitSWI(SWI i, [void _]) {
+  String visitSWI(SWIArmInstruction i, [void _]) {
     return 'swi${visitCondition(i.condition)}';
   }
 }
@@ -432,17 +433,11 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final destination = visitRegister(i.destination);
     final register = visitRegister(i.operand1);
     final operand2 = i.operand2.pick(
-      (shiftedRegisterByImmediate) => visitShiftedRegisterByImmediate(
-        shiftedRegisterByImmediate,
-      ),
-      (shiftedRegisterByRegister) => visitShiftedRegisterByRegister(
-        shiftedRegisterByRegister,
-      ),
-      (shiftedImmediate) => visitShiftedImmediate(
-        shiftedImmediate,
-      ),
+      visitShiftedRegisterByImmediate,
+      visitShiftedRegisterByRegister,
+      visitShiftedImmediate,
     );
-    if (i is MOV || i is MVN) {
+    if (i is MOVArmInstruction || i is MVNArmInstruction) {
       return visitComponents(['$mnuemonic $destination', operand2]);
     } else {
       return visitComponents(['$mnuemonic $destination', register, operand2]);
@@ -638,7 +633,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
 
   @override
   String visitMRS(
-    MRS i, [
+    MRSArmInstruction i, [
     void _,
   ]) {
     // MRS - transfer PSR contents to a register
@@ -650,7 +645,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
 
   @override
   String visitMSR(
-    MSR i, [
+    MSRArmInstruction i, [
     void _,
   ]) {
     final mnuemonic = super.visitPsrTransfer(i);
@@ -674,7 +669,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
 
   @override
   String visitSWP(
-    SWP i, [
+    SWPArmInstruction i, [
     void _,
   ]) {
     final mnuemonic = super.visitSWP(i);
@@ -687,7 +682,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
 
   @override
   String visitB(
-    B i, [
+    BArmInstruction i, [
     void _,
   ]) {
     final mnuemonic = super.visitB(i);
@@ -696,7 +691,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
 
   @override
   String visitBL(
-    BL i, [
+    BLArmInstruction i, [
     void _,
   ]) {
     final mnuemonic = super.visitBL(i);
@@ -705,7 +700,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
 
   @override
   String visitBX(
-    BX i, [
+    BXArmInstruction i, [
     void _,
   ]) {
     final mnuemonic = super.visitBX(i);
@@ -715,7 +710,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
 
   @override
   String visitSWI(
-    SWI i, [
+    SWIArmInstruction i, [
     void _,
   ]) {
     final mnuemonic = super.visitSWI(i);

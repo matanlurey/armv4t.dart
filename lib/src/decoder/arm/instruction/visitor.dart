@@ -6,43 +6,43 @@ part of '../instruction.dart';
 /// primarily as a dispatch mechanism (and hence don't need to recursively visit
 /// a whole structure).
 abstract class ArmInstructionVisitor<R, C> {
-  R visitADC(ADC i, [C context]);
-  R visitADD(ADD i, [C context]);
-  R visitCMN(CMN i, [C context]);
-  R visitCMP(CMP i, [C context]);
-  R visitRSB(RSB i, [C context]);
-  R visitRSC(RSC i, [C context]);
-  R visitSBC(SBC i, [C context]);
-  R visitSUB(SUB i, [C context]);
-  R visitAND(AND i, [C context]);
-  R visitBIC(BIC i, [C context]);
-  R visitEOR(EOR i, [C context]);
-  R visitMOV(MOV i, [C context]);
-  R visitMVN(MVN i, [C context]);
-  R visitORR(ORR i, [C context]);
-  R visitTEQ(TEQ i, [C context]);
-  R visitTST(TST i, [C context]);
-  R visitLDM(LDM i, [C context]);
-  R visitLDR(LDR i, [C context]);
-  R visitLDRH(LDRH i, [C context]);
-  R visitLDRSB(LDRSB i, [C context]);
-  R visitLDRSH(LDRSH i, [C context]);
-  R visitSTM(STM i, [C context]);
-  R visitSTR(STR i, [C context]);
-  R visitSTRH(STRH i, [C context]);
-  R visitSWP(SWP i, [C context]);
-  R visitMLA(MLA i, [C context]);
-  R visitMUL(MUL i, [C context]);
-  R visitSMLAL(SMLAL i, [C context]);
-  R visitSMULL(SMULL i, [C context]);
-  R visitUMLAL(UMLAL i, [C context]);
-  R visitUMULL(UMULL i, [C context]);
-  R visitB(B i, [C context]);
-  R visitBL(BL i, [C context]);
-  R visitBX(BX i, [C context]);
-  R visitMRS(MRS i, [C context]);
-  R visitMSR(MSR i, [C context]);
-  R visitSWI(SWI i, [C context]);
+  R visitADC(ADCArmInstruction i, [C context]);
+  R visitADD(ADDArmInstruction i, [C context]);
+  R visitCMN(CMNArmInstruction i, [C context]);
+  R visitCMP(CMPArmInstruction i, [C context]);
+  R visitRSB(RSBArmInstruction i, [C context]);
+  R visitRSC(RSCArmInstruction i, [C context]);
+  R visitSBC(SBCArmInstruction i, [C context]);
+  R visitSUB(SUBArmInstruction i, [C context]);
+  R visitAND(ANDArmInstruction i, [C context]);
+  R visitBIC(BICArmInstruction i, [C context]);
+  R visitEOR(EORArmInstruction i, [C context]);
+  R visitMOV(MOVArmInstruction i, [C context]);
+  R visitMVN(MVNArmInstruction i, [C context]);
+  R visitORR(ORRArmInstruction i, [C context]);
+  R visitTEQ(TEQArmInstruction i, [C context]);
+  R visitTST(TSTArmInstruction i, [C context]);
+  R visitLDM(LDMArmInstruction i, [C context]);
+  R visitLDR(LDRArmInstruction i, [C context]);
+  R visitLDRH(LDRHArmInstruction i, [C context]);
+  R visitLDRSB(LDRSBArmInstruction i, [C context]);
+  R visitLDRSH(LDRSHArmInstruction i, [C context]);
+  R visitSTM(STMArmInstruction i, [C context]);
+  R visitSTR(STRArmInstruction i, [C context]);
+  R visitSTRH(STRHArmInstruction i, [C context]);
+  R visitSWP(SWPArmInstruction i, [C context]);
+  R visitMLA(MLAArmInstruction i, [C context]);
+  R visitMUL(MULArmInstruction i, [C context]);
+  R visitSMLAL(SMLALArmInstruction i, [C context]);
+  R visitSMULL(SMULLArmInstruction i, [C context]);
+  R visitUMLAL(UMLALArmInstruction i, [C context]);
+  R visitUMULL(UMULLArmInstruction i, [C context]);
+  R visitB(BArmInstruction i, [C context]);
+  R visitBL(BLArmInstruction i, [C context]);
+  R visitBX(BXArmInstruction i, [C context]);
+  R visitMRS(MRSArmInstruction i, [C context]);
+  R visitMSR(MSRArmInstruction i, [C context]);
+  R visitSWI(SWIArmInstruction i, [C context]);
 }
 
 /// An object that visits methods based on the common super types.
@@ -69,72 +69,92 @@ class SuperArmInstructionVisitor<R, C> implements ArmInstructionVisitor<R, C> {
   }
 
   @override
-  R visitADC(ADC i, [C context]) => visitDataProcessing(i, context);
+  R visitADC(ADCArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitADD(ADD i, [C context]) => visitDataProcessing(i, context);
+  R visitADD(ADDArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitCMN(CMN i, [C context]) => visitDataProcessingVoidReturn(i, context);
+  R visitCMN(CMNArmInstruction i, [C context]) =>
+      visitDataProcessingVoidReturn(i, context);
 
   @override
-  R visitCMP(CMP i, [C context]) => visitDataProcessingVoidReturn(i, context);
+  R visitCMP(CMPArmInstruction i, [C context]) =>
+      visitDataProcessingVoidReturn(i, context);
 
   @override
-  R visitRSB(RSB i, [C context]) => visitDataProcessing(i, context);
+  R visitRSB(RSBArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitRSC(RSC i, [C context]) => visitDataProcessing(i, context);
+  R visitRSC(RSCArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitSBC(SBC i, [C context]) => visitDataProcessing(i, context);
+  R visitSBC(SBCArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitSUB(SUB i, [C context]) => visitDataProcessing(i, context);
+  R visitSUB(SUBArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitAND(AND i, [C context]) => visitDataProcessing(i, context);
+  R visitAND(ANDArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitBIC(BIC i, [C context]) => visitDataProcessing(i, context);
+  R visitBIC(BICArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitEOR(EOR i, [C context]) => visitDataProcessing(i, context);
+  R visitEOR(EORArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitMOV(MOV i, [C context]) => visitDataProcessing(i, context);
+  R visitMOV(MOVArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitMVN(MVN i, [C context]) => visitDataProcessing(i, context);
+  R visitMVN(MVNArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitORR(ORR i, [C context]) => visitDataProcessing(i, context);
+  R visitORR(ORRArmInstruction i, [C context]) =>
+      visitDataProcessing(i, context);
 
   @override
-  R visitTEQ(TEQ i, [C context]) => visitDataProcessingVoidReturn(i, context);
+  R visitTEQ(TEQArmInstruction i, [C context]) =>
+      visitDataProcessingVoidReturn(i, context);
 
   @override
-  R visitTST(TST i, [C context]) => visitDataProcessingVoidReturn(i, context);
+  R visitTST(TSTArmInstruction i, [C context]) =>
+      visitDataProcessingVoidReturn(i, context);
 
   R visitBlockDataTransfer(BlockDataTransferArmInstruction i, [C context]) {
     return visitInstruction(i, context);
   }
 
   @override
-  R visitSTM(STM i, [C context]) => visitBlockDataTransfer(i, context);
+  R visitSTM(STMArmInstruction i, [C context]) =>
+      visitBlockDataTransfer(i, context);
 
   @override
-  R visitLDM(LDM i, [C context]) => visitBlockDataTransfer(i, context);
+  R visitLDM(LDMArmInstruction i, [C context]) =>
+      visitBlockDataTransfer(i, context);
 
   R visitSingleDataTransfer(SingleDataTransferArmInstruction i, [C context]) {
     return visitInstruction(i, context);
   }
 
   @override
-  R visitLDR(LDR i, [C context]) => visitSingleDataTransfer(i, context);
+  R visitLDR(LDRArmInstruction i, [C context]) =>
+      visitSingleDataTransfer(i, context);
 
   @override
-  R visitSTR(STR i, [C context]) => visitSingleDataTransfer(i, context);
+  R visitSTR(STRArmInstruction i, [C context]) =>
+      visitSingleDataTransfer(i, context);
 
   R visitHalfwordDataTransfer(
     HalfwordDataTransferArmInstruction i, [
@@ -144,19 +164,23 @@ class SuperArmInstructionVisitor<R, C> implements ArmInstructionVisitor<R, C> {
   }
 
   @override
-  R visitLDRH(LDRH i, [C context]) => visitHalfwordDataTransfer(i, context);
+  R visitLDRH(LDRHArmInstruction i, [C context]) =>
+      visitHalfwordDataTransfer(i, context);
 
   @override
-  R visitLDRSB(LDRSB i, [C context]) => visitHalfwordDataTransfer(i, context);
+  R visitLDRSB(LDRSBArmInstruction i, [C context]) =>
+      visitHalfwordDataTransfer(i, context);
 
   @override
-  R visitLDRSH(LDRSH i, [C context]) => visitHalfwordDataTransfer(i, context);
+  R visitLDRSH(LDRSHArmInstruction i, [C context]) =>
+      visitHalfwordDataTransfer(i, context);
 
   @override
-  R visitSTRH(STRH i, [C context]) => visitHalfwordDataTransfer(i, context);
+  R visitSTRH(STRHArmInstruction i, [C context]) =>
+      visitHalfwordDataTransfer(i, context);
 
   @override
-  R visitSWP(SWP i, [C context]) => visitInstruction(i, context);
+  R visitSWP(SWPArmInstruction i, [C context]) => visitInstruction(i, context);
 
   R visitMultiply(
     MultiplyArmInstruction i, [
@@ -166,10 +190,10 @@ class SuperArmInstructionVisitor<R, C> implements ArmInstructionVisitor<R, C> {
   }
 
   @override
-  R visitMLA(MLA i, [C context]) => visitMultiply(i);
+  R visitMLA(MLAArmInstruction i, [C context]) => visitMultiply(i);
 
   @override
-  R visitMUL(MUL i, [C context]) => visitMultiply(i);
+  R visitMUL(MULArmInstruction i, [C context]) => visitMultiply(i);
 
   R visitMultiplyLong(
     MultiplyLongArmInstruction i, [
@@ -179,36 +203,36 @@ class SuperArmInstructionVisitor<R, C> implements ArmInstructionVisitor<R, C> {
   }
 
   @override
-  R visitSMLAL(SMLAL i, [C context]) => visitMultiplyLong(i);
+  R visitSMLAL(SMLALArmInstruction i, [C context]) => visitMultiplyLong(i);
 
   @override
-  R visitSMULL(SMULL i, [C context]) => visitMultiplyLong(i);
+  R visitSMULL(SMULLArmInstruction i, [C context]) => visitMultiplyLong(i);
 
   @override
-  R visitUMLAL(UMLAL i, [C context]) => visitMultiplyLong(i);
+  R visitUMLAL(UMLALArmInstruction i, [C context]) => visitMultiplyLong(i);
 
   @override
-  R visitUMULL(UMULL i, [C context]) => visitMultiplyLong(i);
+  R visitUMULL(UMULLArmInstruction i, [C context]) => visitMultiplyLong(i);
 
   @override
-  R visitB(B i, [C context]) => visitInstruction(i, context);
+  R visitB(BArmInstruction i, [C context]) => visitInstruction(i, context);
 
   @override
-  R visitBL(BL i, [C context]) => visitInstruction(i, context);
+  R visitBL(BLArmInstruction i, [C context]) => visitInstruction(i, context);
 
   @override
-  R visitBX(BX i, [C context]) => visitInstruction(i, context);
+  R visitBX(BXArmInstruction i, [C context]) => visitInstruction(i, context);
 
   R visitPsrTransfer(PsrTransferArmInstruction i, [C context]) {
     return visitInstruction(i, context);
   }
 
   @override
-  R visitMRS(MRS i, [C context]) => visitPsrTransfer(i, context);
+  R visitMRS(MRSArmInstruction i, [C context]) => visitPsrTransfer(i, context);
 
   @override
-  R visitMSR(MSR i, [C context]) => visitPsrTransfer(i, context);
+  R visitMSR(MSRArmInstruction i, [C context]) => visitPsrTransfer(i, context);
 
   @override
-  R visitSWI(SWI i, [C context]) => visitInstruction(i, context);
+  R visitSWI(SWIArmInstruction i, [C context]) => visitInstruction(i, context);
 }

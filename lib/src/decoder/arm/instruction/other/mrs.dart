@@ -11,11 +11,11 @@ part of '../../instruction.dart';
 /// `1S`.
 @immutable
 @sealed
-class MRS extends PsrTransferArmInstruction {
+class MRSArmInstruction extends PsrTransferArmInstruction {
   /// Destination register.
   final RegisterNotPC destination;
 
-  MRS({
+  MRSArmInstruction({
     @required Condition condition,
     @required bool useSPSR,
     @required this.destination,

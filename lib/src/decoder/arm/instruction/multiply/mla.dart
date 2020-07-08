@@ -15,8 +15,8 @@ part of '../../instruction.dart';
 /// `NZx-`.
 @immutable
 @sealed
-class MLA extends MultiplyArmInstruction {
-  MLA({
+class MLAArmInstruction extends MultiplyArmInstruction {
+  MLAArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterNotPC operand1,

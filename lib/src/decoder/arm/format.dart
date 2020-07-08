@@ -134,95 +134,95 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
     final capture = pattern?.capture(input.value) ?? const [];
     if (identical(pattern, _dataProcessingOrPsrTransfer)) {
       return DataProcessingOrPsrTransferArmFormat(
-        condition: capture[0].asUint4(),
+        condition: Uint4(capture[0]),
         immediateOperand: capture[1] == 1,
-        opCode: capture[2].asUint4(),
+        opCode: Uint4(capture[2]),
         setConditionCodes: capture[3] == 1,
-        operand1Register: capture[4].asUint4(),
-        destinationRegister: capture[5].asUint4(),
+        operand1Register: Uint4(capture[4]),
+        destinationRegister: Uint4(capture[5]),
         operand2: Uint12(capture[6]),
       );
     } else if (identical(pattern, _multiply)) {
       return MultiplyArmFormat(
-        condition: capture[0].asUint4(),
+        condition: Uint4(capture[0]),
         accumulate: capture[1] == 1,
         setConditionCodes: capture[2] == 1,
-        destinationRegister: capture[3].asUint4(),
-        operandRegister1: capture[4].asUint4(),
-        operandRegister2: capture[5].asUint4(),
-        operandRegister3: capture[6].asUint4(),
+        destinationRegister: Uint4(capture[3]),
+        operandRegister1: Uint4(capture[4]),
+        operandRegister2: Uint4(capture[5]),
+        operandRegister3: Uint4(capture[6]),
       );
     } else if (identical(pattern, _multiplyLong)) {
       return MultiplyLongArmFormat(
-        condition: capture[0].asUint4(),
+        condition: Uint4(capture[0]),
         signed: capture[1] == 1,
         accumulate: capture[2] == 1,
         setConditionCodes: capture[3] == 1,
-        destinationRegisterHi: capture[4].asUint4(),
-        destinationRegisterLo: capture[5].asUint4(),
-        operandRegister1: capture[6].asUint4(),
-        operandRegister2: capture[7].asUint4(),
+        destinationRegisterHi: Uint4(capture[4]),
+        destinationRegisterLo: Uint4(capture[5]),
+        operandRegister1: Uint4(capture[6]),
+        operandRegister2: Uint4(capture[7]),
       );
     } else if (identical(pattern, _singleDataSwap)) {
       return SingleDataSwapArmFormat(
-        condition: capture[0].asUint4(),
+        condition: Uint4(capture[0]),
         swapByteQuantity: capture[1] == 1,
-        baseRegister: capture[2].asUint4(),
-        destinationRegister: capture[3].asUint4(),
-        sourceRegister: capture[4].asUint4(),
+        baseRegister: Uint4(capture[2]),
+        destinationRegister: Uint4(capture[3]),
+        sourceRegister: Uint4(capture[4]),
       );
     } else if (identical(pattern, _branchAndExchange)) {
       return BranchAndExchangeArmFormat(
-        condition: capture[0].asUint4(),
-        operand: capture[1].asUint4(),
+        condition: Uint4(capture[0]),
+        operand: Uint4(capture[1]),
       );
     } else if (identical(pattern, _halfWordDataTransfer)) {
       return HalfwordDataTransferArmFormat(
-        condition: capture[0].asUint4(),
+        condition: Uint4(capture[0]),
         preIndexingBit: capture[1] == 1,
         addOffsetBit: capture[2] == 1,
         immediateOffset: capture[3] == 1,
         writeAddressBit: capture[4] == 1,
         loadMemoryBit: capture[5] == 1,
-        baseRegister: capture[6].asUint4(),
-        sourceOrDestinationRegister: capture[7].asUint4(),
-        offsetHiNibble: capture[8].asUint4(),
+        baseRegister: Uint4(capture[6]),
+        sourceOrDestinationRegister: Uint4(capture[7]),
+        offsetHiNibble: Uint4(capture[8]),
         opCode: Uint2(capture[9]),
-        offsetLoNibble: capture[10].asUint4(),
+        offsetLoNibble: Uint4(capture[10]),
       );
     } else if (identical(pattern, _singleDataTransfer)) {
       return SingleDataTransferArmFormat(
-        condition: capture[0].asUint4(),
+        condition: Uint4(capture[0]),
         immediateOffset: capture[1] == 0,
         preIndexingBit: capture[2] == 1,
         addOffsetBit: capture[3] == 1,
         byteQuantityBit: capture[4] == 1,
         writeAddressBit: capture[5] == 1,
         loadMemoryBit: capture[6] == 1,
-        baseRegister: capture[7].asUint4(),
-        sourceOrDestinationRegister: capture[8].asUint4(),
+        baseRegister: Uint4(capture[7]),
+        sourceOrDestinationRegister: Uint4(capture[8]),
         offset: Uint12(capture[9]),
       );
     } else if (identical(pattern, _blockDataTransfer)) {
       return BlockDataTransferArmFormat(
-        condition: capture[0].asUint4(),
+        condition: Uint4(capture[0]),
         preIndexingBit: capture[1] == 1,
         addOffsetBit: capture[2] == 1,
         loadPsrOrForceUserMode: capture[3] == 1,
         writeAddressBit: capture[4] == 1,
         loadMemoryBit: capture[5] == 1,
-        baseRegister: capture[6].asUint4(),
-        registerList: capture[7].asUint16(),
+        baseRegister: Uint4(capture[6]),
+        registerList: Uint16(capture[7]),
       );
     } else if (identical(pattern, _branch)) {
       return BranchArmFormat(
-        condition: capture[0].asUint4(),
+        condition: Uint4(capture[0]),
         link: capture[1] == 1,
         offset: Uint24(capture[2]),
       );
     } else if (identical(pattern, _softwareInterrupt)) {
       return SoftwareInterruptArmFormat(
-        condition: capture[0].asUint4(),
+        condition: Uint4(capture[0]),
         comment: Uint24(capture[1]),
       );
     } else {

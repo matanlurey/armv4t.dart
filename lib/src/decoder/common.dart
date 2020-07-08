@@ -1,9 +1,9 @@
-part of '../instruction.dart';
+import 'dart:typed_data';
 
-abstract class MaySetConditionCodes implements ArmInstruction {
-  /// Whether to set condition codes on the PSR.
-  bool get setConditionCodes;
-}
+import 'package:armv4t/src/common/binary.dart';
+import 'package:binary/binary.dart';
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 
 /// Represents a comment-field that is not significant to the processor.
 @immutable
@@ -45,7 +45,9 @@ class Immediate<T extends Integral<T>> implements Shiftable<Immediate<T>> {
 @immutable
 @sealed
 abstract class Register<R extends Register<R>>
-    implements Comparable<Register<R>>, Shiftable<R> {
+    implements
+        /**/ Comparable<Register<R>>,
+        /**/ Shiftable<R> {
   /// A register that is zero-filled (`0000`).
   static final filledWith0s = RegisterAny(Uint4.zero);
 
@@ -73,6 +75,15 @@ abstract class Register<R extends Register<R>>
 @immutable
 @sealed
 class RegisterAny extends Register<RegisterAny> {
+  /// Stack pointer (`RegisterAny(Uint4(13))`).
+  static final sp = RegisterAny(Uint4(13));
+
+  /// Link register (`RegisterAny(Uint4(14))`).
+  static final lr = RegisterAny(Uint4(14));
+
+  /// Program counter (`RegisterAny(Uint4(15))`).
+  static final pc = RegisterAny(Uint4(15));
+
   RegisterAny(Uint4 index) : super._(index);
 }
 
@@ -80,6 +91,12 @@ class RegisterAny extends Register<RegisterAny> {
 @immutable
 @sealed
 class RegisterNotPC extends Register<RegisterNotPC> {
+  /// Link register (`RegisterNotPC(Uint4(14))`).
+  static final lr = RegisterNotPC(Uint4(14));
+
+  /// Stack pointer (`RegisterNotPC(Uint4(15))`).
+  static final sp = RegisterNotPC(Uint4(15));
+
   RegisterNotPC(Uint4 index) : super._(index) {
     if (index.value == 15) {
       throw RangeError.range(index.value, 0, 14);
@@ -143,7 +160,7 @@ class RegisterList<R extends Register<R>> {
     } else {
       create = (value) => RegisterAny(value) as R;
     }
-    return _values.map((value) => create(value.asUint4()));
+    return _values.map((value) => create(Uint4(value)));
   }
 }
 
