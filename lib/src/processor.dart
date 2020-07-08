@@ -45,9 +45,13 @@ abstract class Arm7Processor {
   factory Arm7Processor({Uint32List registers}) = _Arm7Processor;
 
   /// Reads the current value stored in the register [index].
+  ///
+  /// Throws [RangeError] if [index] is not within the interval `0->15`.
   Uint32 operator [](int index);
 
   /// Writes [value] into the register [index].
+  ///
+  /// Throws [RangeError] if [index] is not within the interval `0->15`.
   void operator []=(int index, Uint32 value);
 
   /// Returns a copy of the current state of the registers.
