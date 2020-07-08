@@ -26,16 +26,19 @@ void main() {
     )).readAsBytes();
 
     final input = Uint16List.view(bytes.buffer);
-    final output = input
-        .map((b) => Uint16(b))
-        .map((i) => ''
-            '${disassemble(i).padRight(32, ' ')} '
-            ';${i.value.toRadixString(16)}')
-        .join('\n');
+    final output = input.map((b) => Uint16(b)).map((i) {
+      final out = ''
+          '${disassemble(i).padRight(32, ' ')} '
+          ';0x${i.value.toRadixString(16).padLeft(4, '0')}';
+      if (out.startsWith('swi')) {
+        return '$out\n';
+      } else {
+        return out;
+      }
+    }).join('\n');
     final golden = path.join(
       'test',
       'decoder',
-      'arm',
       'thumb',
       'fasmarm_test.golden.asm',
     );
