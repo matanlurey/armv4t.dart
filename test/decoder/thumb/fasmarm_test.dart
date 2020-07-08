@@ -4,8 +4,6 @@ library armv4t.test.decoder.thumb.fasmarm_test;
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:armv4t/src/decoder/arm/format.dart';
-import 'package:armv4t/src/decoder/arm/instruction.dart';
 import 'package:armv4t/src/decoder/arm/printer.dart';
 import 'package:armv4t/src/decoder/thumb/converter.dart';
 import 'package:binary/binary.dart';

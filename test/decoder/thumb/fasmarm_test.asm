@@ -44,6 +44,8 @@ processor CPU32_V4T
   bx r0           ; -> BX Rs
   bx r8           ; -> BX Hs
 
+  swi 1           ; -> SWI 1
+
 processor CPU32_7M
   ldr r0, [PC, 1] ; -> LDR Rd, [R15, #Imm]
 
@@ -65,7 +67,7 @@ processor CPU32_7M
 
   strh r0, [r1, 2]  ; -> STRH Rd, [Rb, #Imm]
   ;TODO: Figure out what is needed to compile these.
-  ;lrdh r0, [r1, 2]  ; -> LDRH Rd, [Rb, #Imm]
+  ;lrdh r0, [r1, 2] ; -> LDRH Rd, [Rb, #Imm]
 
   str  r0, [sp, 1]  ; -> STR  Rd, [R13, #Imm]
   ldr  r0, [sp, 1]  ; -> LDR  Rd, [R13, #Imm]
@@ -73,13 +75,17 @@ processor CPU32_7M
   add r0, pc, 1     ; -> ADD  Rd, R15, #Imm
   add r0, sp, 1     ; -> ADD  Rd, R13, #Imm
 
-  add sp, 1         ; -> ADD  R13, R13, #Imm
-  add sp, -1        ; -> ADD  R13, R13, #Imm
+  ;TODO: This seems to generate a format 1 (move shifted register) instruction
+  ;where Offset5=20, which in turns causes a truncation error during conversion.
+  ;add sp, 1        ; -> ADD  R13, R13, #Imm
+  ;add sp, -1       ; -> ADD  R13, R13, #Imm
 
-  push {r0, r1-r2}  ; -> STMDB R13!, { Rlist }
-  push {r0, lr}     ; -> STMBD R13!, { Rlist, R14 }
-  pop  {r0, r1-r2}  ; -> LDMIA R13!, { Rlist }
-  pop  {r0, pc}     ; -> LDMIA R13!, { Rlist, R15 }
+  ;TODO: These seem to produce instructions that do not match anything.
+  ;0xe92d = 1110_1001_0010_1101
+  ;push {r0, r1-r2} ; -> STMDB R13!, { Rlist }
+  ;push {r0, lr}    ; -> STMBD R13!, { Rlist, R14 }
+  ;pop  {r0, r1-r2} ; -> LDMIA R13!, { Rlist }
+  ;pop  {r0, pc}    ; -> LDMIA R13!, { Rlist, R15 }
 
   stmia r0!, {r1}   ; -> STMIA Rb!, { Rlist }
   ldmia r0!, {r1}   ; -> LDMIA Rb!, { Rlist }
@@ -98,8 +104,3 @@ processor CPU32_7M
   blt 84
   bgt 84
   ble 84
-
-processor CPU32_V4T
-  swi 1
-
-  b 84

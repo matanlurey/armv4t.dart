@@ -679,11 +679,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
         destination: format.base.toLoRegister(),
-        offset: Or2.right(ShiftedRegister(
-          format.base.toLoRegisterNonPC(),
-          ShiftType.LSL,
-          format.offset.truncated,
-        )),
+        offset: Or2.left(Immediate(Uint12(format.offset.value))),
       );
     } else {
       // THUMB: LDR{B} Rd, [Rb, #Imm]
@@ -696,11 +692,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
         source: format.base.toLoRegister(),
-        offset: Or2.right(ShiftedRegister(
-          format.base.toLoRegisterNonPC(),
-          ShiftType.LSL,
-          format.offset.truncated,
-        )),
+        offset: Or2.left(Immediate(Uint12(format.offset.value))),
       );
     }
   }
