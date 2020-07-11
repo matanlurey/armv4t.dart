@@ -6,13 +6,6 @@ import 'package:meta/meta.dart';
 
 import 'assert.dart';
 
-// TODO(https://github.com/matanlurey/binary.dart/issues/22).
-extension IntegralX<T extends Integral<T>> on Integral<T> {
-  T toggleBit(int bit, bool set) {
-    return set ? setBit(bit) : clearBit(bit);
-  }
-}
-
 /// Encapsulates an unsigned 2-bit aggregation.
 @sealed
 class Uint2 extends Integral<Uint2> {
