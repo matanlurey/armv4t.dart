@@ -150,7 +150,7 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
     '1110_0OOO_OOOO_OOOO',
   ).build('UNCONDITIONAL_BRANCH');
 
-  static final _allKnownPatterns = [
+  static final _allKnownPatterns = BitPatternGroup([
     _addOffsetToStackPointer,
     _addOrSubtract,
     _aluOperations,
@@ -170,7 +170,7 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
     _softwareInterrupt,
     _spRelativeLoadOrStore,
     _unconditionalBranch,
-  ].toGroup();
+  ]);
 
   const ThumbFormatDecoder();
 

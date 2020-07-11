@@ -110,7 +110,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
     'CCCC_1111_XXXX_XXXX_XXXX_XXXX_XXXX_XXXX',
   ).build('SOFTWARE_INTERRUPT');
 
-  static final _allKnownPatterns = [
+  static final _allKnownPatterns = BitPatternGroup([
     _dataProcessingOrPsrTransfer,
     _multiply,
     _multiplyLong,
@@ -121,7 +121,7 @@ class ArmFormatDecoder extends Converter<Uint32, ArmFormat> {
     _blockDataTransfer,
     _branch,
     _softwareInterrupt,
-  ].toGroup();
+  ]);
 
   const ArmFormatDecoder();
 
