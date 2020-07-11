@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:armv4t/src/common/assert.dart';
+import 'package:armv4t/src/common/binary.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -16,11 +17,23 @@ class ArmOperatingMode {
   static const und = ArmOperatingMode._(0x1b, 'und');
   static const sys = ArmOperatingMode._(0x1f, 'sys');
 
-  /// 4-bit value that represents this mode.
+  /// 5-bit value that represents this mode.
   final int value;
 
   /// Name of the operating mode.
   final String name;
+
+  factory ArmOperatingMode.from(int bits) {
+    Uint5.checkRange(bits);
+    if (bits == usr.value) return usr;
+    if (bits == fiq.value) return fiq;
+    if (bits == irq.value) return irq;
+    if (bits == svc.value) return svc;
+    if (bits == abt.value) return abt;
+    if (bits == und.value) return und;
+    if (bits == sys.value) return sys;
+    throw ArgumentError('Unknown value: $bits');
+  }
 
   const ArmOperatingMode._(this.value, this.name);
 
@@ -37,6 +50,12 @@ class ArmOperatingMode {
 /// An emulated ARMv7 CPU.
 @sealed
 abstract class Arm7Processor {
+  /// Returns a default (valid) register set for a reset processor state.
+  @visibleForTesting
+  static Uint32List defaultRegisterSet() {
+    return _Arm7Processor._defaultRegisterSet();
+  }
+
   /// Creates a new [Arm7Processor], which uses the `ARMv4T` instruction set.
   ///
   /// May optionally provide an initial set of [registers], but these are
@@ -45,7 +64,12 @@ abstract class Arm7Processor {
   factory Arm7Processor({Uint32List registers}) = _Arm7Processor;
 
   /// Current program status register.
-  StatusRegister get psr;
+  StatusRegister get cpsr;
+  set cpsr(StatusRegister psr);
+
+  /// Saved program status register.
+  StatusRegister get spsr;
+  set spsr(StatusRegister psr);
 
   /// Reads the current value stored in the register [index].
   ///
@@ -62,6 +86,20 @@ abstract class Arm7Processor {
 }
 
 class _Arm7Processor implements Arm7Processor {
+  static Uint32List _defaultRegisterSet() => Uint32List(_physicalRegisters)
+    ..[_statusRegistersUsr] =
+        StatusRegister._defaultForMode(ArmOperatingMode.usr).toBits().value
+    ..[_statusRegsitersFiq] =
+        StatusRegister._defaultForMode(ArmOperatingMode.fiq).toBits().value
+    ..[_statusRegistersSvc] =
+        StatusRegister._defaultForMode(ArmOperatingMode.svc).toBits().value
+    ..[_statusRegistersAbt] =
+        StatusRegister._defaultForMode(ArmOperatingMode.abt).toBits().value
+    ..[_statusRegistersIrq] =
+        StatusRegister._defaultForMode(ArmOperatingMode.irq).toBits().value
+    ..[_statusRegistersUnd] =
+        StatusRegister._defaultForMode(ArmOperatingMode.und).toBits().value;
+
   /// Number of registers that are available normally.
   ///
   /// This includes ro->r14, as well as r15 (the program counter).
@@ -114,7 +152,8 @@ class _Arm7Processor implements Arm7Processor {
 
   factory _Arm7Processor({Uint32List registers}) {
     if (registers == null) {
-      registers = Uint32List(_physicalRegisters);
+      // Create a new empty register set.
+      registers = _defaultRegisterSet();
     } else if (registers.length != _physicalRegisters) {
       throw ArgumentError.value(
         registers,
@@ -127,7 +166,7 @@ class _Arm7Processor implements Arm7Processor {
 
   const _Arm7Processor._(this._registers);
 
-  ArmOperatingMode get _mode => ArmOperatingMode.usr;
+  ArmOperatingMode get _mode => cpsr.mode;
 
   static const _statusRegistersUsr = 16;
   static const _bankedRegistersFiq = 17;
@@ -149,33 +188,57 @@ class _Arm7Processor implements Arm7Processor {
       if (mode == ArmOperatingMode.usr || mode == ArmOperatingMode.sys) {
         return index;
       } else {
-        final offset = index - 8;
-        switch (mode) {
-          case ArmOperatingMode.fiq:
-            return _bankedRegistersFiq + offset;
-          case ArmOperatingMode.svc:
-            return _bankedRegistersSvc + offset;
-          case ArmOperatingMode.abt:
-            return _bankedRegistersAbt + offset;
-          case ArmOperatingMode.irq:
-            return _bankedRegistersIrq + offset;
-          case ArmOperatingMode.und:
-            return _bankedRegistersUnd + offset;
-          default:
-            throw StateError('Unexpected: $mode');
+        if (mode == ArmOperatingMode.fiq) {
+          final offset = index - 8;
+          return _bankedRegistersFiq + offset;
+        } else {
+          if (index < 13) {
+            return index;
+          } else {
+            final offset = index - 13;
+            switch (mode) {
+              case ArmOperatingMode.svc:
+                return _bankedRegistersSvc + offset;
+              case ArmOperatingMode.abt:
+                return _bankedRegistersAbt + offset;
+              case ArmOperatingMode.irq:
+                return _bankedRegistersIrq + offset;
+              case ArmOperatingMode.und:
+                return _bankedRegistersUnd + offset;
+              default:
+                throw StateError('Unexpected: $mode');
+            }
+          }
         }
       }
     }
   }
 
   @override
-  StatusRegister get psr => StatusRegister(Uint32(_statusRegister));
+  StatusRegister get cpsr {
+    return StatusRegister(Uint32(_registers[_statusRegistersUsr]));
+  }
 
-  int get _statusRegister {
+  @override
+  set cpsr(StatusRegister psr) {
+    _registers[_statusRegistersUsr] = psr.toBits().value;
+  }
+
+  @override
+  StatusRegister get spsr {
+    return StatusRegister(Uint32(_registers[_savedStatusRegister]));
+  }
+
+  @override
+  set spsr(StatusRegister psr) {
+    _registers[_savedStatusRegister] = psr.toBits().value;
+  }
+
+  int get _savedStatusRegister {
     switch (_mode) {
       case ArmOperatingMode.usr:
       case ArmOperatingMode.sys:
-        return _registers[_statusRegistersUsr];
+        throw StateError('Cannot access SPSR in USR/SYS');
       case ArmOperatingMode.fiq:
         return _registers[_statusRegsitersFiq];
       case ArmOperatingMode.svc:
@@ -207,12 +270,151 @@ class _Arm7Processor implements Arm7Processor {
   Uint32List copyRegisters() => Uint32List.fromList(_registers);
 }
 
-class StatusRegister {
-  const factory StatusRegister(Uint32 value) = _StatusRegister;
+/// Represents an immutable program status register (`PSR`).
+@immutable
+@sealed
+abstract class StatusRegister {
+  factory StatusRegister([Uint32 value]) {
+    if (value == null) {
+      return StatusRegister._defaultForMode(ArmOperatingMode.usr);
+    } else {
+      final register = _StatusRegister(value);
+      // Assert that the mode can be loaded (e.g. is a valid/known range).
+      register.mode;
+      return register;
+    }
+  }
+
+  factory StatusRegister._defaultForMode(ArmOperatingMode mode) {
+    return _StatusRegister(Uint32.zero.replaceBitRange(4, 0, mode.value));
+  }
+
+  /// Returns a new [StatusRegister] with any non-null fields updated.
+  StatusRegister update({
+    bool isSigned,
+    bool isZero,
+    bool isCarry,
+    bool isOverflow,
+    bool irqDisabled,
+    bool fiqDisabled,
+    bool thumbState,
+    ArmOperatingMode mode,
+  });
+
+  /// Whether bit `31` (`N`) set, signifying "signed", otherwise not signed.
+  bool get isSigned;
+
+  /// Whether bit `30` (`Z`) set, signifying "zero", othwerwise not zero.
+  bool get isZero;
+
+  /// Whether bit `29` (`C`) set, signifying "carry", otherwise no carry.
+  bool get isCarry;
+
+  /// Whether bit `28` (`V`) set, signifying "overflow", otherwise no overflow.
+  bool get isOverflow;
+
+  /// Whether bit `7` (`I`) set, signifying that `IRQ` is disabled.
+  bool get irqDisabled;
+
+  /// Whether bit `6` (`F`) set, signifying that `FIQ` is disabled.
+  bool get fiqDisabled;
+
+  /// Whether bit `5` (`T`) set, signifying that `THUMB` mode is enabled.
+  bool get thumbState;
+
+  /// Current operating mode (bits 4-0).
+  ArmOperatingMode get mode;
+
+  /// Returns the bit representation of this register.
+  Uint32 toBits();
 }
 
 class _StatusRegister implements StatusRegister {
+  static const _N = 31;
+  static const _Z = 30;
+  static const _C = 29;
+  static const _V = 28;
+  static const _I = 7;
+  static const _F = 6;
+  static const _T = 5;
+  static const _M4 = 4;
+  static const _M0 = 0;
+
   final Uint32 _value;
 
   const _StatusRegister(this._value);
+
+  @override
+  bool operator ==(Object o) => o is _StatusRegister && _value == o._value;
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  StatusRegister update({
+    bool isSigned,
+    bool isZero,
+    bool isCarry,
+    bool isOverflow,
+    bool irqDisabled,
+    bool fiqDisabled,
+    bool thumbState,
+    ArmOperatingMode mode,
+  }) {
+    var value = _value;
+    if (isSigned != null) {
+      value = value.toggleBit(_N, isSigned);
+    }
+    if (isZero != null) {
+      value = value.toggleBit(_Z, isZero);
+    }
+    if (isCarry != null) {
+      value = value.toggleBit(_C, isCarry);
+    }
+    if (isOverflow != null) {
+      value = value.toggleBit(_V, isOverflow);
+    }
+    if (irqDisabled != null) {
+      value = value.toggleBit(_I, irqDisabled);
+    }
+    if (fiqDisabled != null) {
+      value = value.toggleBit(_F, fiqDisabled);
+    }
+    if (thumbState != null) {
+      value = value.toggleBit(_T, thumbState);
+    }
+    if (mode != null) {
+      value = value.replaceBitRange(_M4, _M0, mode.value);
+    }
+    return _StatusRegister(value);
+  }
+
+  @override
+  bool get isSigned => _value.isSet(_N);
+
+  @override
+  bool get isZero => _value.isSet(_Z);
+
+  @override
+  bool get isCarry => _value.isSet(_C);
+
+  @override
+  bool get isOverflow => _value.isSet(_V);
+
+  @override
+  bool get irqDisabled => _value.isSet(_I);
+
+  @override
+  bool get fiqDisabled => _value.isSet(_F);
+
+  @override
+  bool get thumbState => _value.isSet(_T);
+
+  @override
+  ArmOperatingMode get mode {
+    return ArmOperatingMode.from(_value.bitRange(_M4, _M0).value);
+  }
+
+  @override
+  Uint32 toBits() => _value;
 }
