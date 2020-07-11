@@ -44,6 +44,9 @@ abstract class Arm7Processor {
   /// they were not originally created by a compatible instance of this class.
   factory Arm7Processor({Uint32List registers}) = _Arm7Processor;
 
+  /// Current program status register.
+  StatusRegister get psr;
+
   /// Reads the current value stored in the register [index].
   ///
   /// Throws [RangeError] if [index] is not within the interval `0->15`.
@@ -124,18 +127,92 @@ class _Arm7Processor implements Arm7Processor {
 
   const _Arm7Processor._(this._registers);
 
+  ArmOperatingMode get _mode => ArmOperatingMode.usr;
+
+  static const _statusRegistersUsr = 16;
+  static const _bankedRegistersFiq = 17;
+  static const _statusRegsitersFiq = 24;
+  static const _bankedRegistersSvc = 25;
+  static const _statusRegistersSvc = 27;
+  static const _bankedRegistersAbt = 28;
+  static const _statusRegistersAbt = 30;
+  static const _bankedRegistersIrq = 31;
+  static const _statusRegistersIrq = 33;
+  static const _bankedRegistersUnd = 34;
+  static const _statusRegistersUnd = 36;
+
+  int _swapBankedRegister(int index) {
+    if (index < 8 || index == 15) {
+      return index;
+    } else {
+      final mode = _mode;
+      if (mode == ArmOperatingMode.usr || mode == ArmOperatingMode.sys) {
+        return index;
+      } else {
+        final offset = index - 8;
+        switch (mode) {
+          case ArmOperatingMode.fiq:
+            return _bankedRegistersFiq + offset;
+          case ArmOperatingMode.svc:
+            return _bankedRegistersSvc + offset;
+          case ArmOperatingMode.abt:
+            return _bankedRegistersAbt + offset;
+          case ArmOperatingMode.irq:
+            return _bankedRegistersIrq + offset;
+          case ArmOperatingMode.und:
+            return _bankedRegistersUnd + offset;
+          default:
+            throw StateError('Unexpected: $mode');
+        }
+      }
+    }
+  }
+
+  @override
+  StatusRegister get psr => StatusRegister(Uint32(_statusRegister));
+
+  int get _statusRegister {
+    switch (_mode) {
+      case ArmOperatingMode.usr:
+      case ArmOperatingMode.sys:
+        return _registers[_statusRegistersUsr];
+      case ArmOperatingMode.fiq:
+        return _registers[_statusRegsitersFiq];
+      case ArmOperatingMode.svc:
+        return _registers[_statusRegistersSvc];
+      case ArmOperatingMode.abt:
+        return _registers[_statusRegistersAbt];
+      case ArmOperatingMode.irq:
+        return _registers[_statusRegistersIrq];
+      case ArmOperatingMode.und:
+        return _registers[_statusRegistersUnd];
+      default:
+        throw StateError('Unexpected: $_mode');
+    }
+  }
+
   @override
   Uint32 operator [](int index) {
     RangeError.checkValueInInterval(index, 0, _userRegisters);
-    return _registers.getBoxed(index);
+    return _registers.getBoxed(_swapBankedRegister(index));
   }
 
   @override
   void operator []=(int index, Uint32 value) {
     RangeError.checkValueInInterval(index, 0, _userRegisters);
-    _registers[index] = value.value;
+    _registers[_swapBankedRegister(index)] = value.value;
   }
 
   @override
   Uint32List copyRegisters() => Uint32List.fromList(_registers);
+}
+
+class StatusRegister {
+  const factory StatusRegister(Uint32 value) = _StatusRegister;
+}
+
+class _StatusRegister implements StatusRegister {
+  final Uint32 _value;
+
+  const _StatusRegister(this._value);
 }
