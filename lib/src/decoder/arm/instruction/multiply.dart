@@ -1,5 +1,10 @@
 part of '../instruction.dart';
 
+/// These instructions operate on the general-purpose registers.
+///
+/// This is the base class for any instruction that provides multiplication.
+///
+/// See also [DataProcessingArmInstruction], a similar set of instructions.
 abstract class MultiplyAndMultiplyLongArmInstruction
     /**/ extends ArmInstruction
     /**/ implements
@@ -24,6 +29,7 @@ abstract class MultiplyAndMultiplyLongArmInstruction
   }) : super._(condition: condition);
 }
 
+/// Provides 32-bit results of multiplication.
 abstract class MultiplyArmInstruction
     extends MultiplyAndMultiplyLongArmInstruction {
   /// Destination register.
@@ -54,6 +60,7 @@ abstract class MultiplyArmInstruction
   }
 }
 
+/// Similar to [MultiplyArmInstruction], but may provide 64-bit results.
 abstract class MultiplyLongArmInstruction
     extends MultiplyAndMultiplyLongArmInstruction {
   /// Destination register (Hi bits).

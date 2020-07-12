@@ -14,6 +14,36 @@ void main() {
       expect(registers, Arm7Processor(registers: registers).copyRegisters());
     });
 
+    group('alias registers', () {
+      Arm7Processor cpu;
+
+      setUp(() {
+        cpu = Arm7Processor(registers: registers);
+      });
+
+      test('SP', () {
+        expect(cpu.stackPointer, Uint32.zero);
+
+        cpu.stackPointer = Uint32(8);
+        expect(cpu.stackPointer, Uint32(8));
+        expect(registers[13], 8);
+      });
+      test('LR', () {
+        expect(cpu.linkRegister, Uint32.zero);
+
+        cpu.linkRegister = Uint32(8);
+        expect(cpu.linkRegister, Uint32(8));
+        expect(registers[14], 8);
+      });
+      test('PC', () {
+        expect(cpu.programCounter, Uint32.zero);
+
+        cpu.programCounter = Uint32(8);
+        expect(cpu.programCounter, Uint32(8));
+        expect(registers[15], 8);
+      });
+    });
+
     // - `00 -> 15`: General registers.
     // - `16`:       `CPSR`.
     group('should use default registers', () {
