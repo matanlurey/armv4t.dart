@@ -346,15 +346,26 @@ abstract class StatusRegister {
   });
 
   /// Whether bit `31` (`N`) set, signifying "signed", otherwise not signed.
+  ///
+  /// This is set if the result of an operation is negative (e.g. the most
+  /// significant bit - _msb_ - is a `1`).
   bool get isSigned;
 
   /// Whether bit `30` (`Z`) set, signifying "zero", othwerwise not zero.
+  ///
+  /// This is set if the result of an operation is `0`.
   bool get isZero;
 
   /// Whether bit `29` (`C`) set, signifying "carry", otherwise no carry.
+  ///
+  /// This is set if the result of an operation has a _carry_ out of its _msb_
+  /// (most significant bit).
   bool get isCarry;
 
   /// Whether bit `28` (`V`) set, signifying "overflow", otherwise no overflow.
+  ///
+  /// Set if a sum of two positive operands gives a negative result or if the
+  /// sum of two negative operands gives a positive result.
   bool get isOverflow;
 
   /// Whether bit `7` (`I`) set, signifying that `IRQ` is disabled.
