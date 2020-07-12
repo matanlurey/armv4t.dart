@@ -2,7 +2,6 @@ import 'package:armv4t/armv4t.dart';
 import 'package:armv4t/src/decoder/arm/condition.dart';
 import 'package:armv4t/src/emulator/condition.dart';
 import 'package:armv4t/src/processor.dart';
-import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
 class TestConditionEvaluator with ConditionEvaluator {
