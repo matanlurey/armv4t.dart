@@ -24,10 +24,33 @@ mixin OperandEvaluator {
   @protected
   @visibleForTesting
   Uint32 evaluateImmediate(
-    ShiftedImmediate immediate, {
-    bool setFlags = false,
+    ShiftedImmediate immediate,
+  ) {
+    final value = immediate.immediate.value.value;
+    final rorSh = immediate.rorShift.value;
+    return Uint32(value.rotateRight(rorSh));
+  }
+
+  Uint32 _performShifts(
+    Uint32 value,
+    ShiftType type,
+    int n, {
+    @required bool setFlags,
   }) {
-    throw UnimplementedError();
+    switch (type) {
+      case ShiftType.LSL:
+        return logicalShiftLeft(value, n, setFlags: setFlags);
+      case ShiftType.LSR:
+        return logicalShiftRight(value, n, setFlags: setFlags);
+      case ShiftType.ASR:
+        return arithmeticShiftRight(value, n, setFlags: setFlags);
+      case ShiftType.ROR:
+        return rotateRightShift(value, n, setFlags: setFlags);
+      case ShiftType.RRX:
+        return rotateRightOneBitWithExtend(value, setFlags: setFlags);
+      default:
+        throw StateError('Unexpected: $type');
+    }
   }
 
   /// Returns the result for the provided [register] shifted by an immediate.
@@ -37,7 +60,11 @@ mixin OperandEvaluator {
     ShiftedRegister<Immediate, Register> register, {
     bool setFlags = false,
   }) {
-    throw UnimplementedError();
+    final index = register.operand.index.value;
+    final input = cpu[index];
+    final shift = register.type;
+    final value = register.by.value.value;
+    return _performShifts(input, shift, value, setFlags: setFlags);
   }
 
   /// Returns the result for the provided [register] shifted by a register.
@@ -47,7 +74,11 @@ mixin OperandEvaluator {
     ShiftedRegister<Register, Register> register, {
     bool setFlags = false,
   }) {
-    throw UnimplementedError();
+    final index = register.operand.index.value;
+    final input = cpu[index];
+    final shift = register.type;
+    final value = cpu[register.by.index.value].value;
+    return _performShifts(input, shift, value, setFlags: setFlags);
   }
 
   /// Arithmetic shift right (`>>>`) [value] by [n].
