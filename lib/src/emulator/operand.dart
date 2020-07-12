@@ -13,6 +13,7 @@ mixin OperandEvaluator {
   static final _maxUint32 = Uint32(0xffffffff);
 
   /// Provides an implementation of the CPU to access registers and PSR.
+  @protected
   Arm7Processor get cpu;
 
   /// Returns the result for the provided [immediate] value.
