@@ -1,4 +1,4 @@
-import 'package:armv4t/src/interpreter.dart';
+import 'package:armv4t/src/emulator/operand.dart';
 import 'package:armv4t/src/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
