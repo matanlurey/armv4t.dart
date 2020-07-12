@@ -23,21 +23,30 @@ mixin OperandEvaluator {
   /// ways to represent all powers `2`.
   @protected
   @visibleForTesting
-  Uint32 evaluateImmediate(ShiftedImmediate immediate) {
+  Uint32 evaluateImmediate(
+    ShiftedImmediate immediate, {
+    bool setFlags = false,
+  }) {
     throw UnimplementedError();
   }
 
   /// Returns the result for the provided [register] shifted by an immediate.
   @protected
   @visibleForTesting
-  Uint32 evaluateShiftRegister(ShiftedRegister<Immediate, Register> register) {
+  Uint32 evaluateShiftRegister(
+    ShiftedRegister<Immediate, Register> register, {
+    bool setFlags = false,
+  }) {
     throw UnimplementedError();
   }
 
   /// Returns the result for the provided [register] shifted by a register.
   @protected
   @visibleForTesting
-  Uint32 evaluateRegisters(ShiftedRegister<Register, Register> register) {
+  Uint32 evaluateRegisters(
+    ShiftedRegister<Register, Register> register, {
+    bool setFlags = false,
+  }) {
     throw UnimplementedError();
   }
 
@@ -71,11 +80,9 @@ mixin OperandEvaluator {
     bool setFlags = false,
   }) {
     if (n == 0) {
-      if (value.msb) {
-        return _maxUint32;
-      } else {
-        return Uint32.zero;
-      }
+      final msb = value.msb;
+      cpu.cpsr = cpu.cpsr.update(isCarry: msb);
+      return msb ? _maxUint32 : Uint32.zero;
     }
     return value.shiftRight(n);
   }
@@ -184,7 +191,14 @@ mixin OperandEvaluator {
   /// _*: `-1,073,741,823`._
   @protected
   @visibleForTesting
-  Uint32 rotateRightShift(Uint32 value, int n) {
+  Uint32 rotateRightShift(
+    Uint32 value,
+    int n, {
+    bool setFlags = false,
+  }) {
+    if (n == 0) {
+      return rotateRightOneBitWithExtend(value, setFlags: setFlags);
+    }
     return value.rotateRight(n);
   }
 
