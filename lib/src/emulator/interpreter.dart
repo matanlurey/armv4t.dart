@@ -1,6 +1,7 @@
 import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/decoder/arm/instruction.dart';
 import 'package:armv4t/src/emulator/condition.dart';
+import 'package:armv4t/src/emulator/number.dart';
 import 'package:armv4t/src/emulator/operand.dart';
 import 'package:armv4t/src/processor.dart';
 import 'package:binary/binary.dart';
@@ -40,12 +41,10 @@ class _ArmInterpreter
 
   // SHARED / COMMON
 
-  // ignore: unused_element
   Uint32 _readRegister(Register r) => cpu[r.index.value];
-  // ignore: unused_element
-  Uint32 _writeRegister(RegisterNotPC r, Uint32 v) => cpu[r.index.value] = v;
 
-  // ignore: unused_element
+  Uint32 _writeRegister(Register r, Uint32 v) => cpu[r.index.value] = v;
+
   Uint32 _visitOperand2(
     Or3<
             ShiftedRegister<Immediate<Uint4>, RegisterAny>,
@@ -60,24 +59,70 @@ class _ArmInterpreter
     );
   }
 
+  void _writeToAllFlags(
+    Num64 result, {
+    @required bool op1Signed,
+    @required bool op2Signed,
+  }) {
+    cpu.cpsr = cpu.cpsr.update(
+      // V (If + and + is -, or - and - is +)
+      isOverflow: (op1Signed == op2Signed) != result.isSigned,
+
+      // C (Discard MSB)
+      isCarry: result.hiBits != 0 ? result.loBits.msb(32) : false,
+
+      // Z (If RES == 0)
+      isZero: result.isZero,
+
+      // N (If MSB == 1)
+      isSigned: result.isSigned,
+    );
+  }
+
   // DATA PROCESSING
 
   // Arithmetic
 
+  Uint32 _addWithCarry(
+    Uint32 op1,
+    Uint32 op2, {
+    int carryIn = 0,
+    bool setFlags = false,
+  }) {
+    final uSum = Num64.fromUint32(op1) + Num64.fromUint32(op2) + Num64(carryIn);
+    if (setFlags) {
+      _writeToAllFlags(
+        uSum,
+        op1Signed: op1.msb,
+        op2Signed: op2.msb,
+      );
+    }
+    return uSum.toUint32();
+  }
+
   @override
   void visitADD(ADDArmInstruction i, [void _]) {
-    /*
-    final o1 = _readRegister(i.operand1);
-    final o2 = _visitOperand2(i.operand2);
-    if (i.setConditionCodes) {}
-    _writeRegister(i.destination, o1 + o2);
-    */
-    throw UnimplementedError();
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = _addWithCarry(
+      op1,
+      op2,
+      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+    );
+    _writeRegister(i.destination, res);
   }
 
   @override
   void visitADC(ADCArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = _addWithCarry(
+      op1,
+      op2,
+      carryIn: cpu.cpsr.isCarry ? 1 : 0,
+      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+    );
+    _writeRegister(i.destination, res);
   }
 
   @override

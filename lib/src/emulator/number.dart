@@ -48,6 +48,10 @@ abstract class Num64 {
   @nonVirtual
   bool get isZero => hiBits == 0 && loBits == 0;
 
+  /// Whether the most significant bit is `1`.
+  @nonVirtual
+  bool get isSigned => (hiBits == 0 ? loBits : hiBits).msb(32);
+
   /// Adds two numbers together, returning a resulting number.
   @nonVirtual
   Num64 operator +(Num64 other) {
@@ -97,6 +101,10 @@ abstract class Num64 {
       return super.toString();
     }
   }
+
+  /// Return truncated purely as a 32-bit unsigned integer ([loBits]).
+  @nonVirtual
+  Uint32 toUint32() => Uint32(loBits);
 }
 
 /// An immediate result [Num64] that is created from an [Uint32] instance.
