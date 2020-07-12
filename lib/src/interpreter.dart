@@ -23,13 +23,14 @@ mixin OperandEvaluator {
   /// ways to represent all powers `2`.
   @protected
   @visibleForTesting
-  Uint32 evaluateImmediate(
-    ShiftedImmediate immediate,
+  Uint32 evaluateImmediate<I extends Integral<I>>(
+    ShiftedImmediate<I> immediate,
   ) {
-    final value = immediate.immediate.value.value;
+    final value = immediate.immediate.value;
     final rorSh = immediate.rorShift.value;
     // Intentionally does not flow through rotateRightShift.
-    return Uint32(value.rotateRight(rorSh));
+    final result = value.rotateRightShift(rorSh);
+    return Uint32(result.value);
   }
 
   Uint32 _performShifts(
@@ -88,6 +89,8 @@ mixin OperandEvaluator {
   /// complement signed integer. The original bit `[31]` is copied into the
   /// left-hand [n] bits of the register.
   ///
+  /// If [setFlags], the most significant discard bit is shifted to _carry_.
+  ///
   /// > NOTE: If [n] is `0` (e.g. represents `ASR 0`), it is used a special
   /// > encoding to represent `ASR #32`, which has a guaranteed result of either
   /// > all `1s` or all `0s`, depending on the most significant bit of [value],
@@ -116,7 +119,10 @@ mixin OperandEvaluator {
       cpu.cpsr = cpu.cpsr.update(isCarry: msb);
       return msb ? _maxUint32 : Uint32.zero;
     }
-    return value.shiftRight(n);
+    if (setFlags) {
+      cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(n));
+    }
+    return value.signedRightShift(n);
   }
 
   /// Logical shift right (`>>`) [value] by [n].
@@ -124,7 +130,7 @@ mixin OperandEvaluator {
   /// Divdes [value] by `2^n`, if the contents are regarded as an unsigned
   /// integer. The left-hand [n] bits of the register are set to `0`.
   ///
-  /// If [setFlags], the least significant discard bit is shifted to _carry_.
+  /// If [setFlags], the most significant discard bit is shifted to _carry_.
   ///
   /// > NOTE: If [n] is `0` (e.g. represents `LSR 0`), it is used as a special
   /// > encoding to represent `LSR #32`, which has a guaranteed zero result with
@@ -149,7 +155,7 @@ mixin OperandEvaluator {
     bool setFlags = false,
   }) {
     // Special case: Return zero, shift the most significant bit to _carry_.
-    // This is basically a shortcut to just move the MSB to carry.
+    // This is basically a shortcut to just move the nth-bit to carry.
     if (n == 0) {
       cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(31));
       return Uint32.zero;
@@ -166,7 +172,7 @@ mixin OperandEvaluator {
   /// integer. Overflow may occur without warning. The right-hand [n] bits of
   /// the register are set to `0`.
   ///
-  /// If [setFlags], the least significant discard bit is shifted to _carry_.
+  /// If [setFlags], the most significant discard bit is shifted to _carry_.
   ///
   /// > NOTE: If [n] is `0` (e.g. represents `LSL 0`), this is special cased as
   /// > an operation that directly uses [value] as the operand and does not set
@@ -196,7 +202,7 @@ mixin OperandEvaluator {
       return value;
     }
     if (setFlags) {
-      cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(31 - n));
+      cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(32 - n));
     }
     return value << Uint32(n);
   }
@@ -205,8 +211,11 @@ mixin OperandEvaluator {
   ///
   /// At the same time, all other bits are moved right by [n] bits.
   ///
+  /// If [setFlags], the least significant bit is shifted to _carry_.
+  ///
   /// > NOTE: If [n] is `0` (e.g. represents `ROR 0`), this is special cased as
-  /// > [rotateRightOneBitWithExtend] (`RRX`).
+  /// > [rotateRightOneBitWithExtend] (`RRX`), which in turn will shift _carry_
+  /// > if [setFlags] is set.
   ///
   /// ## Example
   ///
@@ -231,7 +240,10 @@ mixin OperandEvaluator {
     if (n == 0) {
       return rotateRightOneBitWithExtend(value, setFlags: setFlags);
     }
-    return value.rotateRight(n);
+    if (setFlags) {
+      cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(0));
+    }
+    return value.rotateRightShift(n);
   }
 
   /// Shifts the contents of [value] by one bit.
