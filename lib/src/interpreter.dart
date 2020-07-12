@@ -28,6 +28,7 @@ mixin OperandEvaluator {
   ) {
     final value = immediate.immediate.value.value;
     final rorSh = immediate.rorShift.value;
+    // Intentionally does not flow through rotateRightShift.
     return Uint32(value.rotateRight(rorSh));
   }
 
