@@ -50,6 +50,10 @@ class ArmOperatingMode {
 /// An emulated ARMv7 CPU.
 @sealed
 abstract class Arm7Processor {
+  static const _SP = 13;
+  static const _LR = 14;
+  static const _PC = 15;
+
   /// Returns a default (valid) register set for a reset processor state.
   @visibleForTesting
   static Uint32List defaultRegisterSet() {
@@ -63,6 +67,9 @@ abstract class Arm7Processor {
   /// they were not originally created by a compatible instance of this class.
   factory Arm7Processor({Uint32List registers}) = _Arm7Processor;
 
+  @protected
+  const Arm7Processor._();
+
   /// Current program status register.
   StatusRegister get cpsr;
   set cpsr(StatusRegister psr);
@@ -70,6 +77,43 @@ abstract class Arm7Processor {
   /// Saved program status register.
   StatusRegister get spsr;
   set spsr(StatusRegister psr);
+
+  /// `r13`: The _Stack Pointer_ (`SP`) during [StatusRegister.thumbState].
+  ///
+  /// While in _ARM_ state the usr may decide to use `r13` and/or other
+  /// register(s) as stack pointer(s), or as a general purpose regsiter. There's
+  /// a separate `r13` register for _each_ [ArmOperatingMode], and (when used as
+  /// a stack pointer) each exception handler may (really, _must_) use its own
+  /// stack.
+  @nonVirtual
+  Uint32 get stackPointer => this[_SP];
+  set stackPointer(Uint32 value) => this[_SP] = value;
+
+  /// `r14`: The _Link Register_ (`LR`).
+  ///
+  /// When calling to a sub-routine by a Branch with Link (`LR`) instruction,
+  /// then the return address (i.e. the old value of [programCounter]) is saved
+  /// in this register.
+  ///
+  /// Storing the return address in [linkRegister] is faster than pushing it
+  /// into memory, however, as there's only one `LR` for each [ArmOperatingMode]
+  /// the user must manually push its content before entering nested routines.
+  ///
+  /// Same happens when an exception is called; [programCounter] is saved in the
+  /// [linkRegister] of the new [ArmOperatingMode].
+  ///
+  /// > NOTE: In _ARM_ mode, `r14` _may_ be used as a general purpose register
+  /// > provided that the above usage as a link register isn't required.
+  @nonVirtual
+  Uint32 get linkRegister => this[_LR];
+  set linkRegister(Uint32 value) => this[_LR] = value;
+
+  /// `r15`: **Always** used as the _Program Counter_ (`PC`).
+  ///
+  /// TODO(https://github.com/matanlurey/armv4t.dart/issues/41): Pipe-lining?
+  @nonVirtual
+  Uint32 get programCounter => this[_PC];
+  set programCounter(Uint32 value) => this[_PC] = value;
 
   /// Reads the current value stored in the register [index].
   ///
@@ -85,7 +129,7 @@ abstract class Arm7Processor {
   Uint32List copyRegisters();
 }
 
-class _Arm7Processor implements Arm7Processor {
+class _Arm7Processor extends Arm7Processor {
   static Uint32List _defaultRegisterSet() => Uint32List(_physicalRegisters)
     ..[_statusRegistersUsr] =
         StatusRegister._defaultForMode(ArmOperatingMode.usr).toBits().value
@@ -164,7 +208,7 @@ class _Arm7Processor implements Arm7Processor {
     return _Arm7Processor._(registers);
   }
 
-  const _Arm7Processor._(this._registers);
+  const _Arm7Processor._(this._registers) : super._();
 
   ArmOperatingMode get _mode => cpsr.mode;
 
@@ -302,15 +346,26 @@ abstract class StatusRegister {
   });
 
   /// Whether bit `31` (`N`) set, signifying "signed", otherwise not signed.
+  ///
+  /// This is set if the result of an operation is negative (e.g. the most
+  /// significant bit - _msb_ - is a `1`).
   bool get isSigned;
 
   /// Whether bit `30` (`Z`) set, signifying "zero", othwerwise not zero.
+  ///
+  /// This is set if the result of an operation is `0`.
   bool get isZero;
 
   /// Whether bit `29` (`C`) set, signifying "carry", otherwise no carry.
+  ///
+  /// This is set if the result of an operation has a _carry_ out of its _msb_
+  /// (most significant bit).
   bool get isCarry;
 
   /// Whether bit `28` (`V`) set, signifying "overflow", otherwise no overflow.
+  ///
+  /// Set if a sum of two positive operands gives a negative result or if the
+  /// sum of two negative operands gives a positive result.
   bool get isOverflow;
 
   /// Whether bit `7` (`I`) set, signifying that `IRQ` is disabled.

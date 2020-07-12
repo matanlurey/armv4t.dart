@@ -1,5 +1,14 @@
 part of '../instruction.dart';
 
+/// These instructions operate on the general-purpose registers.
+///
+/// They can perform operations such as addition, subtraction, or bit-wise logic
+/// on the contents of two regsiters, and place ther esult in a third register.
+/// They can also operate on the value in a single regsiter, or on a value in
+/// a register and a constant supplied within the instruction (an _immediate
+/// value_, represented by [Immediate] in this library).
+///
+/// See also [MultiplyAndMultiplyLongArmInstruction].
 @immutable
 @sealed
 abstract class DataProcessingArmInstruction

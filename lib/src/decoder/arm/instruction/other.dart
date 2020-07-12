@@ -1,5 +1,6 @@
 part of '../instruction.dart';
 
+/// Move the contents of the CPSR or SPSR to/from a general-purpose register.
 @immutable
 @sealed
 abstract class PsrTransferArmInstruction extends ArmInstruction {

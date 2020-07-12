@@ -42,6 +42,12 @@ abstract class HasTransferByte implements ArmInstruction {
   bool get transferByte;
 }
 
+/// These instructions load/store a value of a single register from/to memory.
+///
+/// They can load or store a 32-bit word or 8-bit unsigned byte. In ARM
+/// architecture v4 and above (i.e. this package) they can also load or store
+/// a 16-bit unsigned halfword [HalfwordDataTransferArmInstruction], or load
+/// and sign extend a 16-bit halfword or an 8-bit byte.
 @immutable
 @sealed
 abstract class SingleDataTransferArmInstruction
@@ -119,6 +125,7 @@ abstract class SingleDataTransferArmInstruction
   }
 }
 
+/// See also [SingleDataTransferArmInstruction], a similar instruction set.
 @immutable
 @sealed
 abstract class HalfwordDataTransferArmInstruction
@@ -161,6 +168,7 @@ abstract class HalfwordDataTransferArmInstruction
   }
 }
 
+/// These instructions load or store any subset of general purpose registers.
 @immutable
 @sealed
 abstract class BlockDataTransferArmInstruction
