@@ -66,7 +66,7 @@ class _ArmInterpreter
   }) {
     cpu.cpsr = cpu.cpsr.update(
       // V (If + and + is -, or - and - is +)
-      isOverflow: (op1Signed == op2Signed) != result.isSigned,
+      isOverflow: op1Signed == op2Signed && op1Signed != result.isSigned,
 
       // C (Discard MSB)
       isCarry: result.hiBits != 0 ? result.loBits.msb(32) : false,
@@ -102,6 +102,7 @@ class _ArmInterpreter
 
   @override
   void visitADD(ADDArmInstruction i, [void _]) {
+    //  rD = operand1 + operand2
     final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
     final res = _addWithCarry(
@@ -114,6 +115,7 @@ class _ArmInterpreter
 
   @override
   void visitADC(ADCArmInstruction i, [void _]) {
+    // rD = operand1 + operand2 + carry
     final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
     final res = _addWithCarry(
@@ -127,22 +129,56 @@ class _ArmInterpreter
 
   @override
   void visitSUB(SUBArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    // rD = operand1 - operand2
+    final op1 = _readRegister(i.operand1);
+    final op2 = ~_visitOperand2(i.operand2);
+    final res = _addWithCarry(
+      op1,
+      op2,
+      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+    );
+    _writeRegister(i.destination, res);
   }
 
   @override
   void visitSBC(SBCArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    // rD = operand1 - operand2 + carry - 1
+    final op1 = _readRegister(i.operand1);
+    final op2 = ~_visitOperand2(i.operand2);
+    final res = _addWithCarry(
+      op1,
+      op2,
+      carryIn: cpu.cpsr.isCarry ? 0 : -1,
+      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+    );
+    _writeRegister(i.destination, res);
   }
 
   @override
   void visitRSB(RSBArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    // rD = operand2 - operand1
+    final op1 = ~_readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = _addWithCarry(
+      op2,
+      op1,
+      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+    );
+    _writeRegister(i.destination, res);
   }
 
   @override
   void visitRSC(RSCArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    // rD = operand2 - operand1 + carry - 1
+    final op1 = ~_readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = _addWithCarry(
+      op2,
+      op1,
+      carryIn: cpu.cpsr.isCarry ? 0 : -1,
+      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+    );
+    _writeRegister(i.destination, res);
   }
 
   @override

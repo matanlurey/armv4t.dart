@@ -171,11 +171,73 @@ abstract class Shiftable<T extends Shiftable<T>> {}
 
 /// Represents a shifted [Immediate] value.
 class ShiftedImmediate<I extends Integral<I>> {
-  /// ROR-Shift applied to [immediate] (`0-30`, in steps of 2).
+  /// ROR-Shift applied to [immediate]; **multiple by two before applying**.
   final Uint4 rorShift;
 
   /// Immediate value.
   final Immediate<I> immediate;
+
+  /// Creates a [ShiftedImmediate] that represents [value].
+  ///
+  /// When writing a constant value in assembler, you may be given just 12 bits:
+  /// - [Uint8]: an [immediate] (i.e. constant) value.
+  /// - [Uint4]: a [rorShift] (rotate-right) shift, which will be doubled.
+  ///
+  /// For any [value] that fits in an [Uint4] directly, it is stored directly.
+  ///
+  /// For any _other_ value, the assembler must calculate what ROR offset is
+  /// needed to transform an 8-bit integer into the integer you meant to
+  /// reprsent.
+  @visibleForTesting
+  static ShiftedImmediate<Uint8> assembleUint8(int value) {
+    RangeError.checkNotNegative(value);
+    if (value < 256) {
+      return ShiftedImmediate(Uint4.zero, Immediate(Uint8(value)));
+    } else {
+      // Number of bits needed to represent value.
+      // For example, for #1020:
+      //   11_1111_1100, or bitWidth = 10.
+      final bitWidth = value.bitLength;
+
+      // Number of bits that the value must move to fit into a Uint8.
+      final moveBits = bitWidth - 8;
+      if (value.bitRange(moveBits - 1, 0) != 0) {
+        throw UnsupportedError('Cannot fit into a Uint8: ${value.toBinary()}');
+      }
+
+      // How the immediate value will be stored.
+      final asUint8 = Uint8(value >> moveBits);
+
+      // Originally #1020 (as a Uint32) would be:
+      //   0000_0000_0000_0000_0000_0011_1111_1100
+      //
+      // It will end up being a Uint32, so #1020 will be encoded as:
+      //   0000_0000_0000_0000_0000_0000_1111_1111
+      //   ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^
+      //   4    4    4    4    4    4    4    2
+      //
+      // To ROR back (from #255, above) to #1020, we would need a ROR of:
+      //  (4 +  4 +  4 +  4 +  4 +  4 +  4 +  2) / 2 =
+      //  (28 + 2) / 2 =
+      //  (30)     / 2 =
+      //  15
+      //
+      // or Uint4(11) == 1111
+
+      // Calculate the amount of ROR shift needed.
+      //                     2
+      //                     vvvvvvvv
+      final distance = (32 - moveBits) / 2;
+      if (distance.truncate() != distance) {
+        throw UnsupportedError('Invalid distance: $distance');
+      }
+
+      return ShiftedImmediate(
+        Uint4(distance.toInt()),
+        Immediate(asUint8),
+      );
+    }
+  }
 
   const ShiftedImmediate(this.rorShift, this.immediate);
 
