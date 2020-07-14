@@ -205,4 +205,44 @@ void main() {
       expect(cpu.cpsr, defaultPSR);
     });
   });
+
+  group('AND', () {
+    ANDArmInstruction instruction;
+  });
+
+  group('EOR', () {
+    EORArmInstruction instruction;
+  });
+
+  group('ORR', () {
+    ORRArmInstruction instruction;
+  });
+
+  group('BIC', () {
+    BICArmInstruction instruction;
+  });
+
+  group('MOV', () {
+    MOVArmInstruction instruction;
+  });
+
+  group('MVN', () {
+    MVNArmInstruction instruction;
+  });
+
+  group('TST', () {
+    TSTArmInstruction instruction;
+  });
+
+  group('TEQ', () {
+    TEQArmInstruction instruction;
+  });
+
+  group('CMP', () {
+    CMPArmInstruction instruction;
+  });
+
+  group('CMN', () {
+    CMNArmInstruction instruction;
+  });
 }
