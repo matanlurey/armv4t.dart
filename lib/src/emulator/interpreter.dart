@@ -132,12 +132,33 @@ class _ArmInterpreter
     _writeRegister(i.destination, res);
   }
 
+  Uint32 _subWithCarry(
+    Uint32 op1,
+    Uint32 op2, {
+    int carryIn = 0,
+    bool setFlags = false,
+  }) {
+    var sum = op1 - op2;
+    if (carryIn != 0) {
+      print('>>> $sum.add64($carryIn)');
+      sum = sum.add64(carryIn.hiLo());
+    }
+    if (setFlags) {
+      _writeToAllFlags(
+        sum,
+        op1Signed: op1.msb,
+        op2Signed: op2.msb,
+      );
+    }
+    return sum.toUint32();
+  }
+
   @override
   void visitSUB(SUBArmInstruction i, [void _]) {
     // rD = operand1 - operand2
     final op1 = _readRegister(i.operand1);
-    final op2 = ~_visitOperand2(i.operand2);
-    final res = _addWithCarry(
+    final op2 = _visitOperand2(i.operand2);
+    final res = _subWithCarry(
       op1,
       op2,
       setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
@@ -149,8 +170,8 @@ class _ArmInterpreter
   void visitSBC(SBCArmInstruction i, [void _]) {
     // rD = operand1 - operand2 + carry - 1
     final op1 = _readRegister(i.operand1);
-    final op2 = ~_visitOperand2(i.operand2);
-    final res = _addWithCarry(
+    final op2 = _visitOperand2(i.operand2);
+    final res = _subWithCarry(
       op1,
       op2,
       carryIn: cpu.cpsr.isCarry ? 0 : -1,
@@ -162,9 +183,9 @@ class _ArmInterpreter
   @override
   void visitRSB(RSBArmInstruction i, [void _]) {
     // rD = operand2 - operand1
-    final op1 = ~_readRegister(i.operand1);
+    final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
-    final res = _addWithCarry(
+    final res = _subWithCarry(
       op2,
       op1,
       setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
@@ -175,9 +196,9 @@ class _ArmInterpreter
   @override
   void visitRSC(RSCArmInstruction i, [void _]) {
     // rD = operand2 - operand1 + carry - 1
-    final op1 = ~_readRegister(i.operand1);
+    final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
-    final res = _addWithCarry(
+    final res = _subWithCarry(
       op2,
       op1,
       carryIn: cpu.cpsr.isCarry ? 0 : -1,
