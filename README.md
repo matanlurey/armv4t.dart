@@ -54,6 +54,11 @@ assembly (or both), these are for you.
   to the more exhaustive resources available explaining the specifications of
   ARM and Thumb.
 
+- [ARM Instruction Set](doc/arm-instruction-set-slides.pdf): A slide deck from
+  the "ARM University Program", explaining the basics of ARM processing and ARM
+  assembly instructions. It is an eductional resources, and even has quizzes to
+  check your understanding at the end of each section.
+
 ### Advanced and/or Emulator Specific
 
 These resources were necessary when writing this package.
