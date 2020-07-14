@@ -1,7 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:armv4t/decode.dart';
+import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/decoder/arm/instruction.dart';
 import 'package:armv4t/src/emulator/condition.dart';
-import 'package:armv4t/src/emulator/number.dart';
 import 'package:armv4t/src/emulator/operand.dart';
 import 'package:armv4t/src/processor.dart';
 import 'package:binary/binary.dart';
@@ -60,16 +62,16 @@ class _ArmInterpreter
   }
 
   void _writeToAllFlags(
-    Num64 result, {
+    Uint32List result, {
     @required bool op1Signed,
     @required bool op2Signed,
   }) {
     cpu.cpsr = cpu.cpsr.update(
       // V (If + and + is -, or - and - is +)
-      isOverflow: op1Signed == op2Signed && op1Signed != result.isSigned,
+      isOverflow: result.hadOverflow(op1Signed, op2Signed),
 
       // C (Discard MSB)
-      isCarry: result.hiBits != 0 ? result.loBits.msb(32) : false,
+      isCarry: result.isCarry,
 
       // Z (If RES == 0)
       isZero: result.isZero,
@@ -89,15 +91,18 @@ class _ArmInterpreter
     int carryIn = 0,
     bool setFlags = false,
   }) {
-    final uSum = Num64.fromUint32(op1) + Num64.fromUint32(op2) + Num64(carryIn);
+    var sum = op1 + op2;
+    if (carryIn != 0) {
+      sum = sum.add64(carryIn.hiLo());
+    }
     if (setFlags) {
       _writeToAllFlags(
-        uSum,
+        sum,
         op1Signed: op1.msb,
         op2Signed: op2.msb,
       );
     }
-    return uSum.toUint32();
+    return sum.toUint32();
   }
 
   @override
