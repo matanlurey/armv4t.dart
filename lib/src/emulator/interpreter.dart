@@ -362,6 +362,22 @@ class _ArmInterpreter
     }
   }
 
+  // PSR Transfer
+
+  @override
+  void visitMRS(MRSArmInstruction i, [void _]) {
+    // Rd = PSR
+    final psr = i.useSPSR ? cpu.spsr : cpu.cpsr;
+    _writeRegister(i.destination, psr.toBits());
+  }
+
+  @override
+  void visitMSR(MSRArmInstruction i, [void _]) {
+    throw UnimplementedError(
+      'https://github.com/matanlurey/armv4t.dart/issues/46',
+    );
+  }
+
   @override
   void visitB(BArmInstruction i, [void _]) {
     throw UnimplementedError();
@@ -404,16 +420,6 @@ class _ArmInterpreter
 
   @override
   void visitMLA(MLAArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitMRS(MRSArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitMSR(MSRArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 
