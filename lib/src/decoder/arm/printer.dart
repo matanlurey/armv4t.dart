@@ -390,12 +390,10 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     // actually stored in the instruction as an 8-bit value with a 4-bit
     // rotation code. The resultant value is the 8-th bit value rotated right
     // 0-30 bits (twice the rotation code amount).
-    //
-    // To undo the encoding, we rotate left 0-30 bits.
-    final code = immediate.rorShift.value;
-    final bits = immediate.immediate.value.value;
-    final undo = bits << code;
-    return '$undo';
+    final code = immediate.rorShift.value * 2;
+    final bits = Uint32(immediate.immediate.value.value);
+    final undo = bits.rotateRightShift(code);
+    return '${undo.value}';
   }
 
   @protected

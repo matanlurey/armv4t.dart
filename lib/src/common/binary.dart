@@ -1,6 +1,8 @@
 /// Extensions to `package:binary` that are not generally applicable/useful.
 library armv4t.src.common.binary;
 
+import 'dart:typed_data';
+
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -428,4 +430,55 @@ class Uint32Builder {
       return Uint32(_builder.toString().bits);
     }
   }
+}
+
+/// Additional extensions for [BinaryUint64HiLo] for this package specifically.
+extension BinaryUint64HiLoX on Uint32List {
+  static Uint32List _new(int hi, int lo) => Uint32List(2)
+    ..hi = hi
+    ..lo = lo;
+
+  /// Returns whether the operands that creates this int that overflow occured.
+  bool hadOverflow(bool aSigned, bool bSigned) {
+    return aSigned == bSigned && aSigned != isSigned;
+  }
+
+  /// Whether the MSB of [lo] was discarded (shifted into [hi]).
+  bool get isCarry => hi != 0 ? msb(1) : false;
+
+  /// Whether this value represents `0`.
+  bool get isZero => hi == 0 && lo == 0;
+
+  /// Whether the most significant bit is `1`.
+  bool get isSigned => msb(hi == 0 ? 1 : 0);
+
+  /// Adds `this` to [other] and returns a new [BinaryUint64HiLo].
+  Uint32List add64(Uint32List other) {
+    final a = this;
+    final b = other;
+
+    final loBitSum = a.lo + b.lo;
+    final overflow = loBitSum.bitRange(52, 32);
+    final loBitVal = loBitSum.bitRange(31, 00);
+    final hiBitSum = a.hi + b.hi + overflow;
+    final hiBitVal = hiBitSum.bitRange(31, 0);
+
+    return _new(hiBitVal, loBitVal);
+  }
+
+  /// Returns truncated purely as a [Uint32] ([lo]).
+  Uint32 toUint32() => Uint32(lo);
+}
+
+/// Additional extensions for [Uint32] for this package specifically.
+extension BinaryUint64FromInt32 on Uint32 {
+  static Uint32List _new(int hi, int lo) => Uint32List(2)
+    ..hi = hi
+    ..lo = lo;
+
+  /// Adds `this` to [other] and returns a [BinaryUint64HiLo].
+  Uint32List operator +(Uint32 other) => hiLo().add64(other.hiLo());
+
+  /// Similar to `BinaryInt.hiLo` but guarantees just low bits.
+  Uint32List hiLo() => _new(0, value);
 }

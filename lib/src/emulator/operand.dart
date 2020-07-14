@@ -27,10 +27,10 @@ mixin OperandEvaluator {
   Uint32 evaluateImmediate<I extends Integral<I>>(
     ShiftedImmediate<I> immediate,
   ) {
-    final value = immediate.immediate.value;
+    final value = Uint32(immediate.immediate.value.value);
     final rorSh = immediate.rorShift.value;
     // Intentionally does not flow through rotateRightShift.
-    final result = value.rotateRightShift(rorSh);
+    final result = value.rotateRightShift(rorSh * 2);
     return Uint32(result.value);
   }
 

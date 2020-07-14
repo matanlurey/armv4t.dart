@@ -472,4 +472,25 @@ class _StatusRegister implements StatusRegister {
 
   @override
   Uint32 toBits() => _value;
+
+  @override
+  String toString() {
+    if (assertionsEnabled) {
+      return ''
+          'StatusRegister {0x${_value.value.toRadixString(16)}}  :\n'
+          '  M = ${mode.name}\n'
+          '\n'
+          '  N = ${isSigned ? 1 : 0}\n'
+          '  Z = ${isZero ? 1 : 0}\n'
+          '  C = ${isCarry ? 1 : 0}\n'
+          '  V = ${isOverflow ? 1 : 0}\n'
+          '\n'
+          '  I = ${irqDisabled ? 1 : 0}\n'
+          '  F = ${fiqDisabled ? 1 : 0}\n'
+          '\n'
+          '  T = ${thumbState ? 1 : 0}';
+    } else {
+      return super.toString();
+    }
+  }
 }
