@@ -124,8 +124,8 @@ void main() {
       cpu[1] = Uint32(2);
       interpreter.execute(instruction);
 
-      expect(cpu[2], Uint32(0xfffffffe));
-      expect(cpu.cpsr, defaultPSR.update(isSigned: true));
+      expect(cpu[2], Uint32(0xffffffff));
+      expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: true));
     });
   });
 
@@ -150,18 +150,99 @@ void main() {
       cpu[1] = Uint32(1);
       interpreter.execute(instruction);
 
-      expect(cpu[2], Uint32(0));
+      expect(cpu[2], Uint32(1));
       expect(cpu.cpsr, defaultPSR);
     });
   });
 
   // RSB op2 - op1
   group('RSB', () {
-    // TODO: This instruction is so similar to RSB we can test it later.
+    RSBArmInstruction instruction;
+
+    test('r2 = r1 - r0', () {
+      instruction = RSBArmInstruction(
+        condition: Condition.al,
+        setConditionCodes: false,
+        operand1: r0,
+        operand2: Or3.left(
+          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint4(0))),
+        ),
+        destination: r2,
+      );
+      expect(decode(instruction), 'rsb r2, r0, r1');
+
+      cpu[0] = Uint32(2);
+      cpu[1] = Uint32(3);
+      interpreter.execute(instruction);
+
+      expect(cpu[2], Uint32(1));
+      expect(cpu.cpsr, defaultPSR);
+    });
   });
 
   // RSC op2 - op1 + carry - 1
   group('RSC', () {
-    // TODO: This instruction is so simular to SBC we can test it later.
+    RSCArmInstruction instruction;
+
+    test('r2 = r1 - r0', () {
+      instruction = RSCArmInstruction(
+        condition: Condition.al,
+        setConditionCodes: true,
+        operand1: r0,
+        operand2: Or3.left(
+          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint4(0))),
+        ),
+        destination: r2,
+      );
+      expect(decode(instruction), 'rscs r2, r0, r1');
+
+      cpu.cpsr = cpu.cpsr.update(isCarry: true);
+      cpu[0] = Uint32(2);
+      cpu[1] = Uint32(3);
+      interpreter.execute(instruction);
+
+      expect(cpu[2], Uint32(1));
+      expect(cpu.cpsr, defaultPSR);
+    });
+  });
+
+  group('AND', () {
+    ANDArmInstruction instruction;
+  });
+
+  group('EOR', () {
+    EORArmInstruction instruction;
+  });
+
+  group('ORR', () {
+    ORRArmInstruction instruction;
+  });
+
+  group('BIC', () {
+    BICArmInstruction instruction;
+  });
+
+  group('MOV', () {
+    MOVArmInstruction instruction;
+  });
+
+  group('MVN', () {
+    MVNArmInstruction instruction;
+  });
+
+  group('TST', () {
+    TSTArmInstruction instruction;
+  });
+
+  group('TEQ', () {
+    TEQArmInstruction instruction;
+  });
+
+  group('CMP', () {
+    CMPArmInstruction instruction;
+  });
+
+  group('CMN', () {
+    CMNArmInstruction instruction;
   });
 }
