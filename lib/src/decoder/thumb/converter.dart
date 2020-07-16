@@ -266,7 +266,6 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       case 0x8:
         return TSTArmInstruction(
           condition: _always,
-          setConditionCodes: true,
           destination: Register.filledWith0s,
           operand1: destination,
           operand2: Or3.left(left()),
@@ -291,7 +290,6 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       case 0xa:
         return CMPArmInstruction(
           condition: _always,
-          setConditionCodes: true,
           destination: Register.filledWith0s,
           operand1: destination,
           operand2: Or3.left(left()),
@@ -301,7 +299,6 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       case 0xb:
         return CMNArmInstruction(
           condition: _always,
-          setConditionCodes: true,
           destination: Register.filledWith0s,
           operand1: destination,
           operand2: Or3.left(left()),
@@ -436,7 +433,6 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
           case 0x1: // 01
             return CMPArmInstruction(
               condition: _always,
-              setConditionCodes: false,
               operand1: destinationLo(),
               destination: Register.filledWith0s,
               operand2: Or3.left(ShiftedRegister(
@@ -450,7 +446,6 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
           case 0x2: // 10
             return CMPArmInstruction(
               condition: _always,
-              setConditionCodes: false,
               operand1: destinationHi(),
               destination: Register.filledWith0s,
               operand2: Or3.left(ShiftedRegister(
@@ -464,7 +459,6 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
           case 0x3: // 11
             return CMPArmInstruction(
               condition: _always,
-              setConditionCodes: false,
               operand1: destinationHi(),
               destination: Register.filledWith0s,
               operand2: Or3.left(ShiftedRegister(
@@ -774,7 +768,6 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       case 0x1:
         return CMPArmInstruction(
           condition: _always,
-          setConditionCodes: true,
           operand1: destination,
           destination: Register.filledWith0s,
           operand2: Or3.right(operand2),
