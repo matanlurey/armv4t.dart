@@ -208,41 +208,199 @@ void main() {
 
   group('AND', () {
     ANDArmInstruction instruction;
+
+    test('r1 = r0 & IMM', () {
+      instruction = ANDArmInstruction(
+        condition: Condition.al,
+        setConditionCodes: false,
+        operand1: r0,
+        destination: r1,
+        operand2: Or3.right(ShiftedImmediate.assembleUint8('101'.bits)),
+      );
+
+      cpu[0] = Uint32('011'.bits);
+      interpreter.execute(instruction);
+
+      expect(cpu[1], Uint32(1));
+      expect(cpu.cpsr, defaultPSR);
+    });
   });
 
   group('EOR', () {
     EORArmInstruction instruction;
+
+    test('r1 = r0 ^ IMM', () {
+      instruction = EORArmInstruction(
+        condition: Condition.al,
+        setConditionCodes: false,
+        operand1: r0,
+        destination: r1,
+        operand2: Or3.right(ShiftedImmediate.assembleUint8('101'.bits)),
+      );
+
+      cpu[0] = Uint32('011'.bits);
+      interpreter.execute(instruction);
+
+      expect(cpu[1], Uint32('110'.bits));
+      expect(cpu.cpsr, defaultPSR);
+    });
   });
 
   group('ORR', () {
     ORRArmInstruction instruction;
+
+    test('r1 = r0 | IMM', () {
+      instruction = ORRArmInstruction(
+        condition: Condition.al,
+        setConditionCodes: false,
+        operand1: r0,
+        destination: r1,
+        operand2: Or3.right(ShiftedImmediate.assembleUint8('101'.bits)),
+      );
+
+      cpu[0] = Uint32('011'.bits);
+      interpreter.execute(instruction);
+
+      expect(cpu[1], Uint32('111'.bits));
+      expect(cpu.cpsr, defaultPSR);
+    });
   });
 
   group('BIC', () {
     BICArmInstruction instruction;
+
+    test('r1 = r0 & ~IMM', () {
+      instruction = BICArmInstruction(
+        condition: Condition.al,
+        setConditionCodes: false,
+        operand1: r0,
+        destination: r1,
+        operand2: Or3.right(ShiftedImmediate.assembleUint8('101'.bits)),
+      );
+
+      cpu[0] = Uint32('011'.bits);
+      interpreter.execute(instruction);
+
+      expect(cpu[1], Uint32('010'.bits));
+      expect(cpu.cpsr, defaultPSR);
+    });
   });
 
   group('MOV', () {
     MOVArmInstruction instruction;
+
+    test('r1 = IMM', () {
+      instruction = MOVArmInstruction(
+        condition: Condition.al,
+        setConditionCodes: false,
+        operand1: Register.filledWith0s,
+        destination: r1,
+        operand2: Or3.right(ShiftedImmediate.assembleUint8(512)),
+      );
+
+      interpreter.execute(instruction);
+
+      expect(cpu[1], Uint32(512));
+      expect(cpu.cpsr, defaultPSR);
+    });
   });
 
   group('MVN', () {
     MVNArmInstruction instruction;
+
+    test('r1 = ~IMM', () {
+      instruction = MVNArmInstruction(
+        condition: Condition.al,
+        setConditionCodes: false,
+        operand1: Register.filledWith0s,
+        destination: r1,
+        operand2: Or3.right(ShiftedImmediate.assembleUint8(32)),
+      );
+
+      interpreter.execute(instruction);
+
+      expect(cpu[1], Uint32((~32).toUnsigned(32)));
+      expect(cpu.cpsr, defaultPSR);
+    });
   });
 
   group('TST', () {
     TSTArmInstruction instruction;
+
+    test('r1 & IMM', () {
+      instruction = TSTArmInstruction(
+        condition: Condition.al,
+        operand1: r1,
+        destination: Register.filledWith0s,
+        operand2: Or3.right(ShiftedImmediate.assembleUint8(0)),
+      );
+
+      interpreter.execute(instruction);
+
+      expect(cpu.cpsr, defaultPSR.update(isZero: true));
+    });
   });
 
   group('TEQ', () {
     TEQArmInstruction instruction;
+
+    test('r1 ^ r2', () {
+      instruction = TEQArmInstruction(
+        condition: Condition.al,
+        operand1: r1,
+        destination: Register.filledWith0s,
+        operand2: Or3.left(
+          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint4.zero)),
+        ),
+      );
+
+      cpu[1] = Uint32(1);
+      cpu[2] = Uint32((-8).toUnsigned(32));
+      interpreter.execute(instruction);
+
+      expect(cpu.cpsr, defaultPSR.update(isSigned: true));
+    });
   });
 
   group('CMP', () {
     CMPArmInstruction instruction;
+
+    test('r1 - r2', () {
+      instruction = CMPArmInstruction(
+        condition: Condition.al,
+        operand1: r1,
+        destination: Register.filledWith0s,
+        operand2: Or3.left(
+          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint4.zero)),
+        ),
+      );
+
+      cpu[1] = Uint32(1);
+      cpu[2] = Uint32(2);
+      interpreter.execute(instruction);
+
+      expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: true));
+    });
   });
 
   group('CMN', () {
     CMNArmInstruction instruction;
+
+    test('r1 + r2', () {
+      instruction = CMNArmInstruction(
+        condition: Condition.al,
+        operand1: r1,
+        destination: Register.filledWith0s,
+        operand2: Or3.left(
+          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint4.zero)),
+        ),
+      );
+
+      cpu[1] = Uint32(1);
+      cpu[2] = Uint32(2);
+      interpreter.execute(instruction);
+
+      expect(cpu.cpsr, defaultPSR);
+    });
   });
 }
