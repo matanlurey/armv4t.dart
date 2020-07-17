@@ -244,7 +244,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
   }) {
     if (isMSR) {
       final flagMask = format.operand1Register;
-      Or2<RegisterAny, ShiftedImmediate<Uint8>> sourceOrImmediate;
+      Or2<RegisterNotPC, ShiftedImmediate<Uint8>> sourceOrImmediate;
 
       if (format.immediateOperand) {
         // I = 1
@@ -257,26 +257,15 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       } else {
         // I = 0
         sourceOrImmediate = Or2.left(
-          RegisterAny(Uint4(format.operand2.bitRange(3, 0).value)),
+          RegisterNotPC(Uint4(format.operand2.bitRange(3, 0).value)),
         );
-      }
-
-      MSRWriteField writeTo;
-
-      if (flagMask.isSet(3)) {
-        writeTo = MSRWriteField.flag;
-      } else if (flagMask.isSet(2)) {
-        writeTo = MSRWriteField.status;
-      } else if (flagMask.isSet(1)) {
-        writeTo = MSRWriteField.extension;
-      } else if (flagMask.isSet(0)) {
-        writeTo = MSRWriteField.control;
       }
 
       return MSRArmInstruction(
         condition: condition,
         useSPSR: useSPSR,
-        writeToField: writeTo,
+        allowChangingFlags: flagMask.isSet(3),
+        allowChangingControls: flagMask.isSet(0),
         sourceOrImmediate: sourceOrImmediate,
       );
     } else {

@@ -32,8 +32,11 @@ class ArmOperatingMode {
     if (bits == abt.value) return abt;
     if (bits == und.value) return und;
     if (bits == sys.value) return sys;
-    throw ArgumentError('Unknown value: $bits');
+    throw ArgumentError('Invalid ArmOperatingMode: $bits');
   }
+
+  /// Whether this is considered 'privileged mode' or not.
+  bool get isPriveleged => this != usr;
 
   const ArmOperatingMode._(this.value, this.name);
 
@@ -71,8 +74,17 @@ abstract class Arm7Processor {
   const Arm7Processor._();
 
   /// Current program status register.
+  ///
+  /// > NOTE: Most bits of [cpsr] are protected from change while in user mode.
+  /// >
+  /// > See [unsafeSetCpsr].
   StatusRegister get cpsr;
   set cpsr(StatusRegister psr);
+
+  /// Sets [cpsr] without any write protection.
+  ///
+  /// This is intended to be used by _tests_ and exceptions only.
+  void unsafeSetCpsr(StatusRegister psr);
 
   /// Saved program status register.
   StatusRegister get spsr;
@@ -265,6 +277,23 @@ class _Arm7Processor extends Arm7Processor {
 
   @override
   set cpsr(StatusRegister psr) {
+    var cpsr = this.cpsr;
+    if (cpsr.mode.isPriveleged) {
+      unsafeSetCpsr(psr);
+    } else {
+      // In user mode only the condition code flags of the PSR _can_ be changed.
+      cpsr = cpsr.update(
+        isCarry: psr.isCarry,
+        isOverflow: psr.isOverflow,
+        isSigned: psr.isSigned,
+        isZero: psr.isZero,
+      );
+      _registers[_statusRegistersUsr] = cpsr.toBits().value;
+    }
+  }
+
+  @override
+  void unsafeSetCpsr(StatusRegister psr) {
     _registers[_statusRegistersUsr] = psr.toBits().value;
   }
 
@@ -284,15 +313,15 @@ class _Arm7Processor extends Arm7Processor {
       case ArmOperatingMode.sys:
         throw StateError('Cannot access SPSR in USR/SYS');
       case ArmOperatingMode.fiq:
-        return _registers[_statusRegsitersFiq];
+        return _statusRegsitersFiq;
       case ArmOperatingMode.svc:
-        return _registers[_statusRegistersSvc];
+        return _statusRegistersSvc;
       case ArmOperatingMode.abt:
-        return _registers[_statusRegistersAbt];
+        return _statusRegistersAbt;
       case ArmOperatingMode.irq:
-        return _registers[_statusRegistersIrq];
+        return _statusRegistersIrq;
       case ArmOperatingMode.und:
-        return _registers[_statusRegistersUnd];
+        return _statusRegistersUnd;
       default:
         throw StateError('Unexpected: $_mode');
     }

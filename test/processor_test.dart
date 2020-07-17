@@ -78,7 +78,7 @@ void main() {
             List.generate(end - start + 1, (i) => i),
           );
           cpu = Arm7Processor(registers: registers);
-          cpu.cpsr = cpu.cpsr.update(mode: mode);
+          cpu.unsafeSetCpsr(cpu.cpsr.update(mode: mode));
         });
       }
 
