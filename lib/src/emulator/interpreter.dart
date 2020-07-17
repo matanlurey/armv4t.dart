@@ -378,7 +378,7 @@ class _ArmInterpreter
 
     // Read initial PSR, and then write to it.
     var psr = (i.useSPSR ? cpu.spsr : cpu.cpsr).toBits();
-    if (i.allowChangingControls) {
+    if (i.allowChangingControls && cpu.cpsr.mode.isPriveleged) {
       psr = psr.replaceBitRange(7, 0, op.bitRange(7, 0).value);
     }
     if (i.allowChangingFlags) {

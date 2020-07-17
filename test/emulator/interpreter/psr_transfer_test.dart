@@ -44,7 +44,6 @@ void main() {
       expect(decode(instruction), 'mrs r0, spsr');
 
       cpu.unsafeSetCpsr(cpu.cpsr.update(mode: ArmOperatingMode.svc));
-
       interpreter.execute(instruction);
       expect(cpu[0], cpu.spsr.toBits());
     });
@@ -60,30 +59,41 @@ void main() {
         allowChangingFlags: true,
         allowChangingControls: true,
         sourceOrImmediate: Or2.right(
+          ShiftedImmediate.assembleUint8(0xf),
+        ),
+      );
+      expect(decode(instruction), 'msr cpsr, 15');
+
+      interpreter.execute(instruction);
+      expect(cpu.cpsr, defaultPSR);
+    });
+
+    test('SPSR_flg = r0', () {
+      instruction = MSRArmInstruction(
+        condition: Condition.al,
+        useSPSR: true,
+        allowChangingFlags: true,
+        allowChangingControls: false,
+        sourceOrImmediate: Or2.right(
           ShiftedImmediate.assembleUint8(
-            ('1111' '1111' '1111' '1111' '1111' '1111' '1111' '1111').bits,
+            ('1111' '0000' '0000' '0000' '0000' '0000' '0000' '0000').bits,
           ),
         ),
       );
-      expect(decode(instruction), 'mrs r0, spsr');
+      expect(decode(instruction), 'msr spsr_flg, 4026531840');
 
-      // User mode: Only flag bits are write-able.
+      cpu.unsafeSetCpsr(cpu.cpsr.update(mode: ArmOperatingMode.svc));
       interpreter.execute(instruction);
       expect(
-        cpu.cpsr,
+        cpu.spsr,
         defaultPSR.update(
-          isSigned: true,
-          isZero: true,
+          mode: ArmOperatingMode.svc,
           isCarry: true,
           isOverflow: true,
+          isZero: true,
+          isSigned: true,
         ),
       );
     });
-
-    test('SPSR = r0', () {});
-
-    test('CPSR_flg = r0', () {});
-
-    test('CPSR_cnd = r0', () {});
   });
 }

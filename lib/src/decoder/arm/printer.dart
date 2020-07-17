@@ -652,9 +652,9 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
       visitShiftedImmediate,
     );
     var psr = i.useSPSR ? 'spsr' : 'cpsr';
-    if (i.allowChangingFlags) {
+    if (i.allowChangingFlags && !i.allowChangingControls) {
       psr = '${psr}_flg';
-    } else if (i.allowChangingControls) {
+    } else if (i.allowChangingControls && !i.allowChangingFlags) {
       psr = '${psr}_ctl';
     }
     return visitComponents(['$mnuemonic $psr', m]);
