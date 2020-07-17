@@ -27,7 +27,7 @@ void main() {
       instruction = MRSArmInstruction(
         condition: Condition.al,
         useSPSR: false,
-        destination: RegisterNotPC(Uint4(0)),
+        destination: r0,
       );
       expect(decode(instruction), 'mrs r0, cpsr');
 
@@ -39,7 +39,7 @@ void main() {
       instruction = MRSArmInstruction(
         condition: Condition.al,
         useSPSR: true,
-        destination: RegisterNotPC(Uint4(0)),
+        destination: r0,
       );
       expect(decode(instruction), 'mrs r0, spsr');
 
@@ -52,5 +52,38 @@ void main() {
 
   group('MSR', () {
     MSRArmInstruction instruction;
+
+    test('CPSR = r0', () {
+      instruction = MSRArmInstruction(
+        condition: Condition.al,
+        useSPSR: false,
+        allowChangingFlags: true,
+        allowChangingControls: true,
+        sourceOrImmediate: Or2.right(
+          ShiftedImmediate.assembleUint8(
+            ('1111' '1111' '1111' '1111' '1111' '1111' '1111' '1111').bits,
+          ),
+        ),
+      );
+      expect(decode(instruction), 'mrs r0, spsr');
+
+      // User mode: Only flag bits are write-able.
+      interpreter.execute(instruction);
+      expect(
+        cpu.cpsr,
+        defaultPSR.update(
+          isSigned: true,
+          isZero: true,
+          isCarry: true,
+          isOverflow: true,
+        ),
+      );
+    });
+
+    test('SPSR = r0', () {});
+
+    test('CPSR_flg = r0', () {});
+
+    test('CPSR_cnd = r0', () {});
   });
 }
