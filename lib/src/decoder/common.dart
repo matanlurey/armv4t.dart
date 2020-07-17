@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:armv4t/src/common/assert.dart';
 import 'package:armv4t/src/common/binary.dart';
 import 'package:binary/binary.dart';
 import 'package:collection/collection.dart';
@@ -85,6 +86,15 @@ class RegisterAny extends Register<RegisterAny> {
   static final pc = RegisterAny(Uint4(15));
 
   RegisterAny(Uint4 index) : super._(index);
+
+  @override
+  String toString() {
+    if (assertionsEnabled) {
+      return 'RegisterAny {$index}';
+    } else {
+      return super.toString();
+    }
+  }
 }
 
 /// A register that _cannot_ refer to `r15` (`PC`).
@@ -100,6 +110,15 @@ class RegisterNotPC extends Register<RegisterNotPC> {
   RegisterNotPC(Uint4 index) : super._(index) {
     if (index.value == 15) {
       throw RangeError.range(index.value, 0, 14);
+    }
+  }
+
+  @override
+  String toString() {
+    if (assertionsEnabled) {
+      return 'RegisterNotPC {$index}';
+    } else {
+      return super.toString();
     }
   }
 }

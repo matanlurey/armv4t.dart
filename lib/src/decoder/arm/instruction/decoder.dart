@@ -286,6 +286,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     final setConditionCodes = format.setConditionCodes;
     final operand1 = RegisterNotPC(format.operandRegister1);
     final operand2 = RegisterNotPC(format.operandRegister2);
+    final operand3 = RegisterNotPC(format.operandRegister3);
     final destination = RegisterNotPC(format.destinationRegister);
 
     if (format.accumulate) {
@@ -295,6 +296,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         setConditionCodes: setConditionCodes,
         operand1: operand1,
         operand2: operand2,
+        operand3: operand3,
         destination: destination,
       );
     } else {

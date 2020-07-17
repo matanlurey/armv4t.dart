@@ -391,6 +391,148 @@ class _ArmInterpreter
     }
   }
 
+  Uint32 _mul32WithAccumulate(
+    Uint32 op1,
+    Uint32 op2, {
+    Uint32List accumulate,
+    bool setFlags = false,
+  }) {
+    return _mul64WithAccumulate(
+      op1,
+      op2,
+      accumulate: accumulate,
+      setFlags: setFlags,
+    ).toUint32();
+  }
+
+  Uint32List _mul64WithAccumulate(
+    Uint32 op1,
+    Uint32 op2, {
+    Uint32List accumulate,
+    bool asSigned = false,
+    bool setFlags = false,
+  }) {
+    Uint32List product;
+    if (asSigned) {
+      final sOp1 = op1.toSigned();
+      final sOp2 = op2.toSigned();
+      var sProduct = sOp1 * sOp2;
+      if (accumulate != null) {
+        sProduct = sProduct.add64(accumulate.asSigned());
+      }
+      product = sProduct.asUnsigned();
+    } else {
+      product = op1 * op2;
+      if (accumulate != null) {
+        product = product.add64(accumulate);
+      }
+    }
+    if (setFlags) {
+      _writeToAllFlags(
+        product,
+        op1Signed: op1.msb,
+        op2Signed: op2.msb,
+      );
+    }
+    return product;
+  }
+
+  @override
+  void visitMUL(MULArmInstruction i, [void _]) {
+    // Rd = Rm * Rs
+    final op1 = _readRegister(i.operand1);
+    final op2 = _readRegister(i.operand2);
+    final res = _mul32WithAccumulate(
+      op1,
+      op2,
+      setFlags: i.setConditionCodes,
+    );
+    _writeRegister(i.destination, res);
+  }
+
+  @override
+  void visitMLA(MLAArmInstruction i, [void _]) {
+    // Rd = Rm * Rs + Rn
+    final op1 = _readRegister(i.operand1);
+    final op2 = _readRegister(i.operand2);
+    final op3 = _readRegister(i.operand3);
+    final res = _mul32WithAccumulate(
+      op1,
+      op2,
+      accumulate: op3.hiLo(),
+      setFlags: i.setConditionCodes,
+    );
+    _writeRegister(i.destination, res);
+  }
+
+  @override
+  void visitSMULL(SMULLArmInstruction i, [void _]) {
+    // RdHi = Rm * Rs
+    final op1 = _readRegister(i.operand1);
+    final op2 = _readRegister(i.operand2);
+    final res = _mul64WithAccumulate(
+      op1,
+      op2,
+      setFlags: i.setConditionCodes,
+      asSigned: true,
+    );
+    _writeRegister(i.destinationHiBits, Uint32(res.hi));
+    _writeRegister(i.destinationLoBits, Uint32(res.lo));
+  }
+
+  @override
+  void visitSMLAL(SMLALArmInstruction i, [void _]) {
+    // RdHiLo = Rm * Rs + RdHiLo
+    final op1 = _readRegister(i.operand1);
+    final op2 = _readRegister(i.operand2);
+    final op3Hi = _readRegister(i.destinationHiBits);
+    final op3Lo = _readRegister(i.destinationLoBits);
+    final res = _mul64WithAccumulate(
+      op1,
+      op2,
+      accumulate: Uint32List(2)
+        ..hi = op3Hi.value
+        ..lo = op3Lo.value,
+      setFlags: i.setConditionCodes,
+      asSigned: true,
+    );
+    _writeRegister(i.destinationHiBits, Uint32(res.hi));
+    _writeRegister(i.destinationLoBits, Uint32(res.lo));
+  }
+
+  @override
+  void visitUMULL(UMULLArmInstruction i, [void _]) {
+    // RdHiLo = Rm * Rs
+    final op1 = _readRegister(i.operand1);
+    final op2 = _readRegister(i.operand2);
+    final res = _mul64WithAccumulate(
+      op1,
+      op2,
+      setFlags: i.setConditionCodes,
+    );
+    _writeRegister(i.destinationHiBits, Uint32(res.hi));
+    _writeRegister(i.destinationLoBits, Uint32(res.lo));
+  }
+
+  @override
+  void visitUMLAL(UMLALArmInstruction i, [void _]) {
+    // RdHiLo = Rm * Rs + RdHiLo
+    final op1 = _readRegister(i.operand1);
+    final op2 = _readRegister(i.operand2);
+    final op3Hi = _readRegister(i.destinationHiBits);
+    final op3Lo = _readRegister(i.destinationLoBits);
+    final res = _mul64WithAccumulate(
+      op1,
+      op2,
+      accumulate: Uint32List(2)
+        ..hi = op3Hi.value
+        ..lo = op3Lo.value,
+      setFlags: i.setConditionCodes,
+    );
+    _writeRegister(i.destinationHiBits, Uint32(res.hi));
+    _writeRegister(i.destinationLoBits, Uint32(res.lo));
+  }
+
   @override
   void visitB(BArmInstruction i, [void _]) {
     throw UnimplementedError();
@@ -432,26 +574,6 @@ class _ArmInterpreter
   }
 
   @override
-  void visitMLA(MLAArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitMUL(MULArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitSMLAL(SMLALArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitSMULL(SMULLArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
   void visitSTM(STMArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
@@ -473,16 +595,6 @@ class _ArmInterpreter
 
   @override
   void visitSWP(SWPArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitUMLAL(UMLALArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitUMULL(UMULLArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 }
