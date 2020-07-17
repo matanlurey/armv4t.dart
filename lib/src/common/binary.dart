@@ -466,6 +466,30 @@ extension BinaryUint64HiLoX on Uint32List {
     return _new(hiBitVal, loBitVal);
   }
 
+  /// Subtracts [other] from `this` and returns a new [BinaryUint64HiLo].
+  Uint32List sub64(Uint32List other) {
+    final aHi = hi;
+    final aLo = lo;
+    final bHi = other.hi;
+    final bLo = other.lo;
+    if (aHi == bHi) {
+      return _new(0, aLo - bLo);
+    }
+
+    var cHi = aHi - bHi;
+    var cLo = aLo - bLo;
+    if (cLo < 0) {
+      cHi -= 1;
+      cLo += 0x100000000;
+    }
+
+    if (aHi > bHi && aHi < 0) {
+      cHi += 0x100000000;
+    }
+
+    return _new(cHi, cLo);
+  }
+
   /// Returns truncated purely as a [Uint32] ([lo]).
   Uint32 toUint32() => Uint32(lo);
 }
@@ -478,6 +502,9 @@ extension BinaryUint64FromInt32 on Uint32 {
 
   /// Adds `this` to [other] and returns a [BinaryUint64HiLo].
   Uint32List operator +(Uint32 other) => hiLo().add64(other.hiLo());
+
+  /// Subtracts [other] from `this` and returns a [BinaryUint64HiLo].
+  Uint32List operator -(Uint32 other) => hiLo().sub64(other.hiLo());
 
   /// Similar to `BinaryInt.hiLo` but guarantees just low bits.
   Uint32List hiLo() => _new(0, value);

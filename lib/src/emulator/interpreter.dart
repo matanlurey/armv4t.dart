@@ -132,12 +132,32 @@ class _ArmInterpreter
     _writeRegister(i.destination, res);
   }
 
+  Uint32 _subWithCarry(
+    Uint32 op1,
+    Uint32 op2, {
+    int carryIn = 0,
+    bool setFlags = false,
+  }) {
+    var sum = op1 - op2;
+    if (carryIn != 0) {
+      sum = sum.add64(carryIn.hiLo());
+    }
+    if (setFlags) {
+      _writeToAllFlags(
+        sum,
+        op1Signed: op1.msb,
+        op2Signed: op2.msb,
+      );
+    }
+    return sum.toUint32();
+  }
+
   @override
   void visitSUB(SUBArmInstruction i, [void _]) {
     // rD = operand1 - operand2
     final op1 = _readRegister(i.operand1);
-    final op2 = ~_visitOperand2(i.operand2);
-    final res = _addWithCarry(
+    final op2 = _visitOperand2(i.operand2);
+    final res = _subWithCarry(
       op1,
       op2,
       setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
@@ -149,8 +169,8 @@ class _ArmInterpreter
   void visitSBC(SBCArmInstruction i, [void _]) {
     // rD = operand1 - operand2 + carry - 1
     final op1 = _readRegister(i.operand1);
-    final op2 = ~_visitOperand2(i.operand2);
-    final res = _addWithCarry(
+    final op2 = _visitOperand2(i.operand2);
+    final res = _subWithCarry(
       op1,
       op2,
       carryIn: cpu.cpsr.isCarry ? 0 : -1,
@@ -162,9 +182,9 @@ class _ArmInterpreter
   @override
   void visitRSB(RSBArmInstruction i, [void _]) {
     // rD = operand2 - operand1
-    final op1 = ~_readRegister(i.operand1);
+    final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
-    final res = _addWithCarry(
+    final res = _subWithCarry(
       op2,
       op1,
       setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
@@ -175,9 +195,9 @@ class _ArmInterpreter
   @override
   void visitRSC(RSCArmInstruction i, [void _]) {
     // rD = operand2 - operand1 + carry - 1
-    final op1 = ~_readRegister(i.operand1);
+    final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
-    final res = _addWithCarry(
+    final res = _subWithCarry(
       op2,
       op1,
       carryIn: cpu.cpsr.isCarry ? 0 : -1,
@@ -186,18 +206,180 @@ class _ArmInterpreter
     _writeRegister(i.destination, res);
   }
 
-  @override
-  void visitAND(ANDArmInstruction i, [void _]) {
-    throw UnimplementedError();
+  void _writeToCZN(Uint32List result) {
+    cpu.cpsr = cpu.cpsr.update(
+      // C (Carry Flag of Shift Operation, Ignored if LSL #0 or Rs=00h)
+      //
+      // We don't update it here though, it does during shifting.
+
+      // Z (If RES == 0)
+      isZero: result.isZero,
+
+      // N (If MSB == 1)
+      isSigned: result.isSigned,
+    );
   }
 
   @override
-  void visitB(BArmInstruction i, [void _]) {
-    throw UnimplementedError();
+  void visitAND(ANDArmInstruction i, [void _]) {
+    // rD = operand1 AND operand2
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = op1 & op2;
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToCZN(res.hiLo());
+    }
+    _writeRegister(i.destination, res);
+  }
+
+  @override
+  void visitEOR(EORArmInstruction i, [void _]) {
+    // rD = operand1 XOR operand2
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = op1 ^ op2;
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToCZN(res.hiLo());
+    }
+    _writeRegister(i.destination, res);
+  }
+
+  @override
+  void visitORR(ORRArmInstruction i, [void _]) {
+    // rD = operand1 OR operand2
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = op1 | op2;
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToCZN(res.hiLo());
+    }
+    _writeRegister(i.destination, res);
   }
 
   @override
   void visitBIC(BICArmInstruction i, [void _]) {
+    // rD = operand1 AND NOT operand2
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = op1 & ~op2;
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToCZN(res.hiLo());
+    }
+    _writeRegister(i.destination, res);
+  }
+
+  @override
+  void visitMOV(MOVArmInstruction i, [void _]) {
+    // rD = operand2
+    final op2 = _visitOperand2(i.operand2);
+    final res = op2;
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToCZN(res.hiLo());
+    }
+    _writeRegister(i.destination, res);
+  }
+
+  @override
+  void visitMVN(MVNArmInstruction i, [void _]) {
+    // rD = NOT operand2
+    final op2 = _visitOperand2(i.operand2);
+    final res = ~op2;
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToCZN(res.hiLo());
+    }
+    _writeRegister(i.destination, res);
+  }
+
+  @override
+  void visitTST(TSTArmInstruction i, [void _]) {
+    // Rn AND Op2
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = op1 & op2;
+    assert(i.setConditionCodes);
+    if (i.destination == Register.filledWith1s) {
+      // TST {P}:
+      //   In user mode, N, Z, C, V can be changed
+      //   Else, additionally I, F, M1, M0 can be changed
+      throw UnimplementedError('TSTP');
+    } else {
+      // TST (Standard Logical Operation)
+      _writeToCZN(res.hiLo());
+    }
+  }
+
+  @override
+  void visitTEQ(TEQArmInstruction i, [void _]) {
+    // Rn XOR Op2
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    final res = op1 ^ op2;
+    assert(i.setConditionCodes);
+    if (i.destination == Register.filledWith1s) {
+      // TEQ {P}:
+      //   In user mode, N, Z, C, V can be changed
+      //   Else, additionally I, F, M1, M0 can be changed
+      throw UnimplementedError('TEQP');
+    } else {
+      // TEQ (Standard Logical Operation)
+      _writeToCZN(res.hiLo());
+    }
+  }
+
+  @override
+  void visitCMP(CMPArmInstruction i, [void _]) {
+    // Rn - Op2
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    assert(i.setConditionCodes);
+    if (i.destination == Register.filledWith1s) {
+      // CMP {P}:
+      //   In user mode, N, Z, C, V can be changed
+      //   Else, additionally I, F, M1, M0 can be changed
+      throw UnimplementedError('CMPP');
+    } else {
+      // CMP (Standard Arithmetic Operation)
+      final res = _subWithCarry(op1, op2, setFlags: true);
+      _writeToCZN(res.hiLo());
+    }
+  }
+
+  @override
+  void visitCMN(CMNArmInstruction i, [void _]) {
+    // Rn + op2
+    final op1 = _readRegister(i.operand1);
+    final op2 = _visitOperand2(i.operand2);
+    assert(i.setConditionCodes);
+    if (i.destination == Register.filledWith1s) {
+      // CMN {P}:
+      //   In user mode, N, Z, C, V can be changed
+      //   Else, additionally I, F, M1, M0 can be changed
+      throw UnimplementedError('CMNP');
+    } else {
+      // CMN (Standard Arithmetic Operation)
+      final res = _addWithCarry(op1, op2, setFlags: true);
+      _writeToCZN(res.hiLo());
+    }
+  }
+
+  // PSR Transfer
+
+  @override
+  void visitMRS(MRSArmInstruction i, [void _]) {
+    // Rd = PSR
+    final psr = i.useSPSR ? cpu.spsr : cpu.cpsr;
+    _writeRegister(i.destination, psr.toBits());
+  }
+
+  @override
+  void visitMSR(MSRArmInstruction i, [void _]) {
+    throw UnimplementedError(
+      'https://github.com/matanlurey/armv4t.dart/issues/46',
+    );
+  }
+
+  @override
+  void visitB(BArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 
@@ -208,21 +390,6 @@ class _ArmInterpreter
 
   @override
   void visitBX(BXArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitCMN(CMNArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitCMP(CMPArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitEOR(EORArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 
@@ -257,32 +424,7 @@ class _ArmInterpreter
   }
 
   @override
-  void visitMOV(MOVArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitMRS(MRSArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitMSR(MSRArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
   void visitMUL(MULArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitMVN(MVNArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitORR(ORRArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 
@@ -318,16 +460,6 @@ class _ArmInterpreter
 
   @override
   void visitSWP(SWPArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitTEQ(TEQArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitTST(TSTArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 

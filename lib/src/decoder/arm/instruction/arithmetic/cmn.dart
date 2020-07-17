@@ -18,7 +18,6 @@ part of '../../instruction.dart';
 class CMNArmInstruction extends DataProcessingArmInstruction {
   CMNArmInstruction({
     @required Condition condition,
-    @required bool setConditionCodes,
     @required RegisterAny operand1,
     @required RegisterAny destination,
     @required
@@ -29,7 +28,7 @@ class CMNArmInstruction extends DataProcessingArmInstruction {
             operand2,
   }) : super._(
           condition: condition,
-          setConditionCodes: setConditionCodes,
+          setConditionCodes: true,
           operand1: operand1,
           destination: destination,
           operand2: operand2,

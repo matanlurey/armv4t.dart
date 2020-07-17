@@ -174,7 +174,6 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       case _ALUOpCode.TST:
         return TSTArmInstruction(
           condition: condition,
-          setConditionCodes: setConditionCodes,
           operand1: operand1,
           destination: destination,
           operand2: operand2,
@@ -182,7 +181,6 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       case _ALUOpCode.TEQ:
         return TEQArmInstruction(
           condition: condition,
-          setConditionCodes: setConditionCodes,
           operand1: operand1,
           destination: destination,
           operand2: operand2,
@@ -190,7 +188,6 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       case _ALUOpCode.CMP:
         return CMPArmInstruction(
           condition: condition,
-          setConditionCodes: setConditionCodes,
           operand1: operand1,
           destination: destination,
           operand2: operand2,
@@ -198,7 +195,6 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       case _ALUOpCode.CMN:
         return CMNArmInstruction(
           condition: condition,
-          setConditionCodes: setConditionCodes,
           operand1: operand1,
           destination: destination,
           operand2: operand2,
