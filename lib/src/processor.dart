@@ -35,6 +35,9 @@ class ArmOperatingMode {
     throw ArgumentError('Invalid ArmOperatingMode: $bits');
   }
 
+  /// Whether this is considered 'privileged mode' or not.
+  bool get isPriveleged => this != usr;
+
   const ArmOperatingMode._(this.value, this.name);
 
   @override

@@ -373,9 +373,10 @@ class _ArmInterpreter
 
   @override
   void visitMSR(MSRArmInstruction i, [void _]) {
-    throw UnimplementedError(
-      'https://github.com/matanlurey/armv4t.dart/issues/46',
-    );
+    // Psr[field] = Op
+    final op = i.sourceOrImmediate.pick(_readRegister, evaluateImmediate);
+
+    //
   }
 
   @override

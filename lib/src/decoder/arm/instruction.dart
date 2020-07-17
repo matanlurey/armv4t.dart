@@ -1,3 +1,4 @@
+import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/common/assert.dart';
 import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/common/union.dart';

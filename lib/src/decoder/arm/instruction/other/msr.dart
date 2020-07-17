@@ -2,6 +2,19 @@ part of '../../instruction.dart';
 
 /// `MSR{cond} Psr{_field},Op`.
 ///
+/// ## Restrictions
+///
+/// - In _user_ mode, the control bits of the `CPSR` are protected from change,
+///   so only the condition code bits of the `CPSR` can be changed. In other
+///   ("privileged") modes the entire `CPSR` can be changed.
+///
+///   > NOTE: Software must never change the state of `T` bit of the `CPSR`.
+///
+/// - The `SPSR` register which is accessed depend on the mode at the time,
+///   i.e. only `SPSR_fiq` is accessible when the processir is in `FIQ` mode.
+///
+/// - Do not attempt to access [useSPSR] in user mode.
+///
 /// ## Execution
 ///
 /// `Psr[field] = Op`
@@ -16,20 +29,20 @@ part of '../../instruction.dart';
 @immutable
 @sealed
 class MSRArmInstruction extends PsrTransferArmInstruction {
-  /// Whether to disallow bits 31-24 (flags) to be changed as a result.
-  final bool protectFlagBits;
+  /// Whether to allow bits 31-24 (flags) to be changed as a result.
+  final bool allowChangingFlags;
 
-  /// Whether to disallow bits 7-0 (control) to be changed as a result.
-  final bool protectControlBits;
+  /// Whether to allow bits 7-0 (control) to be changed as a result.
+  final bool allowChangingControls;
 
   /// Either the source register or an unsigend 8-bit shifted immediate.
-  final Or2<RegisterAny, ShiftedImmediate<Uint8>> sourceOrImmediate;
+  final Or2<RegisterNotPC, ShiftedImmediate<Uint8>> sourceOrImmediate;
 
   MSRArmInstruction({
     @required Condition condition,
     @required bool useSPSR,
-    @required this.protectFlagBits,
-    @required this.protectControlBits,
+    @required this.allowChangingFlags,
+    @required this.allowChangingControls,
     @required this.sourceOrImmediate,
   }) : super._(
           condition: condition,
@@ -46,8 +59,8 @@ class MSRArmInstruction extends PsrTransferArmInstruction {
     return [
       condition,
       useSPSR,
-      protectFlagBits,
-      protectControlBits,
+      allowChangingFlags,
+      allowChangingControls,
       sourceOrImmediate,
     ];
   }
