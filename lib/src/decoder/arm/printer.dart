@@ -652,15 +652,10 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
       visitShiftedImmediate,
     );
     var psr = i.useSPSR ? 'spsr' : 'cpsr';
-    switch (i.writeToField) {
-      case MSRWriteField.flag:
-        psr = '${psr}_flg';
-        break;
-      case MSRWriteField.control:
-        psr = '${psr}_ctl';
-        break;
-      default:
-        break;
+    if (i.protectFlagBits) {
+      psr = '${psr}_flg';
+    } else if (i.protectControlBits) {
+      psr = '${psr}_ctl';
     }
     return visitComponents(['$mnuemonic $psr', m]);
   }

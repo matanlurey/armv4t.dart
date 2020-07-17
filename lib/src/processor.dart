@@ -32,7 +32,7 @@ class ArmOperatingMode {
     if (bits == abt.value) return abt;
     if (bits == und.value) return und;
     if (bits == sys.value) return sys;
-    throw ArgumentError('Unknown value: $bits');
+    throw ArgumentError('Invalid ArmOperatingMode: $bits');
   }
 
   const ArmOperatingMode._(this.value, this.name);
@@ -284,15 +284,15 @@ class _Arm7Processor extends Arm7Processor {
       case ArmOperatingMode.sys:
         throw StateError('Cannot access SPSR in USR/SYS');
       case ArmOperatingMode.fiq:
-        return _registers[_statusRegsitersFiq];
+        return _statusRegsitersFiq;
       case ArmOperatingMode.svc:
-        return _registers[_statusRegistersSvc];
+        return _statusRegistersSvc;
       case ArmOperatingMode.abt:
-        return _registers[_statusRegistersAbt];
+        return _statusRegistersAbt;
       case ArmOperatingMode.irq:
-        return _registers[_statusRegistersIrq];
+        return _statusRegistersIrq;
       case ArmOperatingMode.und:
-        return _registers[_statusRegistersUnd];
+        return _statusRegistersUnd;
       default:
         throw StateError('Unexpected: $_mode');
     }

@@ -16,8 +16,11 @@ part of '../../instruction.dart';
 @immutable
 @sealed
 class MSRArmInstruction extends PsrTransferArmInstruction {
-  /// Which field, if any, to write to - may be `null`.
-  final MSRWriteField writeToField;
+  /// Whether to disallow bits 31-24 (flags) to be changed as a result.
+  final bool protectFlagBits;
+
+  /// Whether to disallow bits 7-0 (control) to be changed as a result.
+  final bool protectControlBits;
 
   /// Either the source register or an unsigend 8-bit shifted immediate.
   final Or2<RegisterAny, ShiftedImmediate<Uint8>> sourceOrImmediate;
@@ -25,7 +28,8 @@ class MSRArmInstruction extends PsrTransferArmInstruction {
   MSRArmInstruction({
     @required Condition condition,
     @required bool useSPSR,
-    @required this.writeToField,
+    @required this.protectFlagBits,
+    @required this.protectControlBits,
     @required this.sourceOrImmediate,
   }) : super._(
           condition: condition,
@@ -42,22 +46,9 @@ class MSRArmInstruction extends PsrTransferArmInstruction {
     return [
       condition,
       useSPSR,
-      writeToField,
+      protectFlagBits,
+      protectControlBits,
       sourceOrImmediate,
     ];
   }
-}
-
-enum MSRWriteField {
-  /// Bit 19: `F` (bits 31-24, aka `_flg`).
-  flag,
-
-  /// Bit 18: `S`` (bits 23-16, reserved, do not change).
-  status,
-
-  /// Bit 17: `X` (bits 15-8, reserved, do not change).
-  extension,
-
-  /// Bit 16: `C` (bits 7-0, aka `_ctl`)
-  control,
 }

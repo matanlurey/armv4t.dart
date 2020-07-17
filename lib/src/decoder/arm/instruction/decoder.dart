@@ -261,22 +261,11 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         );
       }
 
-      MSRWriteField writeTo;
-
-      if (flagMask.isSet(3)) {
-        writeTo = MSRWriteField.flag;
-      } else if (flagMask.isSet(2)) {
-        writeTo = MSRWriteField.status;
-      } else if (flagMask.isSet(1)) {
-        writeTo = MSRWriteField.extension;
-      } else if (flagMask.isSet(0)) {
-        writeTo = MSRWriteField.control;
-      }
-
       return MSRArmInstruction(
         condition: condition,
         useSPSR: useSPSR,
-        writeToField: writeTo,
+        protectFlagBits: flagMask.isSet(3),
+        protectControlBits: flagMask.isSet(0),
         sourceOrImmediate: sourceOrImmediate,
       );
     } else {
