@@ -16,11 +16,15 @@ part of '../../instruction.dart';
 @immutable
 @sealed
 class MLAArmInstruction extends MultiplyArmInstruction {
+  /// Third operand register.
+  final RegisterNotPC operand3;
+
   MLAArmInstruction({
     @required Condition condition,
     @required bool setConditionCodes,
     @required RegisterNotPC operand1,
     @required RegisterNotPC operand2,
+    @required this.operand3,
     @required RegisterNotPC destination,
   }) : super._(
           condition: condition,
