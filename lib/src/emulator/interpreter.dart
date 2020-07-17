@@ -585,12 +585,42 @@ class _ArmInterpreter
       add: i.addOffsetToBase,
       write: i.writeAddressIntoBase,
     );
+    // TODO: Deal with force non-privleged access mode.
     _writeRegister(i.destination, memory);
   }
 
+  // TOOD: Implement.
+  void _storeByte(Uint32 address, Uint8 byte) {}
+
+  // TOOD: Implement.
+  void _storeWord(Uint32 address, Uint16 word) {}
+
+  void _storeMemory(
+    Register register,
+    Uint32 offset,
+    Uint32 source, {
+    @required bool byte,
+    @required bool before,
+    @required bool add,
+    @required bool write,
+  }) {}
+
   @override
   void visitSTR(STRArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    // [Rn +/- Offset] = Rd
+    _storeMemory(
+      i.base,
+      i.offset.pick(
+        (i) => Uint32(i.value.value),
+        evaluateShiftRegister,
+      ),
+      _readRegister(i.source),
+      byte: i.transferByte,
+      before: i.addOffsetBeforeTransfer,
+      add: i.addOffsetToBase,
+      write: i.writeAddressIntoBase,
+    );
+    // TODO: Deal with force non-privleged access mode.
   }
 
   @override
