@@ -409,11 +409,23 @@ class _ArmInterpreter
     Uint32 op1,
     Uint32 op2, {
     Uint32List accumulate,
+    bool asSigned = false,
     bool setFlags = false,
   }) {
-    var product = op1 * op2;
-    if (accumulate != null) {
-      product = product.add64(accumulate);
+    Uint32List product;
+    if (asSigned) {
+      final sOp1 = op1.toSigned();
+      final sOp2 = op2.toSigned();
+      var sProduct = sOp1 * sOp2;
+      if (accumulate != null) {
+        sProduct = sProduct.add64(accumulate.asSigned());
+      }
+      product = sProduct.asUnsigned();
+    } else {
+      product = op1 * op2;
+      if (accumulate != null) {
+        product = product.add64(accumulate);
+      }
     }
     if (setFlags) {
       _writeToAllFlags(
@@ -462,6 +474,7 @@ class _ArmInterpreter
       op1,
       op2,
       setFlags: i.setConditionCodes,
+      asSigned: true,
     );
     _writeRegister(i.destinationHiBits, Uint32(res.hi));
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
@@ -481,6 +494,7 @@ class _ArmInterpreter
         ..hi = op3Hi.value
         ..lo = op3Lo.value,
       setFlags: i.setConditionCodes,
+      asSigned: true,
     );
     _writeRegister(i.destinationHiBits, Uint32(res.hi));
     _writeRegister(i.destinationLoBits, Uint32(res.lo));

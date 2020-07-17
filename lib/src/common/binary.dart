@@ -432,7 +432,7 @@ class Uint32Builder {
   }
 }
 
-/// Additional extensions for [BinaryUint64HiLo] for this package specifically.
+/// Additional extensions for [Uint32List] for this package specifically.
 extension BinaryUint64HiLoX on Uint32List {
   static Uint32List _new(int hi, int lo) => Uint32List(2)
     ..hi = hi
@@ -457,11 +457,11 @@ extension BinaryUint64HiLoX on Uint32List {
     final a = this;
     final b = other;
 
-    final loBitSum = a.lo + b.lo;
-    final overflow = loBitSum.bitRange(52, 32);
-    final loBitVal = loBitSum.bitRange(31, 00);
-    final hiBitSum = a.hi + b.hi + overflow;
-    final hiBitVal = hiBitSum.bitRange(31, 0);
+    final loBitSum = (a.lo + b.lo).hiLo();
+    final overflow = loBitSum.hi;
+    final loBitVal = loBitSum.lo;
+    final hiBitSum = (a.hi + b.hi + overflow).hiLo();
+    final hiBitVal = hiBitSum.lo;
 
     return _new(hiBitVal, loBitVal);
   }
@@ -516,10 +516,67 @@ extension BinaryUint64HiLoX on Uint32List {
 
   /// Returns truncated purely as a [Uint32] ([lo]).
   Uint32 toUint32() => Uint32(lo);
+
+  /// Returns as a [Int32List].
+  Int32List asSigned() => Int32List.view(buffer);
+}
+
+/// Additional extensions for [Int32List] for this package specifically.
+extension BinaryInt64HiLoX on Int32List {
+  static Int32List _new(int hi, int lo) => Int32List(2)
+    ..hi = hi
+    ..lo = lo;
+
+  /// Adds `this` to [other] and returns a new [Int32List].
+  Int32List add64(Int32List other) {
+    final a = this;
+    final b = other;
+
+    final loBitSum = (a.lo + b.lo).hiLo().asSigned();
+    final overflow = loBitSum.hi;
+    final loBitVal = loBitSum.lo;
+    final hiBitSum = (a.hi + b.hi + overflow).hiLo().asSigned();
+    final hiBitVal = hiBitSum.lo;
+
+    return _new(hiBitVal, loBitVal);
+  }
+
+  /// Multiples [other] and `this` and returns a new [Int32List].
+  Int32List mul64(
+    Int32List other, {
+    int overflow = 0,
+  }) {
+    final aHi = hi;
+    final aLo = lo;
+    final bHi = other.hi;
+    final bLo = other.lo;
+
+    var result = aLo * bLo + overflow;
+
+    final tHi = (aLo * bHi + aHi * bLo).hiLo().asSigned();
+    result += tHi.hi;
+
+    final rHl = result.hiLo().asSigned();
+
+    overflow = tHi.hi + rHl.hi;
+    result = rHl.lo;
+    overflow += aHi * bHi;
+
+    return _new(overflow, result);
+  }
+
+  int get hi => this[0];
+  set hi(int hi) => this[0] = hi;
+
+  int get lo => this[1];
+  set lo(int lo) => this[1] = lo;
+
+  /// Returns as a [Uint32List].
+  Uint32List asUnsigned() => Uint32List.view(buffer);
 }
 
 /// Additional extensions for [Uint32] for this package specifically.
-extension BinaryUint64FromInt32 on Uint32 {
+extension BinaryUint64FromUint32 on Uint32 {
   static Uint32List _new(int hi, int lo) => Uint32List(2)
     ..hi = hi
     ..lo = lo;
@@ -535,4 +592,23 @@ extension BinaryUint64FromInt32 on Uint32 {
 
   /// Similar to `BinaryInt.hiLo` but guarantees just low bits.
   Uint32List hiLo() => _new(0, value);
+
+  /// Returns as a signed [Int32].
+  Int32 toSigned() => Int32(value.toSigned(32));
+}
+
+/// Additional extensions for [Int32] for this package specifically.
+extension BinaryInt64FromUint32 on Int32 {
+  static Int32List _new(int hi, int lo) => Int32List(2)
+    ..hi = hi
+    ..lo = lo;
+
+  /// Multiples `this` and [other] and returns a [BinaryUint64HiLo].
+  Int32List operator *(Int32 other) => hiLo().mul64(other.hiLo());
+
+  /// Similar to `BinaryInt.hiLo` but guarantees just low bits.
+  Int32List hiLo() => _new(0, value);
+
+  /// Returns as an unsigned [Uint32].
+  Uint32 toUnsigned() => Uint32(value.toUnsigned(32));
 }
