@@ -38,6 +38,6 @@ class LDRArmInstruction extends SingleDataTransferArmInstruction {
     return visitor.visitLDR(this, context);
   }
 
-  /// Source register.
-  RegisterAny get source => sourceOrDestination;
+  /// Destination register.
+  RegisterAny get destination => sourceOrDestination;
 }

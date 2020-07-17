@@ -38,6 +38,6 @@ class STRArmInstruction extends SingleDataTransferArmInstruction {
     return visitor.visitSTR(this, context);
   }
 
-  /// Destination register.
-  RegisterAny get destination => sourceOrDestination;
+  /// Source register.
+  RegisterAny get source => sourceOrDestination;
 }

@@ -15,6 +15,8 @@ abstract class ArmInterpreter {
   factory ArmInterpreter(Arm7Processor cpu) = _ArmInterpreter;
 
   /// Executes [instruction] relative to current [cpu].
+  ///
+  /// > NOTE: [ArmInstruction.condition] must evaluate to `true` for the [cpu].
   void execute(ArmInstruction instruction);
 
   /// Implement to provide access to the processor.
@@ -533,6 +535,64 @@ class _ArmInterpreter
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
   }
 
+  // TOOD: Implement.
+  Uint32 _loadByte(Uint32 address) => Uint32(Uint8.zero.value);
+
+  // TOOD: Implement.
+  Uint32 _loadWord(Uint32 address) => Uint32(Uint16.zero.value);
+
+  Uint32 _readMemory(
+    Register register,
+    Uint32 offset, {
+    @required bool byte,
+    @required bool before,
+    @required bool add,
+    @required bool write,
+  }) {
+    Uint32 result;
+    Uint32 address;
+    final base = _readRegister(register);
+    if (before) {
+      address = (add ? (base + offset) : (base - offset)).toUint32();
+      result = byte ? _loadByte(address) : _loadWord(address);
+    } else {
+      address = base;
+      result = byte ? _loadByte(address) : _loadWord(address);
+      if (add) {
+        result = (result + offset).toUint32();
+      } else {
+        result = (result - offset).toUint32();
+      }
+    }
+    if (write) {
+      _writeRegister(register, address);
+    }
+    return result;
+  }
+
+  @override
+  void visitLDR(LDRArmInstruction i, [void _]) {
+    // Rd = [Rn +/- Offset]
+    // (Loads from memory into a register)
+    final memory = _readMemory(
+      i.base,
+      i.offset.pick(
+        (i) => Uint32(i.value.value),
+        evaluateShiftRegister,
+      ),
+      byte: i.transferByte,
+      before: i.addOffsetBeforeTransfer,
+      add: i.addOffsetToBase,
+      write: i.writeAddressIntoBase,
+    );
+    _writeRegister(i.destination, memory);
+  }
+
+  @override
+  void visitSTR(STRArmInstruction i, [void _]) {
+    throw UnimplementedError();
+  }
+
   @override
   void visitB(BArmInstruction i, [void _]) {
     throw UnimplementedError();
@@ -554,11 +614,6 @@ class _ArmInterpreter
   }
 
   @override
-  void visitLDR(LDRArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
   void visitLDRH(LDRHArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
@@ -575,11 +630,6 @@ class _ArmInterpreter
 
   @override
   void visitSTM(STMArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitSTR(STRArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 
