@@ -74,8 +74,17 @@ abstract class Arm7Processor {
   const Arm7Processor._();
 
   /// Current program status register.
+  ///
+  /// > NOTE: Most bits of [cpsr] are protected from change while in user mode.
+  /// >
+  /// > See [unsafeSetCpsr].
   StatusRegister get cpsr;
   set cpsr(StatusRegister psr);
+
+  /// Sets [cpsr] without any write protection.
+  ///
+  /// This is intended to be used by _tests_ and exceptions only.
+  void unsafeSetCpsr(StatusRegister psr);
 
   /// Saved program status register.
   StatusRegister get spsr;
@@ -268,6 +277,23 @@ class _Arm7Processor extends Arm7Processor {
 
   @override
   set cpsr(StatusRegister psr) {
+    var cpsr = this.cpsr;
+    if (cpsr.mode.isPriveleged) {
+      unsafeSetCpsr(psr);
+    } else {
+      // In user mode only the condition code flags of the PSR _can_ be changed.
+      cpsr = cpsr.update(
+        isCarry: psr.isCarry,
+        isOverflow: psr.isOverflow,
+        isSigned: psr.isSigned,
+        isZero: psr.isZero,
+      );
+      _registers[_statusRegistersUsr] = cpsr.toBits().value;
+    }
+  }
+
+  @override
+  void unsafeSetCpsr(StatusRegister psr) {
     _registers[_statusRegistersUsr] = psr.toBits().value;
   }
 

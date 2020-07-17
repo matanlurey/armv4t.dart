@@ -43,7 +43,7 @@ void main() {
       );
       expect(decode(instruction), 'mrs r0, spsr');
 
-      cpu.cpsr = cpu.cpsr.update(mode: ArmOperatingMode.svc);
+      cpu.unsafeSetCpsr(cpu.cpsr.update(mode: ArmOperatingMode.svc));
 
       interpreter.execute(instruction);
       expect(cpu[0], cpu.spsr.toBits());
