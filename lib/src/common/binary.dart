@@ -490,6 +490,30 @@ extension BinaryUint64HiLoX on Uint32List {
     return _new(cHi, cLo);
   }
 
+  /// Multiples [other] and `this` and returns a new [BinaryUint64HiLo].
+  Uint32List mul64(
+    Uint32List other, {
+    int overflow = 0,
+  }) {
+    final aHi = hi;
+    final aLo = lo;
+    final bHi = other.hi;
+    final bLo = other.lo;
+
+    var result = aLo * bLo + overflow;
+
+    final tHi = (aLo * bHi + aHi * bLo).hiLo();
+    result += tHi.hi;
+
+    final rHl = result.hiLo();
+
+    overflow = tHi.hi + rHl.hi;
+    result = rHl.lo;
+    overflow += aHi * bHi;
+
+    return _new(overflow, result);
+  }
+
   /// Returns truncated purely as a [Uint32] ([lo]).
   Uint32 toUint32() => Uint32(lo);
 }
@@ -505,6 +529,9 @@ extension BinaryUint64FromInt32 on Uint32 {
 
   /// Subtracts [other] from `this` and returns a [BinaryUint64HiLo].
   Uint32List operator -(Uint32 other) => hiLo().sub64(other.hiLo());
+
+  /// Multiples `this` and [other] and returns a [BinaryUint64HiLo].
+  Uint32List operator *(Uint32 other) => hiLo().mul64(other.hiLo());
 
   /// Similar to `BinaryInt.hiLo` but guarantees just low bits.
   Uint32List hiLo() => _new(0, value);
