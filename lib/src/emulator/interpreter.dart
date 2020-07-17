@@ -373,9 +373,22 @@ class _ArmInterpreter
 
   @override
   void visitMSR(MSRArmInstruction i, [void _]) {
-    throw UnimplementedError(
-      'https://github.com/matanlurey/armv4t.dart/issues/46',
-    );
+    // Psr[field] = Op
+    final op = i.sourceOrImmediate.pick(_readRegister, evaluateImmediate);
+
+    // Read initial PSR, and then write to it.
+    var psr = (i.useSPSR ? cpu.spsr : cpu.cpsr).toBits();
+    if (i.allowChangingControls && cpu.cpsr.mode.isPriveleged) {
+      psr = psr.replaceBitRange(7, 0, op.bitRange(7, 0).value);
+    }
+    if (i.allowChangingFlags) {
+      psr = psr.replaceBitRange(31, 24, op.bitRange(31, 24).value);
+    }
+    if (i.useSPSR) {
+      cpu.spsr = StatusRegister(psr);
+    } else {
+      cpu.cpsr = StatusRegister(psr);
+    }
   }
 
   @override
