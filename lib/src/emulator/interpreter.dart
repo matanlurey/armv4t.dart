@@ -578,6 +578,7 @@ class _ArmInterpreter
   void visitLDR(LDRArmInstruction i, [void _]) {
     // Rd = [Rn +/- Offset]
     // (Loads from memory into a register)
+    // TODO: Deal with "PC as a base" scenario.
     final memory = _readMemory(
       i.base,
       i.offset.pick(
@@ -636,6 +637,7 @@ class _ArmInterpreter
   @override
   void visitSTR(STRArmInstruction i, [void _]) {
     // [Rn +/- Offset] = Rd
+    // TODO: Deal with "PC as a base" scenario.
     _storeMemory(
       i.base,
       i.offset.pick(
