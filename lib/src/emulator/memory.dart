@@ -67,7 +67,7 @@ class _Memory implements Memory {
       address.value,
       address.value + 1,
       [
-        word.bitRange(16, 8).value,
+        word.bitRange(15, 8).value,
         word.bitRange(7, 0).value,
       ],
     );

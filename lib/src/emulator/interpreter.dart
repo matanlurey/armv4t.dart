@@ -563,9 +563,9 @@ class _ArmInterpreter
       address = base;
       result = byte ? _loadByte(address) : _loadWord(address);
       if (add) {
-        result = (result + offset).toUint32();
+        address = (address + offset).toUint32();
       } else {
-        result = (result - offset).toUint32();
+        address = (address - offset).toUint32();
       }
     }
     if (write) {
@@ -578,7 +578,6 @@ class _ArmInterpreter
   void visitLDR(LDRArmInstruction i, [void _]) {
     // Rd = [Rn +/- Offset]
     // (Loads from memory into a register)
-    // TODO: Deal with "PC as a base" scenario.
     final memory = _readMemory(
       i.base,
       i.offset.pick(
@@ -637,7 +636,6 @@ class _ArmInterpreter
   @override
   void visitSTR(STRArmInstruction i, [void _]) {
     // [Rn +/- Offset] = Rd
-    // TODO: Deal with "PC as a base" scenario.
     _storeMemory(
       i.base,
       i.offset.pick(

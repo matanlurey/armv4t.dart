@@ -124,11 +124,11 @@ abstract class SingleDataTransferArmInstruction
 
   /// `W`: Whether to write address into base (`1`), otherwise (`0`).
   ///
-  /// > If [addOffsetBeforeTransfer] is set, this is _always_ `true`.
+  /// > If [addOffsetBeforeTransfer] is cleared, this is _always_ `true`.
   bool get writeAddressIntoBase {
     if (writeAddressIntoBaseOrForceNonPrivilegedAccess) {
       return true;
-    } else if (addOffsetBeforeTransfer) {
+    } else if (!addOffsetBeforeTransfer) {
       return true;
     } else {
       return false;
