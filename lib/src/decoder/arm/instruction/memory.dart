@@ -26,12 +26,40 @@ abstract class DataTransferArmInstruction extends ArmInstruction {
     @required this.writeAddressIntoBaseOrForceNonPrivilegedAccess,
     @required this.base,
   }) : super._(condition: condition);
+
+  /// Whether to force non-privileged (user mode) access.
+  ///
+  /// > This is `true` when [writeAddressIntoBaseOrForceNonPrivilegedAccess] is
+  /// > `true` (`W` set) but [addOffsetBeforeTransfer] is also `true` (`P` set);
+  /// > [writeAddressIntoBase] is _always_ `true` when [addOffsetBeforeTransfer]
+  /// > is `true`.
+  bool get forceNonPrivilegedAccess {
+    if (writeAddressIntoBaseOrForceNonPrivilegedAccess) {
+      return addOffsetBeforeTransfer;
+    } else {
+      return false;
+    }
+  }
+
+  /// `W`: Whether to write address into base (`1`), otherwise (`0`).
+  ///
+  /// > If [addOffsetBeforeTransfer] is cleared, this is _always_ `true`.
+  bool get writeAddressIntoBase {
+    if (writeAddressIntoBaseOrForceNonPrivilegedAccess) {
+      return true;
+    } else if (!addOffsetBeforeTransfer) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
 mixin HasWriteBackOnly on DataTransferArmInstruction {
   /// `W`: Whether to write address into base (`1`), otherwise (`0`).
   ///
   /// > If [addOffsetBeforeTransfer] is set, this is _always_ `true`.
+  @override
   bool get writeAddressIntoBase {
     return writeAddressIntoBaseOrForceNonPrivilegedAccess;
   }
@@ -107,33 +135,6 @@ abstract class SingleDataTransferArmInstruction
               writeAddressIntoBaseOrForceNonPrivilegedAccess,
           base: base,
         );
-
-  /// Whether to force non-privileged (user mode) access.
-  ///
-  /// > This is `true` when [writeAddressIntoBaseOrForceNonPrivilegedAccess] is
-  /// > `true` (`W` set) but [addOffsetBeforeTransfer] is also `true` (`P` set);
-  /// > [writeAddressIntoBase] is _always_ `true` when [addOffsetBeforeTransfer]
-  /// > is `true`.
-  bool get forceNonPrivilegedAccess {
-    if (writeAddressIntoBaseOrForceNonPrivilegedAccess) {
-      return addOffsetBeforeTransfer;
-    } else {
-      return false;
-    }
-  }
-
-  /// `W`: Whether to write address into base (`1`), otherwise (`0`).
-  ///
-  /// > If [addOffsetBeforeTransfer] is cleared, this is _always_ `true`.
-  bool get writeAddressIntoBase {
-    if (writeAddressIntoBaseOrForceNonPrivilegedAccess) {
-      return true;
-    } else if (!addOffsetBeforeTransfer) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   @override
   List<Object> _values() {

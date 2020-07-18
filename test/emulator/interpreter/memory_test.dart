@@ -276,4 +276,114 @@ void main() {
       });
     });
   });
+
+  group('Halfword and Signed Data Transfer:', () {
+    group('LDRH', () {
+      LDRHArmInstruction instruction;
+
+      test('r0 = [r1]', () {
+        instruction = LDRHArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          base: r1,
+          destination: r0,
+          offset: Or2.right(Immediate(Uint8.zero)),
+        );
+        expect(decode(instruction), 'ldrh r0, [r1]');
+
+        cpu[1] = Uint32(2);
+        memory.storeHalfWord(Uint32(2), Uint16(16));
+        interpreter.execute(instruction);
+
+        expect(cpu[0], Uint32(16));
+      });
+    });
+
+    group('LDRSH', () {
+      LDRSHArmInstruction instruction;
+
+      test('r0 = [r1]', () {
+        instruction = LDRSHArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          base: r1,
+          destination: r0,
+          offset: Or2.right(Immediate(Uint8.zero)),
+        );
+        expect(decode(instruction), 'ldrsh r0, [r1]');
+
+        cpu[1] = Uint32(2);
+        memory.storeHalfWord(
+          Uint32(2),
+          Uint16(('1000' '0000' '0000' '0000').bits),
+        );
+        interpreter.execute(instruction);
+
+        expect(
+          cpu[0],
+          Uint32(
+            ('1111' '1111' '1111' '1111' '1000' '0000' '0000' '0000').bits,
+          ),
+        );
+      });
+    });
+
+    group('LDRSB', () {
+      LDRSBArmInstruction instruction;
+
+      test('r0 = [r1]', () {
+        instruction = LDRSBArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          base: r1,
+          destination: r0,
+          offset: Or2.right(Immediate(Uint8.zero)),
+        );
+        expect(decode(instruction), 'ldrsb r0, [r1]');
+
+        cpu[1] = Uint32(2);
+        memory.storeByte(
+          Uint32(2),
+          Uint8(('1000' '0000').bits),
+        );
+        interpreter.execute(instruction);
+
+        expect(
+          cpu[0],
+          Uint32(
+            ('1111' '1111' '1111' '1111' '1111' '1111' '1000' '0000').bits,
+          ),
+        );
+      });
+    });
+
+    group('STRH', () {
+      STRHArmInstruction instruction;
+
+      test('[r1] = r0', () {
+        instruction = STRHArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          base: r1,
+          source: r0,
+          offset: Or2.right(Immediate(Uint8.zero)),
+        );
+        expect(decode(instruction), 'strh r0, [r1]');
+
+        cpu[0] = Uint32(24);
+        cpu[1] = Uint32(2);
+        interpreter.execute(instruction);
+
+        expect(memory.loadHalfWord(Uint32(2)), Uint16(24));
+      });
+    });
+  });
 }

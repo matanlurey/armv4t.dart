@@ -541,38 +541,60 @@ class _ArmInterpreter
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
   }
 
-  Uint32 _loadAddress(Uint32 address, _Size size) {
+  Uint32 _loadFromAddress(
+    Uint32 address,
+    _Size size, {
+    @required bool signed,
+  }) {
+    Uint32 result;
     switch (size) {
       case _Size.byte:
-        return Uint32(_memory.loadByte(address).value);
+        result = Uint32(_memory.loadByte(address).value);
+        if (signed) {
+          result = result.signExtend(7);
+        }
+        break;
       case _Size.halfWord:
-        return Uint32(_memory.loadHalfWord(address).value);
+        result = Uint32(_memory.loadHalfWord(address).value);
+        if (signed) {
+          result = result.signExtend(15);
+        }
+        break;
       case _Size.word:
-        return Uint32(_memory.loadWord(address).value);
+        result = Uint32(_memory.loadWord(address).value);
         break;
       default:
         throw StateError('Unexpected: $size');
     }
+    return result;
   }
 
   Uint32 _loadMemory(
     Register register,
     Uint32 offset, {
     @required _Size size,
+    @required bool signed,
     @required bool before,
     @required bool add,
     @required bool write,
+    @required bool userMode,
   }) {
+    if (!userMode) {
+      userMode = cpu.cpsr.mode.isUser;
+    }
+
+    // TODO: Handle restrictions based on user mode/privileged mode.
+
     Uint32 result;
     Uint32 address;
 
     final base = _readRegister(register);
     if (before) {
       address = (add ? (base + offset) : (base - offset)).toUint32();
-      result = _loadAddress(address, size);
+      result = _loadFromAddress(address, size, signed: signed);
     } else {
       address = base;
-      result = _loadAddress(address, size);
+      result = _loadFromAddress(address, size, signed: signed);
       if (add) {
         address = (address + offset).toUint32();
       } else {
@@ -596,11 +618,12 @@ class _ArmInterpreter
         evaluateShiftRegister,
       ),
       size: i.transferByte ? _Size.byte : _Size.word,
+      signed: false,
       before: i.addOffsetBeforeTransfer,
       add: i.addOffsetToBase,
       write: i.writeAddressIntoBase,
+      userMode: i.forceNonPrivilegedAccess,
     );
-    // TODO: Deal with force non-privleged access mode.
     _writeRegister(i.destination, memory);
   }
 
@@ -612,7 +635,14 @@ class _ArmInterpreter
     @required bool before,
     @required bool add,
     @required bool write,
+    @required bool userMode,
   }) {
+    if (!userMode) {
+      userMode = cpu.cpsr.mode.isUser;
+    }
+
+    // TODO: Handle restrictions based on user mode/privileged mode.
+
     Uint32 address;
 
     void store() {
@@ -659,18 +689,79 @@ class _ArmInterpreter
       before: i.addOffsetBeforeTransfer,
       add: i.addOffsetToBase,
       write: i.writeAddressIntoBase,
+      userMode: i.forceNonPrivilegedAccess,
     );
-    // TODO: Deal with force non-privleged access mode.
   }
 
   @override
   void visitLDRH(LDRHArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    final result = _loadMemory(
+      i.base,
+      i.offset.pick(
+        _readRegister,
+        (i) => Uint32(i.value.value),
+      ),
+      size: _Size.halfWord,
+      signed: false,
+      before: i.addOffsetBeforeTransfer,
+      add: i.addOffsetToBase,
+      write: i.writeAddressIntoBase,
+      userMode: i.forceNonPrivilegedAccess,
+    );
+    _writeRegister(i.destination, result);
+  }
+
+  @override
+  void visitLDRSH(LDRSHArmInstruction i, [void _]) {
+    final result = _loadMemory(
+      i.base,
+      i.offset.pick(
+        _readRegister,
+        (i) => Uint32(i.value.value),
+      ),
+      size: _Size.halfWord,
+      signed: true,
+      before: i.addOffsetBeforeTransfer,
+      add: i.addOffsetToBase,
+      write: i.writeAddressIntoBase,
+      userMode: i.forceNonPrivilegedAccess,
+    );
+    _writeRegister(i.destination, result);
+  }
+
+  @override
+  void visitLDRSB(LDRSBArmInstruction i, [void _]) {
+    final result = _loadMemory(
+      i.base,
+      i.offset.pick(
+        _readRegister,
+        (i) => Uint32(i.value.value),
+      ),
+      size: _Size.byte,
+      signed: true,
+      before: i.addOffsetBeforeTransfer,
+      add: i.addOffsetToBase,
+      write: i.writeAddressIntoBase,
+      userMode: i.forceNonPrivilegedAccess,
+    );
+    _writeRegister(i.destination, result);
   }
 
   @override
   void visitSTRH(STRHArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    _storeMemory(
+      i.base,
+      i.offset.pick(
+        _readRegister,
+        (i) => Uint32(i.value.value),
+      ),
+      _readRegister(i.source),
+      size: _Size.halfWord,
+      before: i.addOffsetBeforeTransfer,
+      add: i.addOffsetToBase,
+      write: i.writeAddressIntoBase,
+      userMode: i.forceNonPrivilegedAccess,
+    );
   }
 
   @override
@@ -690,16 +781,6 @@ class _ArmInterpreter
 
   @override
   void visitLDM(LDMArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitLDRSB(LDRSBArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitLDRSH(LDRSHArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 

@@ -16,7 +16,7 @@ class LDRHArmInstruction extends HalfwordDataTransferArmInstruction {
     @required bool addOffsetToBase,
     @required bool writeAddressIntoBase,
     @required RegisterAny base,
-    @required RegisterAny source,
+    @required RegisterAny destination,
     @required Or2<RegisterNotPC, Immediate<Uint8>> offset,
   }) : super._(
           condition: condition,
@@ -24,7 +24,7 @@ class LDRHArmInstruction extends HalfwordDataTransferArmInstruction {
           addOffsetToBase: addOffsetToBase,
           writeAddressIntoBase: writeAddressIntoBase,
           base: base,
-          sourceOrDestination: source,
+          sourceOrDestination: destination,
           offset: offset,
         );
 
@@ -33,6 +33,6 @@ class LDRHArmInstruction extends HalfwordDataTransferArmInstruction {
     return visitor.visitLDRH(this, context);
   }
 
-  /// Source register.
-  RegisterAny get source => sourceOrDestination;
+  /// Destination register.
+  RegisterAny get destination => sourceOrDestination;
 }
