@@ -4,6 +4,7 @@ import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/decoder/arm/instruction.dart';
 import 'package:armv4t/src/emulator/condition.dart';
+import 'package:armv4t/src/emulator/memory.dart';
 import 'package:armv4t/src/emulator/operand.dart';
 import 'package:armv4t/src/processor.dart';
 import 'package:binary/binary.dart';
@@ -12,9 +13,14 @@ import 'package:meta/meta.dart';
 /// Provides a virtual dispatch-based interpretation of [ArmInstruction]s.
 @sealed
 abstract class ArmInterpreter {
-  factory ArmInterpreter(Arm7Processor cpu) = _ArmInterpreter;
+  factory ArmInterpreter(
+    Arm7Processor cpu,
+    Memory memory,
+  ) = _ArmInterpreter;
 
   /// Executes [instruction] relative to current [cpu].
+  ///
+  /// > NOTE: [ArmInstruction.condition] must evaluate to `true` for the [cpu].
   void execute(ArmInstruction instruction);
 
   /// Implement to provide access to the processor.
@@ -32,7 +38,9 @@ class _ArmInterpreter
   @override
   final Arm7Processor cpu;
 
-  _ArmInterpreter(this.cpu);
+  final Memory _memory;
+
+  _ArmInterpreter(this.cpu, this._memory);
 
   @override
   void execute(ArmInstruction instruction) {
@@ -533,6 +541,116 @@ class _ArmInterpreter
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
   }
 
+  Uint32 _loadByte(Uint32 address) => Uint32(_memory.loadByte(address).value);
+
+  Uint32 _loadWord(Uint32 address) => Uint32(_memory.loadWord(address).value);
+
+  Uint32 _readMemory(
+    Register register,
+    Uint32 offset, {
+    @required bool byte,
+    @required bool before,
+    @required bool add,
+    @required bool write,
+  }) {
+    Uint32 result;
+    Uint32 address;
+    final base = _readRegister(register);
+    if (before) {
+      address = (add ? (base + offset) : (base - offset)).toUint32();
+      result = byte ? _loadByte(address) : _loadWord(address);
+    } else {
+      address = base;
+      result = byte ? _loadByte(address) : _loadWord(address);
+      if (add) {
+        address = (address + offset).toUint32();
+      } else {
+        address = (address - offset).toUint32();
+      }
+    }
+    if (write) {
+      _writeRegister(register, address);
+    }
+    return result;
+  }
+
+  @override
+  void visitLDR(LDRArmInstruction i, [void _]) {
+    // Rd = [Rn +/- Offset]
+    // (Loads from memory into a register)
+    final memory = _readMemory(
+      i.base,
+      i.offset.pick(
+        (i) => Uint32(i.value.value),
+        evaluateShiftRegister,
+      ),
+      byte: i.transferByte,
+      before: i.addOffsetBeforeTransfer,
+      add: i.addOffsetToBase,
+      write: i.writeAddressIntoBase,
+    );
+    // TODO: Deal with force non-privleged access mode.
+    _writeRegister(i.destination, memory);
+  }
+
+  void _storeByte(Uint32 address, Uint8 byte) {
+    _memory.storeByte(address, byte);
+  }
+
+  void _storeWord(Uint32 address, Uint16 word) {
+    _memory.storeWord(address, word);
+  }
+
+  void _storeMemory(
+    Register register,
+    Uint32 offset,
+    Uint32 source, {
+    @required bool byte,
+    @required bool before,
+    @required bool add,
+    @required bool write,
+  }) {
+    Uint32 address;
+    final base = _readRegister(register);
+    if (before) {
+      address = (add ? (base + offset) : (base - offset)).toUint32();
+      if (byte) {
+        _storeByte(address, Uint8(source.bitRange(7, 0).value));
+      } else {
+        _storeWord(address, Uint16(source.bitRange(15, 0).value));
+      }
+    } else {
+      address = base;
+      if (byte) {
+        _storeByte(address, Uint8(source.bitRange(7, 0).value));
+      } else {
+        _storeWord(address, Uint16(source.bitRange(15, 0).value));
+      }
+      address = (add ? address + offset : address - offset).toUint32();
+    }
+    if (write) {
+      _writeRegister(register, address);
+    }
+  }
+
+  @override
+  void visitSTR(STRArmInstruction i, [void _]) {
+    // [Rn +/- Offset] = Rd
+    _storeMemory(
+      i.base,
+      i.offset.pick(
+        (i) => Uint32(i.value.value),
+        evaluateShiftRegister,
+      ),
+      _readRegister(i.source),
+      byte: i.transferByte,
+      before: i.addOffsetBeforeTransfer,
+      add: i.addOffsetToBase,
+      write: i.writeAddressIntoBase,
+    );
+    // TODO: Deal with force non-privleged access mode.
+  }
+
   @override
   void visitB(BArmInstruction i, [void _]) {
     throw UnimplementedError();
@@ -554,11 +672,6 @@ class _ArmInterpreter
   }
 
   @override
-  void visitLDR(LDRArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
   void visitLDRH(LDRHArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
@@ -575,11 +688,6 @@ class _ArmInterpreter
 
   @override
   void visitSTM(STMArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitSTR(STRArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 

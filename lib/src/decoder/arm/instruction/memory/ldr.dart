@@ -17,7 +17,7 @@ class LDRArmInstruction extends SingleDataTransferArmInstruction {
     @required bool writeAddressIntoBaseOrForceNonPrivilegedAccess,
     @required bool transferByte,
     @required RegisterAny base,
-    @required RegisterAny source,
+    @required RegisterAny destination,
     @required
         Or2<Immediate<Uint12>, ShiftedRegister<Immediate<Uint4>, RegisterNotPC>>
             offset,
@@ -29,7 +29,7 @@ class LDRArmInstruction extends SingleDataTransferArmInstruction {
               writeAddressIntoBaseOrForceNonPrivilegedAccess,
           transferByte: transferByte,
           base: base,
-          sourceOrDestination: source,
+          sourceOrDestination: destination,
           offset: offset,
         );
 
@@ -38,6 +38,6 @@ class LDRArmInstruction extends SingleDataTransferArmInstruction {
     return visitor.visitLDR(this, context);
   }
 
-  /// Source register.
-  RegisterAny get source => sourceOrDestination;
+  /// Destination register.
+  RegisterAny get destination => sourceOrDestination;
 }

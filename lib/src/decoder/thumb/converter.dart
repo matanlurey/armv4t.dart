@@ -685,7 +685,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
-        source: format.base.toLoRegister(),
+        destination: format.base.toLoRegister(),
         offset: Or2.left(Immediate(Uint12(format.offset.value))),
       );
     }
@@ -706,7 +706,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
-        source: format.base.toLoRegister(),
+        destination: format.base.toLoRegister(),
         offset: Or2.right(ShiftedRegister(
           format.offset.toLoRegisterNonPC(),
           ShiftType.LSL,
@@ -903,7 +903,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
       transferByte: false,
       base: format.destination.toLoRegister(),
-      source: RegisterAny.pc,
+      destination: RegisterAny.pc,
       offset: Or2.left(Immediate(Uint12(format.word.value))),
     );
   }
@@ -972,7 +972,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: false,
         base: RegisterAny.sp,
-        source: format.destination.toLoRegister(),
+        destination: format.destination.toLoRegister(),
         offset: Or2.left(Immediate(Uint12(format.word.value))),
       );
     } else {
