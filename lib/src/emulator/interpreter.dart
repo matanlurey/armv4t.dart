@@ -4,6 +4,7 @@ import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/decoder/arm/instruction.dart';
 import 'package:armv4t/src/emulator/condition.dart';
+import 'package:armv4t/src/emulator/memory.dart';
 import 'package:armv4t/src/emulator/operand.dart';
 import 'package:armv4t/src/processor.dart';
 import 'package:binary/binary.dart';
@@ -12,7 +13,10 @@ import 'package:meta/meta.dart';
 /// Provides a virtual dispatch-based interpretation of [ArmInstruction]s.
 @sealed
 abstract class ArmInterpreter {
-  factory ArmInterpreter(Arm7Processor cpu) = _ArmInterpreter;
+  factory ArmInterpreter(
+    Arm7Processor cpu,
+    Memory memory,
+  ) = _ArmInterpreter;
 
   /// Executes [instruction] relative to current [cpu].
   ///
@@ -34,7 +38,9 @@ class _ArmInterpreter
   @override
   final Arm7Processor cpu;
 
-  _ArmInterpreter(this.cpu);
+  final Memory _memory;
+
+  _ArmInterpreter(this.cpu, this._memory);
 
   @override
   void execute(ArmInstruction instruction) {
@@ -535,11 +541,9 @@ class _ArmInterpreter
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
   }
 
-  // TOOD: Implement.
-  Uint32 _loadByte(Uint32 address) => Uint32(Uint8.zero.value);
+  Uint32 _loadByte(Uint32 address) => Uint32(_memory.loadByte(address).value);
 
-  // TOOD: Implement.
-  Uint32 _loadWord(Uint32 address) => Uint32(Uint16.zero.value);
+  Uint32 _loadWord(Uint32 address) => Uint32(_memory.loadWord(address).value);
 
   Uint32 _readMemory(
     Register register,
@@ -589,11 +593,13 @@ class _ArmInterpreter
     _writeRegister(i.destination, memory);
   }
 
-  // TOOD: Implement.
-  void _storeByte(Uint32 address, Uint8 byte) {}
+  void _storeByte(Uint32 address, Uint8 byte) {
+    _memory.storeByte(address, byte);
+  }
 
-  // TOOD: Implement.
-  void _storeWord(Uint32 address, Uint16 word) {}
+  void _storeWord(Uint32 address, Uint16 word) {
+    _memory.storeWord(address, word);
+  }
 
   void _storeMemory(
     Register register,
@@ -603,7 +609,29 @@ class _ArmInterpreter
     @required bool before,
     @required bool add,
     @required bool write,
-  }) {}
+  }) {
+    Uint32 address;
+    final base = _readRegister(register);
+    if (before) {
+      address = (add ? (base + offset) : (base - offset)).toUint32();
+      if (byte) {
+        _storeByte(address, Uint8(source.bitRange(7, 0).value));
+      } else {
+        _storeWord(address, Uint16(source.bitRange(15, 0).value));
+      }
+    } else {
+      address = base;
+      if (byte) {
+        _storeByte(address, Uint8(source.bitRange(7, 0).value));
+      } else {
+        _storeWord(address, Uint16(source.bitRange(15, 0).value));
+      }
+      address = (add ? address + offset : address - offset).toUint32();
+    }
+    if (write) {
+      _writeRegister(register, address);
+    }
+  }
 
   @override
   void visitSTR(STRArmInstruction i, [void _]) {

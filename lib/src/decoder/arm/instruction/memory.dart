@@ -48,6 +48,31 @@ abstract class HasTransferByte implements ArmInstruction {
 /// architecture v4 and above (i.e. this package) they can also load or store
 /// a 16-bit unsigned halfword [HalfwordDataTransferArmInstruction], or load
 /// and sign extend a 16-bit halfword or an 8-bit byte.
+///
+/// ## Offsets and auto-indexing
+///
+/// The [offset] from the [base] may either be a 12-bit unsigned binary
+/// immediate value in the instruction, or a second register (possibly shifted
+/// in some way). The [offset] may be added to ([addOffsetToBase] = `true`) or
+/// subtracted from  ([addOffsetToBase] = `false`).
+///
+/// The [offset] modification may be performed either before (
+/// [addOffsetBeforeTransfer] = `false`) or after ([addOffsetBeforeTransfer] =
+/// `true`) the base is used as the transfer address.
+///
+/// The `W` bit ([writeAddressIntoBaseOrForceNonPrivilegedAccess]) gives
+/// optional auto-incrment and decrement addressing modes. The modified base
+/// value may be written back to the base (or kept if = `false`).
+///
+/// > NOTE: In the case of [addOffsetBeforeTransfer] = `false`, or post-indexing
+/// > that write-back is redundant and is _always_ cleared, sinc th old base
+/// > value can be retained by setting the [offset] to `0`. Therefore
+/// > post-indexed data transfers _always_ write back the modified base, and the
+/// > only use of [writeAddressIntoBaseOrForceNonPrivilegedAccess] is in
+/// > privileged-mode code, where set forces non-priveleged mode for the
+/// > transfer, allowing the operating system to gnerate a usr address in a
+/// > system where memory management hardware makes suitable use of this
+/// > hardware.
 @immutable
 @sealed
 abstract class SingleDataTransferArmInstruction
