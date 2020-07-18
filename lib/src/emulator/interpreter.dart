@@ -543,7 +543,7 @@ class _ArmInterpreter
 
   Uint32 _loadByte(Uint32 address) => Uint32(_memory.loadByte(address).value);
 
-  Uint32 _loadWord(Uint32 address) => Uint32(_memory.loadWord(address).value);
+  Uint32 _loadWord(Uint32 address) => _memory.loadWord(address);
 
   Uint32 _readMemory(
     Register register,
@@ -597,7 +597,7 @@ class _ArmInterpreter
     _memory.storeByte(address, byte);
   }
 
-  void _storeWord(Uint32 address, Uint16 word) {
+  void _storeWord(Uint32 address, Uint32 word) {
     _memory.storeWord(address, word);
   }
 
@@ -617,14 +617,14 @@ class _ArmInterpreter
       if (byte) {
         _storeByte(address, Uint8(source.bitRange(7, 0).value));
       } else {
-        _storeWord(address, Uint16(source.bitRange(15, 0).value));
+        _storeWord(address, source);
       }
     } else {
       address = base;
       if (byte) {
         _storeByte(address, Uint8(source.bitRange(7, 0).value));
       } else {
-        _storeWord(address, Uint16(source.bitRange(15, 0).value));
+        _storeWord(address, source);
       }
       address = (add ? address + offset : address - offset).toUint32();
     }
