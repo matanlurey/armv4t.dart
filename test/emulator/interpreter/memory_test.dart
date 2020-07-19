@@ -19,7 +19,7 @@ void main() {
 
   setUp(() {
     cpu = Arm7Processor();
-    memory = Memory(10);
+    memory = Memory(12);
     interpreter = ArmInterpreter(cpu, memory);
   });
 
@@ -40,9 +40,9 @@ void main() {
         );
         expect(decode(instruction), 'ldr r0, [r1]');
 
-        // Read memory address 5.
-        cpu[1] = Uint32(5);
-        memory.storeWord(Uint32(5), Uint16(10240));
+        // Read memory address 4.
+        cpu[1] = Uint32(4);
+        memory.storeWord(Uint32(4), Uint32(10240));
         interpreter.execute(instruction);
 
         expect(cpu[0], Uint32(10240));
@@ -61,9 +61,9 @@ void main() {
         );
         expect(decode(instruction), 'ldrb r0, [r1]');
 
-        // Read memory address 5.
-        cpu[1] = Uint32(5);
-        memory.storeByte(Uint32(5), Uint8(255));
+        // Read memory address 4.
+        cpu[1] = Uint32(4);
+        memory.storeByte(Uint32(4), Uint8(255));
         interpreter.execute(instruction);
 
         expect(cpu[0], Uint32(255));
@@ -78,17 +78,17 @@ void main() {
           transferByte: false,
           base: r1,
           destination: r0,
-          offset: Or2.left(Immediate(Uint12(5))),
+          offset: Or2.left(Immediate(Uint12(3))),
         );
-        expect(decode(instruction), 'ldr r0, [r1, 5]');
+        expect(decode(instruction), 'ldr r0, [r1, 3]');
 
-        // Read memory address 3 + 5.
-        cpu[1] = Uint32(3);
-        memory.storeWord(Uint32(8), Uint16(10240));
+        // Read memory address 1 + 3.
+        cpu[1] = Uint32(1);
+        memory.storeWord(Uint32(4), Uint32(10240));
         interpreter.execute(instruction);
 
         expect(cpu[0], Uint32(10240));
-        expect(cpu[1], Uint32(3), reason: 'No write back');
+        expect(cpu[1], Uint32(1), reason: 'No write back');
       });
 
       test('r0 = [r1] + O: Writeback', () {
@@ -100,17 +100,17 @@ void main() {
           transferByte: false,
           base: r1,
           destination: r0,
-          offset: Or2.left(Immediate(Uint12(5))),
+          offset: Or2.left(Immediate(Uint12(3))),
         );
-        expect(decode(instruction), 'ldr r0, [r1, 5]!');
+        expect(decode(instruction), 'ldr r0, [r1, 3]!');
 
-        // Read memory address 3 + 5.
-        cpu[1] = Uint32(3);
-        memory.storeWord(Uint32(8), Uint16(10240));
+        // Read memory address 1 + 3.
+        cpu[1] = Uint32(1);
+        memory.storeWord(Uint32(4), Uint32(10240));
         interpreter.execute(instruction);
 
         expect(cpu[0], Uint32(10240));
-        expect(cpu[1], Uint32(8), reason: 'Explicit writeback');
+        expect(cpu[1], Uint32(4), reason: 'Explicit writeback');
       });
 
       test('r0 = [r1 - O]', () {
@@ -122,13 +122,13 @@ void main() {
           transferByte: false,
           base: r1,
           destination: r0,
-          offset: Or2.left(Immediate(Uint12(2))),
+          offset: Or2.left(Immediate(Uint12(3))),
         );
-        expect(decode(instruction), 'ldr r0, [r1, -2]');
+        expect(decode(instruction), 'ldr r0, [r1, -3]');
 
-        // Read memory address 3 - 2.
+        // Read memory address 3 - 3.
         cpu[1] = Uint32(3);
-        memory.storeWord(Uint32(1), Uint16(10240));
+        memory.storeWord(Uint32(0), Uint32(10240));
         interpreter.execute(instruction);
 
         expect(cpu[0], Uint32(10240));
@@ -144,16 +144,16 @@ void main() {
           transferByte: false,
           base: r1,
           destination: r0,
-          offset: Or2.left(Immediate(Uint12(2))),
+          offset: Or2.left(Immediate(Uint12(4))),
         );
 
-        // Read memory address 3.
-        cpu[1] = Uint32(3);
-        memory.storeWord(Uint32(3), Uint16(10240));
+        // Read memory address 0.
+        cpu[1] = Uint32(0);
+        memory.storeWord(Uint32(0), Uint32(10240));
         interpreter.execute(instruction);
 
         expect(cpu[0], Uint32(10240));
-        expect(cpu[1], Uint32(5), reason: 'Implicit write back');
+        expect(cpu[1], Uint32(4), reason: 'Implicit write back');
       });
     });
 
@@ -180,7 +180,7 @@ void main() {
 
         expect(cpu[0], Uint32(4));
         expect(cpu[1], Uint32(10240));
-        expect(memory.loadWord(Uint32(4)), Uint16(10240));
+        expect(memory.loadWord(Uint32(4)), Uint32(10240));
       });
 
       test('[r0] = r1: Byte', () {
@@ -219,14 +219,14 @@ void main() {
         );
         expect(decode(instruction), 'str r1, [r0, 3]');
 
-        // Store r1 into memory location 4 + 3.
-        cpu[0] = Uint32(4);
+        // Store r1 into memory location 1 + 3.
+        cpu[0] = Uint32(1);
         cpu[1] = Uint32(10240);
         interpreter.execute(instruction);
 
-        expect(cpu[0], Uint32(4));
+        expect(cpu[0], Uint32(1));
         expect(cpu[1], Uint32(10240));
-        expect(memory.loadWord(Uint32(7)), Uint16(10240));
+        expect(memory.loadWord(Uint32(4)), Uint32(10240));
       });
 
       test('[r0] = r1 - O', () {
@@ -238,18 +238,18 @@ void main() {
           transferByte: false,
           base: r0,
           destination: r1,
-          offset: Or2.left(Immediate(Uint12(3))),
+          offset: Or2.left(Immediate(Uint12(4))),
         );
-        expect(decode(instruction), 'str r1, [r0, -3]');
+        expect(decode(instruction), 'str r1, [r0, -4]');
 
-        // Store r1 into memory location 4 - 3.
+        // Store r1 into memory location 4 - 4.
         cpu[0] = Uint32(4);
         cpu[1] = Uint32(10240);
         interpreter.execute(instruction);
 
         expect(cpu[0], Uint32(4));
         expect(cpu[1], Uint32(10240));
-        expect(memory.loadWord(Uint32(1)), Uint16(10240));
+        expect(memory.loadWord(Uint32(0)), Uint32(10240));
       });
 
       test('[r0] = r1 + O', () {
@@ -272,7 +272,117 @@ void main() {
 
         expect(cpu[0], Uint32(7), reason: 'Writeback (Implicit)');
         expect(cpu[1], Uint32(10240));
-        expect(memory.loadWord(Uint32(4)), Uint16(10240));
+        expect(memory.loadWord(Uint32(4)), Uint32(10240));
+      });
+    });
+  });
+
+  group('Halfword and Signed Data Transfer:', () {
+    group('LDRH', () {
+      LDRHArmInstruction instruction;
+
+      test('r0 = [r1]', () {
+        instruction = LDRHArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          base: r1,
+          destination: r0,
+          offset: Or2.right(Immediate(Uint8.zero)),
+        );
+        expect(decode(instruction), 'ldrh r0, [r1]');
+
+        cpu[1] = Uint32(2);
+        memory.storeHalfWord(Uint32(2), Uint16(16));
+        interpreter.execute(instruction);
+
+        expect(cpu[0], Uint32(16));
+      });
+    });
+
+    group('LDRSH', () {
+      LDRSHArmInstruction instruction;
+
+      test('r0 = [r1]', () {
+        instruction = LDRSHArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          base: r1,
+          destination: r0,
+          offset: Or2.right(Immediate(Uint8.zero)),
+        );
+        expect(decode(instruction), 'ldrsh r0, [r1]');
+
+        cpu[1] = Uint32(2);
+        memory.storeHalfWord(
+          Uint32(2),
+          Uint16(('1000' '0000' '0000' '0000').bits),
+        );
+        interpreter.execute(instruction);
+
+        expect(
+          cpu[0],
+          Uint32(
+            ('1111' '1111' '1111' '1111' '1000' '0000' '0000' '0000').bits,
+          ),
+        );
+      });
+    });
+
+    group('LDRSB', () {
+      LDRSBArmInstruction instruction;
+
+      test('r0 = [r1]', () {
+        instruction = LDRSBArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          base: r1,
+          destination: r0,
+          offset: Or2.right(Immediate(Uint8.zero)),
+        );
+        expect(decode(instruction), 'ldrsb r0, [r1]');
+
+        cpu[1] = Uint32(2);
+        memory.storeByte(
+          Uint32(2),
+          Uint8(('1000' '0000').bits),
+        );
+        interpreter.execute(instruction);
+
+        expect(
+          cpu[0],
+          Uint32(
+            ('1111' '1111' '1111' '1111' '1111' '1111' '1000' '0000').bits,
+          ),
+        );
+      });
+    });
+
+    group('STRH', () {
+      STRHArmInstruction instruction;
+
+      test('[r1] = r0', () {
+        instruction = STRHArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          base: r1,
+          source: r0,
+          offset: Or2.right(Immediate(Uint8.zero)),
+        );
+        expect(decode(instruction), 'strh r0, [r1]');
+
+        cpu[0] = Uint32(24);
+        cpu[1] = Uint32(2);
+        interpreter.execute(instruction);
+
+        expect(memory.loadHalfWord(Uint32(2)), Uint16(24));
       });
     });
   });

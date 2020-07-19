@@ -25,4 +25,4 @@ dependency_overrides:
   binary:
     git:
       url: https://github.com/matanlurey/binary.dart
-      ref: dd6a27811e24260215a56bb3b9a9119a88bc8b51
+      ref: 05345aa01622fdacb402673c06e6ceb637739e02

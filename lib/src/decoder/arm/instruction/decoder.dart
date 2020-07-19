@@ -409,7 +409,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     final addOffsetToBase = format.addOffsetBit;
     final writeAddressIntoBase = format.writeAddressBit;
     final base = RegisterAny(format.baseRegister);
-    final source = RegisterAny(format.sourceOrDestinationRegister);
+    final sourceOr = RegisterAny(format.sourceOrDestinationRegister);
 
     Or2<RegisterNotPC, Immediate<Uint8>> offset;
     if (format.immediateOffset) {
@@ -430,7 +430,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
             addOffsetToBase: addOffsetToBase,
             writeAddressIntoBase: writeAddressIntoBase,
             base: base,
-            source: source,
+            destination: sourceOr,
             offset: offset,
           );
         case 0x2:
@@ -440,7 +440,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
             addOffsetToBase: addOffsetToBase,
             writeAddressIntoBase: writeAddressIntoBase,
             base: base,
-            source: source,
+            destination: sourceOr,
             offset: offset,
           );
         case 0x3:
@@ -450,7 +450,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
             addOffsetToBase: addOffsetToBase,
             writeAddressIntoBase: writeAddressIntoBase,
             base: base,
-            source: source,
+            destination: sourceOr,
             offset: offset,
           );
         default:
@@ -464,7 +464,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         addOffsetToBase: addOffsetToBase,
         writeAddressIntoBase: writeAddressIntoBase,
         base: base,
-        destination: source,
+        source: sourceOr,
         offset: offset,
       );
     }

@@ -575,7 +575,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         addOffsetToBase: true,
         writeAddressIntoBase: false,
         base: format.destination.toLoRegister(),
-        source: format.destination.toLoRegister(),
+        destination: format.destination.toLoRegister(),
         offset: Or2.right(Immediate(format.word)),
       );
     } else {
@@ -587,7 +587,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         addOffsetToBase: true,
         writeAddressIntoBase: false,
         base: format.destination.toLoRegister(),
-        destination: format.destination.toLoRegister(),
+        source: format.destination.toLoRegister(),
         offset: Or2.right(Immediate(format.word)),
       );
     }
@@ -609,7 +609,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
           addOffsetToBase: true,
           writeAddressIntoBase: false,
           base: format.baseRegister.toLoRegister(),
-          destination: format.sourceOrdestinationRegister.toLoRegister(),
+          source: format.sourceOrdestinationRegister.toLoRegister(),
           offset: Or2.left(format.offsetRegister.toLoRegisterNonPC()),
         );
       } else {
@@ -622,7 +622,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
           addOffsetToBase: true,
           writeAddressIntoBase: false,
           base: format.baseRegister.toLoRegister(),
-          source: format.sourceOrdestinationRegister.toLoRegister(),
+          destination: format.sourceOrdestinationRegister.toLoRegister(),
           offset: Or2.left(format.offsetRegister.toLoRegisterNonPC()),
         );
       }
@@ -637,7 +637,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
           addOffsetToBase: true,
           writeAddressIntoBase: false,
           base: format.baseRegister.toLoRegister(),
-          source: format.sourceOrdestinationRegister.toLoRegister(),
+          destination: format.sourceOrdestinationRegister.toLoRegister(),
           offset: Or2.left(format.offsetRegister.toLoRegisterNonPC()),
         );
       } else {
@@ -650,7 +650,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
           addOffsetToBase: true,
           writeAddressIntoBase: false,
           base: format.baseRegister.toLoRegister(),
-          source: format.sourceOrdestinationRegister.toLoRegister(),
+          destination: format.sourceOrdestinationRegister.toLoRegister(),
           offset: Or2.left(format.offsetRegister.toLoRegisterNonPC()),
         );
       }
