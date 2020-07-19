@@ -10,6 +10,9 @@ abstract class Memory {
   ///
   /// Optionally may provide existing [data] to import.
   factory Memory(int size, {List<int> data}) {
+    if (size % 4 != 0) {
+      throw ArgumentError.value(size, 'size', 'Must be divisible by 4');
+    }
     final data = Uint8List(size);
     if (data != null) {
       final Object upcast = data;

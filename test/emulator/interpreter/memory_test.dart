@@ -19,7 +19,7 @@ void main() {
 
   setUp(() {
     cpu = Arm7Processor();
-    memory = Memory(10);
+    memory = Memory(12);
     interpreter = ArmInterpreter(cpu, memory);
   });
 
