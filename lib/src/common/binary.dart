@@ -344,6 +344,10 @@ class Uint24 extends Integral<Uint24> {
   String toDebugString() => '$_name {$value}';
 }
 
+extension Uint24X on Uint24 {
+  Int24 toSigned() => Int24(value.toSigned(24));
+}
+
 /// Encapsulates an signed 24-bit aggregation.
 @sealed
 class Int24 extends Integral<Int24> {

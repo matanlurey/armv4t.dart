@@ -571,7 +571,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     void _,
   ]) {
     final condition = Condition.parse(format.condition.value);
-    final offset = format.offset;
+    final offset = format.offset.toSigned();
 
     if (format.link) {
       // L = 1

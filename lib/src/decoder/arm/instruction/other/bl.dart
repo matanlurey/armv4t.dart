@@ -10,7 +10,7 @@ part of '../../instruction.dart';
 ///
 /// `2S+1N`.
 class BLArmInstruction extends ArmInstruction {
-  final Uint24 offset;
+  final Int24 offset;
 
   BLArmInstruction({
     @required Condition condition,
