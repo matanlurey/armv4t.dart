@@ -83,6 +83,9 @@ class _ArmInterpreter
     @required bool op1Signed,
     @required bool op2Signed,
   }) {
+    print(
+        '>>> isOverflow: $result.hadOverflow($op1Signed, $op2Signed) = ${result.hadOverflow(op1Signed, op2Signed)}');
+    print('>>> isSigned:   ${result.isSigned}');
     cpu.cpsr = cpu.cpsr.update(
       // V (If + and + is -, or - and - is +)
       isOverflow: result.hadOverflow(op1Signed, op2Signed),
@@ -102,24 +105,16 @@ class _ArmInterpreter
 
   // Arithmetic
 
-  Uint32 _addWithCarry(
+  Uint32List _addWithCarry(
     Uint32 op1,
     Uint32 op2, {
     int carryIn = 0,
-    bool setFlags = false,
   }) {
     var sum = op1 + op2;
     if (carryIn != 0) {
       sum = sum.add64(carryIn.hiLo());
     }
-    if (setFlags) {
-      _writeToAllFlags(
-        sum,
-        op1Signed: op1.msb,
-        op2Signed: op2.msb,
-      );
-    }
-    return sum.toUint32();
+    return sum;
   }
 
   @override
@@ -130,9 +125,11 @@ class _ArmInterpreter
     final res = _addWithCarry(
       op1,
       op2,
-      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
     );
-    _writeRegister(i.destination, res);
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToAllFlags(res, op1Signed: op1.msb, op2Signed: op2.msb);
+    }
+    _writeRegister(i.destination, res.toUint32());
   }
 
   @override
@@ -144,29 +141,11 @@ class _ArmInterpreter
       op1,
       op2,
       carryIn: cpu.cpsr.isCarry ? 1 : 0,
-      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
     );
-    _writeRegister(i.destination, res);
-  }
-
-  Uint32 _subWithCarry(
-    Uint32 op1,
-    Uint32 op2, {
-    int carryIn = 0,
-    bool setFlags = false,
-  }) {
-    var sum = op1 - op2;
-    if (carryIn != 0) {
-      sum = sum.add64(carryIn.hiLo());
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToAllFlags(res, op1Signed: op1.msb, op2Signed: op2.msb);
     }
-    if (setFlags) {
-      _writeToAllFlags(
-        sum,
-        op1Signed: op1.msb,
-        op2Signed: op2.msb,
-      );
-    }
-    return sum.toUint32();
+    _writeRegister(i.destination, res.toUint32());
   }
 
   @override
@@ -174,12 +153,15 @@ class _ArmInterpreter
     // rD = operand1 - operand2
     final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
-    final res = _subWithCarry(
+    final res = _addWithCarry(
       op1,
-      op2,
-      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+      ~op2,
+      carryIn: 1,
     );
-    _writeRegister(i.destination, res);
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToAllFlags(res, op1Signed: op1.msb, op2Signed: op2.msb);
+    }
+    _writeRegister(i.destination, res.toUint32());
   }
 
   @override
@@ -187,13 +169,15 @@ class _ArmInterpreter
     // rD = operand1 - operand2 + carry - 1
     final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
-    final res = _subWithCarry(
+    final res = _addWithCarry(
       op1,
-      op2,
-      carryIn: cpu.cpsr.isCarry ? 0 : -1,
-      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+      ~op2,
+      carryIn: cpu.cpsr.isCarry ? 1 : 0,
     );
-    _writeRegister(i.destination, res);
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToAllFlags(res, op1Signed: op1.msb, op2Signed: op2.msb);
+    }
+    _writeRegister(i.destination, res.toUint32());
   }
 
   @override
@@ -201,12 +185,15 @@ class _ArmInterpreter
     // rD = operand2 - operand1
     final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
-    final res = _subWithCarry(
-      op2,
+    final res = _addWithCarry(
+      ~op2,
       op1,
-      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+      carryIn: 1,
     );
-    _writeRegister(i.destination, res);
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToAllFlags(res, op1Signed: op1.msb, op2Signed: op2.msb);
+    }
+    _writeRegister(i.destination, res.toUint32());
   }
 
   @override
@@ -214,13 +201,15 @@ class _ArmInterpreter
     // rD = operand2 - operand1 + carry - 1
     final op1 = _readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
-    final res = _subWithCarry(
-      op2,
+    final res = _addWithCarry(
+      ~op2,
       op1,
-      carryIn: cpu.cpsr.isCarry ? 0 : -1,
-      setFlags: i.setConditionCodes && !i.destination.isProgramCounter,
+      carryIn: cpu.cpsr.isCarry ? 1 : 0,
     );
-    _writeRegister(i.destination, res);
+    if (i.setConditionCodes && !i.destination.isProgramCounter) {
+      _writeToAllFlags(res, op1Signed: op1.msb, op2Signed: op2.msb);
+    }
+    _writeRegister(i.destination, res.toUint32());
   }
 
   void _writeToCZN(Uint32List result) {
@@ -356,8 +345,9 @@ class _ArmInterpreter
       throw UnimplementedError('CMPP');
     } else {
       // CMP (Standard Arithmetic Operation)
-      final res = _subWithCarry(op1, op2, setFlags: true);
-      _writeToCZN(res.hiLo());
+      final res = _addWithCarry(op1, ~op2, carryIn: 1);
+      print('>>> CMP $op1 - $op2 = $res');
+      _writeToAllFlags(res, op1Signed: op1.msb, op2Signed: op2.msb);
     }
   }
 
@@ -374,8 +364,8 @@ class _ArmInterpreter
       throw UnimplementedError('CMNP');
     } else {
       // CMN (Standard Arithmetic Operation)
-      final res = _addWithCarry(op1, op2, setFlags: true);
-      _writeToCZN(res.hiLo());
+      final res = _addWithCarry(op1, ~op2, carryIn: 1);
+      _writeToAllFlags(res, op1Signed: op1.msb, op2Signed: op2.msb);
     }
   }
 

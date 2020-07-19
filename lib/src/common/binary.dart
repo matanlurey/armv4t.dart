@@ -443,9 +443,7 @@ extension BinaryUint64HiLoX on Uint32List {
     ..lo = lo;
 
   /// Returns whether the operands that creates this int that overflow occured.
-  bool hadOverflow(bool aSigned, bool bSigned) {
-    return aSigned == bSigned && aSigned != isSigned;
-  }
+  bool hadOverflow(bool aSigned, bool bSigned) => aSigned == bSigned ^ isSigned;
 
   /// Whether the MSB of [lo] was discarded (shifted into [hi]).
   bool get isCarry => hi != 0 ? msb(1) : false;
