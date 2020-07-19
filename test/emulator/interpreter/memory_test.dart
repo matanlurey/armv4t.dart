@@ -397,7 +397,7 @@ void main() {
           addOffsetBeforeTransfer: true,
           addOffsetToBase: true,
           writeAddressIntoBase: false,
-          loadPsrOrForceUserMode: false,
+          loadPsr: false,
           base: r0,
           registerList: RegisterList({1, 2, 3}),
         );
@@ -421,7 +421,7 @@ void main() {
           addOffsetBeforeTransfer: true,
           addOffsetToBase: true,
           writeAddressIntoBase: false,
-          loadPsrOrForceUserMode: true,
+          loadPsr: true,
           base: r0,
           registerList: RegisterList({1, 2, 3, 15}),
         );
@@ -456,7 +456,7 @@ void main() {
           addOffsetBeforeTransfer: true,
           addOffsetToBase: true,
           writeAddressIntoBase: true,
-          loadPsrOrForceUserMode: false,
+          loadPsr: false,
           base: r0,
           registerList: RegisterList({1, 2, 3}),
         );
@@ -469,6 +469,35 @@ void main() {
         interpreter.execute(instruction);
 
         expect(cpu[0], Uint32(12), reason: 'Write-back');
+        expect(cpu[1], Uint32(1));
+        expect(cpu[2], Uint32(2));
+        expect(cpu[3], Uint32(3));
+      });
+    });
+
+    group('STM', () {
+      STMArmInstruction instruction;
+
+      test('[r0...] = {1-3}: User-mode', () {
+        instruction = STMArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          forceNonPrivilegedAccess: true,
+          base: r0,
+          registerList: RegisterList({1, 2, 3}),
+        );
+        expect(decode(instruction), 'ldmib r0, {r1-r3}');
+
+        cpu.unsafeSetCpsr(cpu.cpsr.update(mode: ArmOperatingMode.fiq));
+        memory
+          ..storeWord(Uint32(4), Uint32(1))
+          ..storeWord(Uint32(8), Uint32(2))
+          ..storeWord(Uint32(12), Uint32(3));
+        interpreter.execute(instruction);
+
+        expect(cpu[0], Uint32(0), reason: 'No write-back');
         expect(cpu[1], Uint32(1));
         expect(cpu[2], Uint32(2));
         expect(cpu[3], Uint32(3));

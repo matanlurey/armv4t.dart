@@ -872,7 +872,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         addOffsetBeforeTransfer: false,
         addOffsetToBase: true,
         writeAddressIntoBase: true,
-        loadPsrOrForceUserMode: false,
+        loadPsr: false,
         base: RegisterAny.sp,
         registerList: RegisterList.parse(format.registerList.value),
       );
@@ -884,7 +884,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         addOffsetBeforeTransfer: false,
         addOffsetToBase: true,
         writeAddressIntoBase: true,
-        loadPsrOrForceUserMode: false,
+        forceNonPrivilegedAccess: false,
         base: RegisterAny.sp,
         registerList: RegisterList.parse(format.registerList.value),
       );
@@ -935,7 +935,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         addOffsetBeforeTransfer: false,
         addOffsetToBase: true,
         writeAddressIntoBase: true,
-        loadPsrOrForceUserMode: false,
+        loadPsr: false,
         base: RegisterAny.sp,
         registerList: RegisterList.parse(registerList.value),
       );
@@ -950,7 +950,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         addOffsetBeforeTransfer: true,
         addOffsetToBase: false,
         writeAddressIntoBase: true,
-        loadPsrOrForceUserMode: false,
+        forceNonPrivilegedAccess: false,
         base: RegisterAny.sp,
         registerList: RegisterList.parse(registerList.value),
       );

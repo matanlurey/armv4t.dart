@@ -15,7 +15,7 @@ class STMArmInstruction extends BlockDataTransferArmInstruction {
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,
     @required bool writeAddressIntoBase,
-    @required bool loadPsrOrForceUserMode,
+    @required bool forceNonPrivilegedAccess,
     @required RegisterAny base,
     @required RegisterList<RegisterAny> registerList,
   }) : super._(
@@ -23,7 +23,7 @@ class STMArmInstruction extends BlockDataTransferArmInstruction {
           addOffsetBeforeTransfer: addOffsetBeforeTransfer,
           addOffsetToBase: addOffsetToBase,
           writeAddressIntoBase: writeAddressIntoBase,
-          loadPsrOrForceUserMode: loadPsrOrForceUserMode,
+          loadPsrOrForceUserMode: forceNonPrivilegedAccess,
           base: base,
           registerList: registerList,
         );
