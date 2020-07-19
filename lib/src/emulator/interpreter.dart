@@ -877,6 +877,34 @@ class _ArmInterpreter
   }
 
   @override
+  void visitSWP(SWPArmInstruction i, [void _]) {
+    // Rd = [Rm]
+    final result = _loadMemory(
+      i.source,
+      Uint32.zero,
+      size: i.transferByte ? _Size.byte : _Size.word,
+      signed: false,
+      before: true,
+      add: true,
+      write: false,
+      forceUserMode: false,
+    );
+    _writeRegister(i.destination, result);
+
+    // [Rn] = Rm
+    _storeMemory(
+      i.base,
+      Uint32.zero,
+      _readRegister(i.source),
+      size: i.transferByte ? _Size.byte : _Size.word,
+      before: false,
+      add: true,
+      write: true,
+      forceUserMode: false,
+    );
+  }
+
+  @override
   void visitB(BArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
@@ -893,11 +921,6 @@ class _ArmInterpreter
 
   @override
   void visitSWI(SWIArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitSWP(SWPArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 }
