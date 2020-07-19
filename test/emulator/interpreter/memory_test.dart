@@ -478,7 +478,7 @@ void main() {
     group('STM', () {
       STMArmInstruction instruction;
 
-      test('[r0...] = {1-3}: User-mode', () {
+      test('[r0...] = {8-10}: User-mode', () {
         instruction = STMArmInstruction(
           condition: Condition.al,
           addOffsetBeforeTransfer: true,
@@ -486,21 +486,33 @@ void main() {
           writeAddressIntoBase: false,
           forceNonPrivilegedAccess: true,
           base: r0,
-          registerList: RegisterList({1, 2, 3}),
+          registerList: RegisterList({8, 9, 10}),
         );
-        expect(decode(instruction), 'ldmib r0, {r1-r3}');
+        expect(decode(instruction), 'stmib r0, {r8-r10}^');
 
         cpu.unsafeSetCpsr(cpu.cpsr.update(mode: ArmOperatingMode.fiq));
-        memory
-          ..storeWord(Uint32(4), Uint32(1))
-          ..storeWord(Uint32(8), Uint32(2))
-          ..storeWord(Uint32(12), Uint32(3));
+        cpu
+          // Swapped registers (for FIQ).
+          ..[8] = Uint32(666)
+          ..[9] = Uint32(666)
+          ..[10] = Uint32(666)
+          // User-mode banked registers.
+          ..forceUserModeWrite(8, Uint32(1))
+          ..forceUserModeWrite(9, Uint32(2))
+          ..forceUserModeWrite(10, Uint32(3));
         interpreter.execute(instruction);
 
         expect(cpu[0], Uint32(0), reason: 'No write-back');
-        expect(cpu[1], Uint32(1));
-        expect(cpu[2], Uint32(2));
-        expect(cpu[3], Uint32(3));
+
+        // Swapped registers were ignored.
+        expect(cpu[8], Uint32(666));
+        expect(cpu[9], Uint32(666));
+        expect(cpu[10], Uint32(666));
+
+        // User-mode registers.
+        expect(cpu.forceUserModeRead(8), Uint32(1));
+        expect(cpu.forceUserModeRead(9), Uint32(2));
+        expect(cpu.forceUserModeRead(10), Uint32(3));
       });
     });
   });
