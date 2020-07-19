@@ -904,24 +904,63 @@ class _ArmInterpreter
     );
   }
 
+  void _branch(int offset) {
+    // PC = PC + 8 + Offset * 4
+    var pc = cpu.programCounter.value;
+    pc += 8 + offset * 4;
+    cpu.programCounter = Uint32(pc);
+  }
+
   @override
   void visitB(BArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    _branch(i.offset.value);
   }
 
   @override
   void visitBL(BLArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    final returnTo = cpu.programCounter.value + 4;
+    cpu.linkRegister = Uint32(returnTo);
+    _branch(i.offset.value);
   }
 
   @override
   void visitBX(BXArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    // PC = Rn, T = Rn.0
+    if (i.switchToThumbMode(_readRegister)) {
+      cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: true));
+      final jump = _readRegister(i.operand).value - 1;
+      cpu.programCounter = Uint32(jump);
+    } else {
+      cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: false));
+      cpu.programCounter = _readRegister(i.operand);
+    }
+  }
+
+  // TODO: Implement for other exception types.
+  void _enterExceptionSWI() {
+    const _baseVector = 0x00000000;
+    const _swiOffsets = 0x08;
+
+    // R14_<new mode>   = PC + nn
+    // SPSR_<new mode>  = CPSR
+    // CPSR_T           = 0
+    // CPSR_M           = mode
+    // CPSR_F           = 1 (Reset and FIQ Only)
+    // PC               = EXCEPTION_VECTOR
+    final cpsr = cpu.cpsr;
+    cpu
+      ..linkRegister = cpu.programCounter
+      ..unsafeSetCpsr(cpu.cpsr.update(
+        thumbState: false,
+        mode: ArmOperatingMode.svc,
+      ))
+      ..spsr = cpsr
+      ..programCounter = Uint32(_baseVector + _swiOffsets);
   }
 
   @override
   void visitSWI(SWIArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    _enterExceptionSWI();
   }
 }
 

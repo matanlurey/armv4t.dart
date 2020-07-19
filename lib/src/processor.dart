@@ -301,7 +301,7 @@ class _Arm7Processor extends Arm7Processor {
         isSigned: psr.isSigned,
         isZero: psr.isZero,
       );
-      _registers[_statusRegistersUsr] = cpsr.toBits().value;
+      unsafeSetCpsr(cpsr);
     }
   }
 
