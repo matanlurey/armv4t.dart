@@ -19,7 +19,7 @@ void main() {
 
   setUp(() {
     cpu = Arm7Processor();
-    memory = Memory(12);
+    memory = Memory(20);
     interpreter = ArmInterpreter(cpu, memory);
   });
 
@@ -383,6 +383,136 @@ void main() {
         interpreter.execute(instruction);
 
         expect(memory.loadHalfWord(Uint32(2)), Uint16(24));
+      });
+    });
+  });
+
+  group('Block Data Transfer', () {
+    group('LDM', () {
+      LDMArmInstruction instruction;
+
+      test('r{1-3} = [r0]', () {
+        instruction = LDMArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          loadPsr: false,
+          base: r0,
+          registerList: RegisterList({1, 2, 3}),
+        );
+        expect(decode(instruction), 'ldmib r0, {r1-r3}');
+
+        memory
+          ..storeWord(Uint32(4), Uint32(1))
+          ..storeWord(Uint32(8), Uint32(2))
+          ..storeWord(Uint32(12), Uint32(3));
+        interpreter.execute(instruction);
+
+        expect(cpu[0], Uint32(0), reason: 'No write-back');
+        expect(cpu[1], Uint32(1));
+        expect(cpu[2], Uint32(2));
+        expect(cpu[3], Uint32(3));
+      });
+
+      test('r{1-3, 15} = [r0]: Load PSR', () {
+        instruction = LDMArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          loadPsr: true,
+          base: r0,
+          registerList: RegisterList({1, 2, 3, 15}),
+        );
+        expect(decode(instruction), 'ldmib r0, {r1-r3, r15}^');
+
+        cpu.unsafeSetCpsr(cpu.cpsr.update(mode: ArmOperatingMode.fiq));
+        cpu.spsr = cpu.spsr.update(isOverflow: true);
+        memory
+          ..storeWord(Uint32(4), Uint32(1))
+          ..storeWord(Uint32(8), Uint32(2))
+          ..storeWord(Uint32(12), Uint32(3))
+          ..storeWord(Uint32(16), Uint32(4));
+        interpreter.execute(instruction);
+
+        expect(cpu[0], Uint32(0), reason: 'No write-back');
+        expect(cpu[1], Uint32(1));
+        expect(cpu[2], Uint32(2));
+        expect(cpu[3], Uint32(3));
+        expect(cpu.programCounter, Uint32(4));
+        expect(
+          cpu.cpsr,
+          StatusRegister().update(
+            isOverflow: true,
+            mode: ArmOperatingMode.fiq,
+          ),
+        );
+      });
+
+      test('r{1-3} = [r0]: Write-back', () {
+        instruction = LDMArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: true,
+          loadPsr: false,
+          base: r0,
+          registerList: RegisterList({1, 2, 3}),
+        );
+        expect(decode(instruction), 'ldmib r0!, {r1-r3}');
+
+        memory
+          ..storeWord(Uint32(4), Uint32(1))
+          ..storeWord(Uint32(8), Uint32(2))
+          ..storeWord(Uint32(12), Uint32(3));
+        interpreter.execute(instruction);
+
+        expect(cpu[0], Uint32(12), reason: 'Write-back');
+        expect(cpu[1], Uint32(1));
+        expect(cpu[2], Uint32(2));
+        expect(cpu[3], Uint32(3));
+      });
+    });
+
+    group('STM', () {
+      STMArmInstruction instruction;
+
+      test('[r0...] = {8-10}: User-mode', () {
+        instruction = STMArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          forceNonPrivilegedAccess: true,
+          base: r0,
+          registerList: RegisterList({8, 9, 10}),
+        );
+        expect(decode(instruction), 'stmib r0, {r8-r10}^');
+
+        cpu.unsafeSetCpsr(cpu.cpsr.update(mode: ArmOperatingMode.fiq));
+        cpu
+          // Swapped registers (for FIQ).
+          ..[8] = Uint32(666)
+          ..[9] = Uint32(666)
+          ..[10] = Uint32(666)
+          // User-mode banked registers.
+          ..forceUserModeWrite(8, Uint32(1))
+          ..forceUserModeWrite(9, Uint32(2))
+          ..forceUserModeWrite(10, Uint32(3));
+        interpreter.execute(instruction);
+
+        expect(cpu[0], Uint32(0), reason: 'No write-back');
+
+        // Swapped registers were ignored.
+        expect(cpu[8], Uint32(666));
+        expect(cpu[9], Uint32(666));
+        expect(cpu[10], Uint32(666));
+
+        // User-mode registers.
+        expect(cpu.forceUserModeRead(8), Uint32(1));
+        expect(cpu.forceUserModeRead(9), Uint32(2));
+        expect(cpu.forceUserModeRead(10), Uint32(3));
       });
     });
   });

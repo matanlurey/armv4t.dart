@@ -59,6 +59,15 @@ assembly (or both), these are for you.
   assembly instructions. It is an eductional resources, and even has quizzes to
   check your understanding at the end of each section.
 
+- [CSE30 Data Transfer Instructions](doc/cse30-data-transfer-instructions.pdf):
+  I found it a bit difficult coming from almost entirely higher level languages
+  to understand data transfer instructions (register <--> memory); this is a
+  slide deck from a CSE30 course that does a decent job explaining the basics.
+
+  There is another slide deck,
+  [multiple data transfer instructions](doc/arm-multiple-data-transfers.pdf)
+  that specifically helps explain `LDM` and `STM` instructions.
+
 ### Advanced and/or Emulator Specific
 
 These resources were necessary when writing this package.

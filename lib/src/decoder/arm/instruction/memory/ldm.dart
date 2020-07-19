@@ -15,7 +15,7 @@ class LDMArmInstruction extends BlockDataTransferArmInstruction {
     @required bool addOffsetBeforeTransfer,
     @required bool addOffsetToBase,
     @required bool writeAddressIntoBase,
-    @required bool loadPsrOrForceUserMode,
+    @required bool loadPsr,
     @required RegisterAny base,
     @required RegisterList<RegisterAny> registerList,
   }) : super._(
@@ -23,7 +23,7 @@ class LDMArmInstruction extends BlockDataTransferArmInstruction {
           addOffsetBeforeTransfer: addOffsetBeforeTransfer,
           addOffsetToBase: addOffsetToBase,
           writeAddressIntoBase: writeAddressIntoBase,
-          loadPsrOrForceUserMode: loadPsrOrForceUserMode,
+          loadPsrOrForceUserMode: loadPsr,
           base: base,
           registerList: registerList,
         );
@@ -32,4 +32,10 @@ class LDMArmInstruction extends BlockDataTransferArmInstruction {
   R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
     return visitor.visitLDM(this, context);
   }
+
+  @override
+  bool get forceNonPrivilegedAccess => false;
+
+  /// Whether to load PSR.
+  bool get loadPsr => loadPsrOrForceUserMode;
 }
