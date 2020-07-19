@@ -141,11 +141,8 @@ class RegisterList<R extends Register<R>> {
     }
   }
 
-  factory RegisterList(Set<Uint4> values) {
-    if (values.contains(Uint4(15))) {
-      throw RangeError.range(15, 0, 14);
-    }
-    final sorted = values.map((v) => v.value).toList()..sort();
+  factory RegisterList(Set<int> values) {
+    final sorted = values.map((v) => Uint4.checkRange(v)).toList()..sort();
     return RegisterList._(
       UnmodifiableUint8ListView(Uint8List.fromList(sorted)),
     );

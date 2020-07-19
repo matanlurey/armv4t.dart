@@ -795,7 +795,7 @@ class _ArmInterpreter
       final result = _loadMemory(
         // Base register containing the *initial* memory address.
         i.base,
-        Uint32.zero,
+        Uint32(4),
         size: _Size.word,
         signed: false,
         // Addressing mode:
@@ -847,7 +847,7 @@ class _ArmInterpreter
     for (final register in i.registerList.registers) {
       _storeMemory(
         i.base,
-        Uint32.zero,
+        Uint32(4),
         _readRegister(
           register,
           forceUserMode: i.forceNonPrivilegedAccess,
