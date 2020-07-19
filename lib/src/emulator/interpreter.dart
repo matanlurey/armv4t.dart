@@ -51,9 +51,18 @@ class _ArmInterpreter
 
   // SHARED / COMMON
 
-  Uint32 _readRegister(Register r) => cpu[r.index.value];
+  Uint32 _readRegister(
+    Register r, {
+    bool forceUserMode = false,
+  }) =>
+      cpu[r.index.value];
 
-  Uint32 _writeRegister(Register r, Uint32 v) => cpu[r.index.value] = v;
+  Uint32 _writeRegister(
+    Register r,
+    Uint32 v, {
+    bool forceUserMode = false,
+  }) =>
+      cpu[r.index.value] = v;
 
   Uint32 _visitOperand2(
     Or3<
@@ -570,25 +579,19 @@ class _ArmInterpreter
   }
 
   Uint32 _loadMemory(
-    Register register,
+    Register baseRegister,
     Uint32 offset, {
     @required _Size size,
     @required bool signed,
     @required bool before,
     @required bool add,
     @required bool write,
-    @required bool userMode,
+    @required bool forceUserMode,
   }) {
-    if (!userMode) {
-      userMode = cpu.cpsr.mode.isUser;
-    }
-
-    // TODO: Handle restrictions based on user mode/privileged mode.
-
     Uint32 result;
     Uint32 address;
 
-    final base = _readRegister(register);
+    final base = _readRegister(baseRegister, forceUserMode: forceUserMode);
     if (before) {
       address = (add ? (base + offset) : (base - offset)).toUint32();
       result = _loadFromAddress(address, size, signed: signed);
@@ -602,7 +605,7 @@ class _ArmInterpreter
       }
     }
     if (write) {
-      _writeRegister(register, address);
+      _writeRegister(baseRegister, address, forceUserMode: forceUserMode);
     }
     return result;
   }
@@ -622,27 +625,25 @@ class _ArmInterpreter
       before: i.addOffsetBeforeTransfer,
       add: i.addOffsetToBase,
       write: i.writeAddressIntoBase,
-      userMode: i.forceNonPrivilegedAccess,
+      forceUserMode: i.forceNonPrivilegedAccess,
     );
-    _writeRegister(i.destination, memory);
+    _writeRegister(
+      i.destination,
+      memory,
+      forceUserMode: i.forceNonPrivilegedAccess,
+    );
   }
 
   void _storeMemory(
-    Register register,
+    Register baseRegister,
     Uint32 offset,
     Uint32 source, {
     @required _Size size,
     @required bool before,
     @required bool add,
     @required bool write,
-    @required bool userMode,
+    @required bool forceUserMode,
   }) {
-    if (!userMode) {
-      userMode = cpu.cpsr.mode.isUser;
-    }
-
-    // TODO: Handle restrictions based on user mode/privileged mode.
-
     Uint32 address;
 
     void store() {
@@ -661,7 +662,7 @@ class _ArmInterpreter
       }
     }
 
-    final base = _readRegister(register);
+    final base = _readRegister(baseRegister, forceUserMode: forceUserMode);
     if (before) {
       address = (add ? (base + offset) : (base - offset)).toUint32();
       store();
@@ -671,7 +672,7 @@ class _ArmInterpreter
       address = (add ? address + offset : address - offset).toUint32();
     }
     if (write) {
-      _writeRegister(register, address);
+      _writeRegister(baseRegister, address, forceUserMode: forceUserMode);
     }
   }
 
@@ -684,12 +685,15 @@ class _ArmInterpreter
         (i) => Uint32(i.value.value),
         evaluateShiftRegister,
       ),
-      _readRegister(i.source),
+      _readRegister(
+        i.source,
+        forceUserMode: i.forceNonPrivilegedAccess,
+      ),
       size: i.transferByte ? _Size.byte : _Size.word,
       before: i.addOffsetBeforeTransfer,
       add: i.addOffsetToBase,
       write: i.writeAddressIntoBase,
-      userMode: i.forceNonPrivilegedAccess,
+      forceUserMode: i.forceNonPrivilegedAccess,
     );
   }
 
@@ -706,9 +710,13 @@ class _ArmInterpreter
       before: i.addOffsetBeforeTransfer,
       add: i.addOffsetToBase,
       write: i.writeAddressIntoBase,
-      userMode: i.forceNonPrivilegedAccess,
+      forceUserMode: i.forceNonPrivilegedAccess,
     );
-    _writeRegister(i.destination, result);
+    _writeRegister(
+      i.destination,
+      result,
+      forceUserMode: i.forceNonPrivilegedAccess,
+    );
   }
 
   @override
@@ -724,9 +732,13 @@ class _ArmInterpreter
       before: i.addOffsetBeforeTransfer,
       add: i.addOffsetToBase,
       write: i.writeAddressIntoBase,
-      userMode: i.forceNonPrivilegedAccess,
+      forceUserMode: i.forceNonPrivilegedAccess,
     );
-    _writeRegister(i.destination, result);
+    _writeRegister(
+      i.destination,
+      result,
+      forceUserMode: i.forceNonPrivilegedAccess,
+    );
   }
 
   @override
@@ -742,9 +754,13 @@ class _ArmInterpreter
       before: i.addOffsetBeforeTransfer,
       add: i.addOffsetToBase,
       write: i.writeAddressIntoBase,
-      userMode: i.forceNonPrivilegedAccess,
+      forceUserMode: i.forceNonPrivilegedAccess,
     );
-    _writeRegister(i.destination, result);
+    _writeRegister(
+      i.destination,
+      result,
+      forceUserMode: i.forceNonPrivilegedAccess,
+    );
   }
 
   @override
@@ -755,13 +771,109 @@ class _ArmInterpreter
         _readRegister,
         (i) => Uint32(i.value.value),
       ),
-      _readRegister(i.source),
+      _readRegister(
+        i.source,
+        forceUserMode: i.forceNonPrivilegedAccess,
+      ),
       size: _Size.halfWord,
       before: i.addOffsetBeforeTransfer,
       add: i.addOffsetToBase,
       write: i.writeAddressIntoBase,
-      userMode: i.forceNonPrivilegedAccess,
+      forceUserMode: i.forceNonPrivilegedAccess,
     );
+  }
+
+  @override
+  void visitLDM(LDMArmInstruction i, [void _]) {
+    // If write-back is not used, we want to restore the base register.
+    final base = _readRegister(
+      i.base,
+      forceUserMode: i.forceNonPrivilegedAccess,
+    );
+    // Loads multiple memory locations into multiple registers.
+    for (final register in i.registerList.registers) {
+      final result = _loadMemory(
+        // Base register containing the *initial* memory address.
+        i.base,
+        Uint32.zero,
+        size: _Size.word,
+        signed: false,
+        // Addressing mode:
+        //   IA: Increment address after each transfer  (e.g. FD)
+        //   IB: Increment address before each transfer (e.g. ED)
+        //   DA: Decrement address after each transfer  (e.g. FA)
+        //   DB: Decrement address before each transfer (e.g. EA)
+        before: i.addOffsetBeforeTransfer,
+        add: i.addOffsetToBase,
+        // Always "write-back" - e.g. increment/decrement address.
+        write: true,
+        // Whether to write to user-bank registers regardless of current mode.
+        forceUserMode: i.forceNonPrivilegedAccess,
+      );
+      _writeRegister(
+        register,
+        result,
+        forceUserMode: i.forceNonPrivilegedAccess,
+      );
+    }
+    if (i.loadPsr) {
+      if (i.registerList.registers.last.isProgramCounter) {
+        // Mode change.
+        cpu.cpsr = cpu.spsr;
+      } else {
+        // User bank transfer.
+        // No write-back possible, so restore the base register.
+        assert(!i.writeAddressIntoBase, 'Should not be set');
+      }
+    }
+    // Restore base register if write-back disabled.
+    if (!i.writeAddressIntoBase) {
+      _writeRegister(
+        i.base,
+        base,
+        forceUserMode: i.forceNonPrivilegedAccess,
+      );
+    }
+  }
+
+  @override
+  void visitSTM(STMArmInstruction i, [void _]) {
+    // If write-back is not used, we want to restore the base register.
+    final base = _readRegister(
+      i.base,
+      forceUserMode: i.forceNonPrivilegedAccess,
+    );
+    // Stores into multiple memory locations from multiple registers.
+    for (final register in i.registerList.registers) {
+      _storeMemory(
+        i.base,
+        Uint32.zero,
+        _readRegister(
+          register,
+          forceUserMode: i.forceNonPrivilegedAccess,
+        ),
+        size: _Size.word,
+        // Addressing mode:
+        //   IA: Increment address after each transfer  (e.g. FD)
+        //   IB: Increment address before each transfer (e.g. ED)
+        //   DA: Decrement address after each transfer  (e.g. FA)
+        //   DB: Decrement address before each transfer (e.g. EA)
+        before: i.addOffsetBeforeTransfer,
+        add: i.addOffsetToBase,
+        // Always "write-back" - e.g. increment/decrement address.
+        write: true,
+        // Whether to write to user-bank registers regardless of current mode.
+        forceUserMode: i.forceNonPrivilegedAccess,
+      );
+    }
+    // Restore base register if write-back disabled.
+    if (!i.writeAddressIntoBase) {
+      _writeRegister(
+        i.base,
+        base,
+        forceUserMode: i.forceNonPrivilegedAccess,
+      );
+    }
   }
 
   @override
@@ -776,16 +888,6 @@ class _ArmInterpreter
 
   @override
   void visitBX(BXArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitLDM(LDMArmInstruction i, [void _]) {
-    throw UnimplementedError();
-  }
-
-  @override
-  void visitSTM(STMArmInstruction i, [void _]) {
     throw UnimplementedError();
   }
 

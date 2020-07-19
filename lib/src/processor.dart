@@ -135,10 +135,20 @@ abstract class Arm7Processor {
   /// Throws [RangeError] if [index] is not within the interval `0->15`.
   Uint32 operator [](int index);
 
+  /// Reads the current value in user banked register [index].
+  ///
+  /// Throws [RangeError] if [index] is not within the interval `0->15`.
+  Uint32 forceUserModeRead(int index);
+
   /// Writes [value] into the register [index].
   ///
   /// Throws [RangeError] if [index] is not within the interval `0->15`.
   void operator []=(int index, Uint32 value);
+
+  /// Writes [value] into the user banked register [value].
+  ///
+  /// Throws [RangeError] if [index] is not within the interval `0->15`.
+  void forceUserModeWrite(int index, Uint32 value);
 
   /// Returns a copy of the current state of the registers.
   Uint32List copyRegisters();
@@ -340,6 +350,18 @@ class _Arm7Processor extends Arm7Processor {
   void operator []=(int index, Uint32 value) {
     RangeError.checkValueInInterval(index, 0, _userRegisters);
     _registers[_swapBankedRegister(index)] = value.value;
+  }
+
+  @override
+  Uint32 forceUserModeRead(int index) {
+    RangeError.checkValueInInterval(index, 0, _userRegisters);
+    return _registers.getBoxed(index);
+  }
+
+  @override
+  void forceUserModeWrite(int index, Uint32 value) {
+    RangeError.checkValueInInterval(index, 0, _userRegisters);
+    _registers[index] = value.value;
   }
 
   @override

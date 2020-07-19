@@ -32,4 +32,10 @@ class LDMArmInstruction extends BlockDataTransferArmInstruction {
   R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
     return visitor.visitLDM(this, context);
   }
+
+  @override
+  bool get forceNonPrivilegedAccess => false;
+
+  /// Whether to load PSR.
+  bool get loadPsr => loadPsrOrForceUserMode;
 }
