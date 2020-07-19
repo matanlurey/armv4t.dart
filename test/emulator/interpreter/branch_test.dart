@@ -27,11 +27,11 @@ void main() {
         condition: Condition.al,
         offset: Int24(4),
       );
-      expect(decode(instruction), 'b 16');
+      expect(decode(instruction), 'b 4');
 
       interpreter.execute(instruction);
 
-      expect(cpu.programCounter, Uint32(0 + 8 + 16 * 4));
+      expect(cpu.programCounter, Uint32(24));
     });
   });
 
@@ -43,13 +43,13 @@ void main() {
         condition: Condition.al,
         offset: Int24(4),
       );
-      expect(decode(instruction), 'bl 16');
+      expect(decode(instruction), 'bl 4');
 
       cpu.programCounter = Uint32(16);
       interpreter.execute(instruction);
 
-      expect(cpu.programCounter, Uint32(16 + 8 + 16 * 4));
-      expect(cpu.linkRegister, Uint32(16 + 4));
+      expect(cpu.programCounter, Uint32(40));
+      expect(cpu.linkRegister, Uint32(20));
     });
   });
 
