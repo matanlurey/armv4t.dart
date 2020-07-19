@@ -140,7 +140,7 @@ void main() {
     });
   });
 
-  group('StautsRegister', () {
+  group('StatusRegister', () {
     const _N = 31;
     const _Z = 30;
     const _C = 29;
