@@ -516,4 +516,31 @@ void main() {
       });
     });
   });
+
+  group('Single Data Swap', () {
+    SWPArmInstruction instruction;
+
+    test('r0 = [r1], [r2] = r1', () {
+      instruction = SWPArmInstruction(
+        condition: Condition.al,
+        transferByte: false,
+        base: RegisterNotPC(Uint4(1)),
+        destination: RegisterNotPC(Uint4(0)),
+        source: RegisterNotPC(Uint4(2)),
+      );
+      expect(decode(instruction), 'swp r0, r2, [r1]');
+
+      // r0 = [r1] (i.e. r0 = 1024)
+      memory.storeWord(Uint32(0), Uint32(1024));
+      cpu[1] = Uint32(0);
+
+      interpreter.execute(instruction);
+
+      expect(cpu[0], Uint32(1024));
+      expect(cpu[1], Uint32(0));
+
+      expect(memory.loadWord(Uint32(0)), Uint32(0));
+      expect(memory.loadWord(Uint32(4)), Uint32(0));
+    });
+  });
 }
