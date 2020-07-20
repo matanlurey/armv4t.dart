@@ -1,7 +1,7 @@
 import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/emulator/interpreter.dart';
 import 'package:armv4t/src/emulator/memory.dart';
-import 'package:armv4t/src/processor.dart';
+import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
@@ -43,7 +43,7 @@ void main() {
         // Read memory address 4.
         cpu[1] = Uint32(4);
         memory.storeWord(Uint32(4), Uint32(10240));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(10240));
       });
@@ -64,7 +64,7 @@ void main() {
         // Read memory address 4.
         cpu[1] = Uint32(4);
         memory.storeByte(Uint32(4), Uint8(255));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(255));
       });
@@ -85,7 +85,7 @@ void main() {
         // Read memory address 1 + 3.
         cpu[1] = Uint32(1);
         memory.storeWord(Uint32(4), Uint32(10240));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(10240));
         expect(cpu[1], Uint32(1), reason: 'No write back');
@@ -107,7 +107,7 @@ void main() {
         // Read memory address 1 + 3.
         cpu[1] = Uint32(1);
         memory.storeWord(Uint32(4), Uint32(10240));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(10240));
         expect(cpu[1], Uint32(4), reason: 'Explicit writeback');
@@ -129,7 +129,7 @@ void main() {
         // Read memory address 3 - 3.
         cpu[1] = Uint32(3);
         memory.storeWord(Uint32(0), Uint32(10240));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(10240));
         expect(cpu[1], Uint32(3));
@@ -150,7 +150,7 @@ void main() {
         // Read memory address 0.
         cpu[1] = Uint32(0);
         memory.storeWord(Uint32(0), Uint32(10240));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(10240));
         expect(cpu[1], Uint32(4), reason: 'Implicit write back');
@@ -176,7 +176,7 @@ void main() {
         // Store r1 into memory location 4.
         cpu[0] = Uint32(4);
         cpu[1] = Uint32(10240);
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(4));
         expect(cpu[1], Uint32(10240));
@@ -199,7 +199,7 @@ void main() {
         // Store r1 into memory location 4.
         cpu[0] = Uint32(4);
         cpu[1] = Uint32(255);
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(4));
         expect(cpu[1], Uint32(255));
@@ -222,7 +222,7 @@ void main() {
         // Store r1 into memory location 1 + 3.
         cpu[0] = Uint32(1);
         cpu[1] = Uint32(10240);
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(1));
         expect(cpu[1], Uint32(10240));
@@ -245,7 +245,7 @@ void main() {
         // Store r1 into memory location 4 - 4.
         cpu[0] = Uint32(4);
         cpu[1] = Uint32(10240);
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(4));
         expect(cpu[1], Uint32(10240));
@@ -268,7 +268,7 @@ void main() {
         // Store r1 into memory location 4.
         cpu[0] = Uint32(4);
         cpu[1] = Uint32(10240);
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(7), reason: 'Writeback (Implicit)');
         expect(cpu[1], Uint32(10240));
@@ -295,7 +295,7 @@ void main() {
 
         cpu[1] = Uint32(2);
         memory.storeHalfWord(Uint32(2), Uint16(16));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(16));
       });
@@ -321,7 +321,7 @@ void main() {
           Uint32(2),
           Uint16(('1000' '0000' '0000' '0000').bits),
         );
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(
           cpu[0],
@@ -352,7 +352,7 @@ void main() {
           Uint32(2),
           Uint8(('1000' '0000').bits),
         );
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(
           cpu[0],
@@ -380,7 +380,7 @@ void main() {
 
         cpu[0] = Uint32(24);
         cpu[1] = Uint32(2);
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(memory.loadHalfWord(Uint32(2)), Uint16(24));
       });
@@ -407,7 +407,7 @@ void main() {
           ..storeWord(Uint32(4), Uint32(1))
           ..storeWord(Uint32(8), Uint32(2))
           ..storeWord(Uint32(12), Uint32(3));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(0), reason: 'No write-back');
         expect(cpu[1], Uint32(1));
@@ -434,7 +434,7 @@ void main() {
           ..storeWord(Uint32(8), Uint32(2))
           ..storeWord(Uint32(12), Uint32(3))
           ..storeWord(Uint32(16), Uint32(4));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(0), reason: 'No write-back');
         expect(cpu[1], Uint32(1));
@@ -466,7 +466,7 @@ void main() {
           ..storeWord(Uint32(4), Uint32(1))
           ..storeWord(Uint32(8), Uint32(2))
           ..storeWord(Uint32(12), Uint32(3));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(12), reason: 'Write-back');
         expect(cpu[1], Uint32(1));
@@ -500,7 +500,7 @@ void main() {
           ..forceUserModeWrite(8, Uint32(1))
           ..forceUserModeWrite(9, Uint32(2))
           ..forceUserModeWrite(10, Uint32(3));
-        interpreter.execute(instruction);
+        interpreter.run(instruction);
 
         expect(cpu[0], Uint32(0), reason: 'No write-back');
 
@@ -534,7 +534,7 @@ void main() {
       memory.storeWord(Uint32(0), Uint32(1024));
       cpu[1] = Uint32(0);
 
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[0], Uint32(1024));
       expect(cpu[1], Uint32(0));

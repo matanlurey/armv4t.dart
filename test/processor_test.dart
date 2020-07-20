@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:armv4t/src/processor.dart';
+import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 

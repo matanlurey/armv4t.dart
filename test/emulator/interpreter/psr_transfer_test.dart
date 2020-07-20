@@ -1,7 +1,7 @@
 import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/emulator/interpreter.dart';
 import 'package:armv4t/src/emulator/memory.dart';
-import 'package:armv4t/src/processor.dart';
+import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
@@ -32,7 +32,7 @@ void main() {
       );
       expect(decode(instruction), 'mrs r0, cpsr');
 
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
       expect(cpu[0], cpu.cpsr.toBits());
     });
 
@@ -45,7 +45,7 @@ void main() {
       expect(decode(instruction), 'mrs r0, spsr');
 
       cpu.unsafeSetCpsr(cpu.cpsr.update(mode: ArmOperatingMode.svc));
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
       expect(cpu[0], cpu.spsr.toBits());
     });
   });
@@ -65,7 +65,7 @@ void main() {
       );
       expect(decode(instruction), 'msr cpsr, 15');
 
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
       expect(cpu.cpsr, defaultPSR);
     });
 
@@ -84,7 +84,7 @@ void main() {
       expect(decode(instruction), 'msr spsr_flg, 4026531840');
 
       cpu.unsafeSetCpsr(cpu.cpsr.update(mode: ArmOperatingMode.svc));
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
       expect(
         cpu.spsr,
         defaultPSR.update(

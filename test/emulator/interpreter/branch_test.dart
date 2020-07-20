@@ -2,7 +2,7 @@ import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/emulator/interpreter.dart';
 import 'package:armv4t/src/emulator/memory.dart';
-import 'package:armv4t/src/processor.dart';
+import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
@@ -29,7 +29,7 @@ void main() {
       );
       expect(decode(instruction), 'b 4');
 
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu.programCounter, Uint32(24));
     });
@@ -46,7 +46,7 @@ void main() {
       expect(decode(instruction), 'bl 4');
 
       cpu.programCounter = Uint32(16);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu.programCounter, Uint32(40));
       expect(cpu.linkRegister, Uint32(20));
@@ -64,7 +64,7 @@ void main() {
       expect(decode(instruction), 'bx r0');
 
       cpu[0] = Uint32('1001'.bits);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu.cpsr.thumbState, isTrue);
       expect(cpu.programCounter, Uint32('1000'.bits));
@@ -82,7 +82,7 @@ void main() {
       expect(decode(instruction), 'swi 0');
 
       final cpsr = cpu.cpsr;
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu.linkRegister, Uint32.zero);
       expect(cpu.spsr, cpsr);

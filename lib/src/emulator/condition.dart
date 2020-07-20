@@ -1,9 +1,8 @@
 import 'package:armv4t/src/decoder/arm/condition.dart';
-import 'package:armv4t/src/processor.dart';
+import 'package:armv4t/src/emulator/processor.dart';
 import 'package:meta/meta.dart';
 
 /// Provides functionality for evaluating instruction conditions.
-@immutable
 mixin ConditionEvaluator {
   /// Provides an implementation of the CPU to access registers and PSR.
   @protected

@@ -3,7 +3,6 @@ import 'package:meta/meta.dart';
 /// _ARM_ opcode suffixes that are used for conditionally executing code.
 ///
 /// > NOTE: In _THUMB_ mode, `{cond}` can only be used for branch opcodes.
-@immutable
 @sealed
 class Condition {
   /// Equal (zero, same, `Z=1`).

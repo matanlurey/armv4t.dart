@@ -1,7 +1,7 @@
 import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/emulator/interpreter.dart';
 import 'package:armv4t/src/emulator/memory.dart';
-import 'package:armv4t/src/processor.dart';
+import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
@@ -41,7 +41,7 @@ void main() {
 
       cpu[0] = Uint32(1);
       cpu[1] = Uint32(2);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[2], Uint32(3));
       expect(cpu.cpsr, defaultPSR);
@@ -60,7 +60,7 @@ void main() {
       expect(decode(instruction), 'adds r2, r0, r1');
 
       cpu[0] = cpu[1] = Uint32.zero;
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[2], Uint32.zero);
       expect(cpu.cpsr, defaultPSR.update(isZero: true));
@@ -76,7 +76,7 @@ void main() {
       );
       expect(decode(instruction), 'add r2, r0, 1020');
 
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[2], Uint32(1020));
       expect(cpu.cpsr, defaultPSR);
@@ -98,7 +98,7 @@ void main() {
       expect(decode(instruction), 'adc r1, r0, 2');
 
       cpu.cpsr = cpu.cpsr.update(isCarry: true);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[1], Uint32(3));
       expect(cpu.cpsr, defaultPSR.update(isCarry: true));
@@ -123,7 +123,7 @@ void main() {
 
       cpu[0] = Uint32(1);
       cpu[1] = Uint32(2);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[2], Uint32(0xffffffff));
       expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: false));
@@ -149,7 +149,7 @@ void main() {
       cpu.cpsr = cpu.cpsr.update(isCarry: true);
       cpu[0] = Uint32(2);
       cpu[1] = Uint32(1);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[2], Uint32(1));
       expect(cpu.cpsr, defaultPSR);
@@ -174,7 +174,7 @@ void main() {
 
       cpu[0] = Uint32(2);
       cpu[1] = Uint32(3);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[2], Uint32(1));
       expect(cpu.cpsr, defaultPSR);
@@ -200,7 +200,7 @@ void main() {
       cpu.cpsr = cpu.cpsr.update(isCarry: true);
       cpu[0] = Uint32(2);
       cpu[1] = Uint32(3);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[2], Uint32(1));
       expect(cpu.cpsr, defaultPSR);
@@ -220,7 +220,7 @@ void main() {
       );
 
       cpu[0] = Uint32('011'.bits);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[1], Uint32(1));
       expect(cpu.cpsr, defaultPSR);
@@ -240,7 +240,7 @@ void main() {
       );
 
       cpu[0] = Uint32('011'.bits);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[1], Uint32('110'.bits));
       expect(cpu.cpsr, defaultPSR);
@@ -260,7 +260,7 @@ void main() {
       );
 
       cpu[0] = Uint32('011'.bits);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[1], Uint32('111'.bits));
       expect(cpu.cpsr, defaultPSR);
@@ -280,7 +280,7 @@ void main() {
       );
 
       cpu[0] = Uint32('011'.bits);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[1], Uint32('010'.bits));
       expect(cpu.cpsr, defaultPSR);
@@ -299,7 +299,7 @@ void main() {
         operand2: Or3.right(ShiftedImmediate.assembleUint8(512)),
       );
 
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[1], Uint32(512));
       expect(cpu.cpsr, defaultPSR);
@@ -318,7 +318,7 @@ void main() {
         operand2: Or3.right(ShiftedImmediate.assembleUint8(32)),
       );
 
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[1], Uint32((~32).toUnsigned(32)));
       expect(cpu.cpsr, defaultPSR);
@@ -336,7 +336,7 @@ void main() {
         operand2: Or3.right(ShiftedImmediate.assembleUint8(0)),
       );
 
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu.cpsr, defaultPSR.update(isZero: true));
     });
@@ -357,7 +357,7 @@ void main() {
 
       cpu[1] = Uint32(1);
       cpu[2] = Uint32((-8).toUnsigned(32));
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu.cpsr, defaultPSR.update(isSigned: true));
     });
@@ -378,7 +378,7 @@ void main() {
 
       cpu[1] = Uint32(6);
       cpu[2] = Uint32(24);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: false));
     });
@@ -395,7 +395,7 @@ void main() {
 
       cpu[1] = Uint32(54);
       cpu[2] = Uint32(24);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu.cpsr, defaultPSR.update(isSigned: false, isOverflow: false));
     });
@@ -416,7 +416,7 @@ void main() {
 
       cpu[1] = Uint32(1);
       cpu[2] = Uint32(2);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu.cpsr, defaultPSR);
     });

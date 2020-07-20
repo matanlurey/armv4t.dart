@@ -6,7 +6,7 @@ import 'package:armv4t/src/decoder/arm/instruction.dart';
 import 'package:armv4t/src/emulator/condition.dart';
 import 'package:armv4t/src/emulator/memory.dart';
 import 'package:armv4t/src/emulator/operand.dart';
-import 'package:armv4t/src/processor.dart';
+import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -18,10 +18,26 @@ abstract class ArmInterpreter {
     Memory memory,
   ) = _ArmInterpreter;
 
-  /// Executes [instruction] relative to current [cpu].
+  /// Whether [Arm7Processor.programCounter] has exceeded [Memory.length];
+  bool get atEndOfMemory;
+
+  /// Runs [instruction] relative to current [cpu].
   ///
-  /// > NOTE: [ArmInstruction.condition] must evaluate to `true` for the [cpu].
-  bool execute(ArmInstruction instruction);
+  /// Returns whether the instruction was executed (e.g. due to conditions).
+  ///
+  /// Unlike [step], [Arm7Processor.programCounter] is _not_ modified as a
+  /// result of normal execution (but it might be as a result of a branching
+  /// instruction or other instructions that write into `r15`). See [step].
+  bool run(ArmInstruction instruction);
+
+  /// Runs [instruction] relative to the current [cpu].
+  ///
+  /// The [Arm7Processor.programCounter] is incremented as a result, and it is
+  /// possible that the program should stop executing (e.g. the end of the
+  /// program has been reached). See [atEndOfMemory].
+  ///
+  /// Returns whether the instruction was executed (e.g. due to conditions).
+  bool step(ArmInstruction instruction);
 
   /// Implement to provide access to the processor.
   @protected
@@ -43,13 +59,34 @@ class _ArmInterpreter
   _ArmInterpreter(this.cpu, this._memory);
 
   @override
-  bool execute(ArmInstruction instruction) {
+  bool get atEndOfMemory {
+    final nextByte = cpu.programCounter.value;
+    return nextByte >= _memory.length;
+  }
+
+  @override
+  bool run(ArmInstruction instruction) {
     if (evaluateCondition(instruction.condition)) {
       instruction.accept(this);
       return true;
     } else {
       return false;
     }
+  }
+
+  /// A flag that marks whether [_branch] was used.
+  ///
+  /// This allows skipping the program counter increment in [step].
+  var _executedBranch = false;
+
+  @override
+  bool step(ArmInstruction instruction) {
+    _executedBranch = false;
+    final ran = run(instruction);
+    if (!_executedBranch) {
+      cpu.incrementProgramCounter();
+    }
+    return ran;
   }
 
   // SHARED / COMMON
@@ -936,6 +973,7 @@ class _ArmInterpreter
     final origin = cpu.programCounter.value;
     final destination = origin + (offset * 4) + 8;
     cpu.programCounter = Uint32(destination);
+    _executedBranch = true;
   }
 
   @override

@@ -1,5 +1,5 @@
 import 'package:armv4t/decode.dart';
-import 'package:armv4t/src/processor.dart';
+import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -8,7 +8,6 @@ import 'package:meta/meta.dart';
 /// A novel feature of _ARM_ is that all data-processing instructions can
 /// include an optional _shift”_ whereas most other architectures have separate
 /// shift instructions.
-@immutable
 mixin OperandEvaluator {
   static final _maxUint32 = Uint32(0xffffffff);
 

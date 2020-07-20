@@ -130,6 +130,20 @@ abstract class Arm7Processor {
   Uint32 get programCounter => this[_PC];
   set programCounter(Uint32 value) => this[_PC] = value;
 
+  /// A convenience for incrementing the [programCounter].
+  ///
+  /// In _ARM_ mode it is increased by 4, and in _THUMB_ mode by 2.
+  @nonVirtual
+  void incrementProgramCounter() {
+    var result = programCounter.value;
+    if (cpsr.thumbState) {
+      result += 2;
+    } else {
+      result += 4;
+    }
+    programCounter = Uint32(result);
+  }
+
   /// Reads the current value stored in the register [index].
   ///
   /// Throws [RangeError] if [index] is not within the interval `0->15`.

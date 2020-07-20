@@ -7,4 +7,5 @@ export 'src/emulator/condition.dart';
 export 'src/emulator/interpreter.dart';
 export 'src/emulator/memory.dart';
 export 'src/emulator/operand.dart';
-export 'src/processor.dart';
+export 'src/emulator/processor.dart';
+export 'src/emulator/vm.dart';

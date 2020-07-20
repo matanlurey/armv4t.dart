@@ -11,4 +11,6 @@ export 'src/decoder/arm/condition.dart';
 export 'src/decoder/arm/format.dart';
 export 'src/decoder/arm/instruction.dart';
 export 'src/decoder/arm/printer.dart';
+export 'src/decoder/thumb/converter.dart';
+export 'src/decoder/thumb/format.dart';
 export 'src/decoder/common.dart';
