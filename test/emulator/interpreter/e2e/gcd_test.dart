@@ -49,11 +49,11 @@ void main() {
 
   int limit;
 
-  setUp((() => limit = 20));
+  setUp((() => limit = 50));
 
   void execute(int eof) {
     if (limit-- == 0) {
-      throw StateError('Program executed more than 20 instructions');
+      throw StateError('Program executed more than 50 instructions');
     }
 
     final c = cpu.programCounter.value;
@@ -65,19 +65,15 @@ void main() {
 
     final f = const ArmFormatDecoder().convert(i);
     final d = f.accept(const ArmInstructionDecoder());
-    interpreter.execute(d);
+    final e = interpreter.execute(d);
 
-    if ((cpu.programCounter.value + 4) ~/ 4 >= eof) {
+    if ((cpu.programCounter.value + 4) ~/ 4 > eof) {
       print(''.padRight(16 * 5, '-'));
-      print('EXIT @ ${cpu.programCounter.value}');
+      print('EXIT @ ${cpu.programCounter.value}, EOF = ${eof * 4}');
       return;
     } else {
-      if (cpu.programCounter.value == c) {
-        // TODO: This is a hack - we want to let branch instructions set the
-        // program counter, but currently no other instruction attempts to
-        // increment the program counter.
-        //
-        // Remove after https://github.com/matanlurey/armv4t.dart/issues/58.
+      // TODO(https://github.com/matanlurey/armv4t.dart/issues/58).
+      if (!e || d is! BArmInstruction) {
         cpu.programCounter = Uint32(cpu.programCounter.value + 4);
       }
       execute(eof);

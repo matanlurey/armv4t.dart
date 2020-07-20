@@ -21,7 +21,7 @@ abstract class ArmInterpreter {
   /// Executes [instruction] relative to current [cpu].
   ///
   /// > NOTE: [ArmInstruction.condition] must evaluate to `true` for the [cpu].
-  void execute(ArmInstruction instruction);
+  bool execute(ArmInstruction instruction);
 
   /// Implement to provide access to the processor.
   @protected
@@ -43,9 +43,12 @@ class _ArmInterpreter
   _ArmInterpreter(this.cpu, this._memory);
 
   @override
-  void execute(ArmInstruction instruction) {
+  bool execute(ArmInstruction instruction) {
     if (evaluateCondition(instruction.condition)) {
       instruction.accept(this);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -82,10 +85,8 @@ class _ArmInterpreter
     Uint32List result, {
     @required bool op1Signed,
     @required bool op2Signed,
+    bool result64 = false,
   }) {
-    print(
-        '>>> isOverflow: $result.hadOverflow($op1Signed, $op2Signed) = ${result.hadOverflow(op1Signed, op2Signed)}');
-    print('>>> isSigned:   ${result.isSigned}');
     cpu.cpsr = cpu.cpsr.update(
       // V (If + and + is -, or - and - is +)
       isOverflow: result.hadOverflow(op1Signed, op2Signed),
@@ -94,7 +95,7 @@ class _ArmInterpreter
       isCarry: result.isCarry,
 
       // Z (If RES == 0)
-      isZero: result.isZero,
+      isZero: result64 ? result.isZero64 : result.isZero32,
 
       // N (If MSB == 1)
       isSigned: result.isSigned,
@@ -152,10 +153,10 @@ class _ArmInterpreter
   void visitSUB(SUBArmInstruction i, [void _]) {
     // rD = operand1 - operand2
     final op1 = _readRegister(i.operand1);
-    final op2 = _visitOperand2(i.operand2);
+    final op2 = ~_visitOperand2(i.operand2);
     final res = _addWithCarry(
       op1,
-      ~op2,
+      op2,
       carryIn: 1,
     );
     if (i.setConditionCodes && !i.destination.isProgramCounter) {
@@ -168,10 +169,10 @@ class _ArmInterpreter
   void visitSBC(SBCArmInstruction i, [void _]) {
     // rD = operand1 - operand2 + carry - 1
     final op1 = _readRegister(i.operand1);
-    final op2 = _visitOperand2(i.operand2);
+    final op2 = ~_visitOperand2(i.operand2);
     final res = _addWithCarry(
       op1,
-      ~op2,
+      op2,
       carryIn: cpu.cpsr.isCarry ? 1 : 0,
     );
     if (i.setConditionCodes && !i.destination.isProgramCounter) {
@@ -183,10 +184,10 @@ class _ArmInterpreter
   @override
   void visitRSB(RSBArmInstruction i, [void _]) {
     // rD = operand2 - operand1
-    final op1 = _readRegister(i.operand1);
+    final op1 = ~_readRegister(i.operand1);
     final op2 = _visitOperand2(i.operand2);
     final res = _addWithCarry(
-      ~op2,
+      op2,
       op1,
       carryIn: 1,
     );
@@ -200,9 +201,9 @@ class _ArmInterpreter
   void visitRSC(RSCArmInstruction i, [void _]) {
     // rD = operand2 - operand1 + carry - 1
     final op1 = _readRegister(i.operand1);
-    final op2 = _visitOperand2(i.operand2);
+    final op2 = ~_visitOperand2(i.operand2);
     final res = _addWithCarry(
-      ~op2,
+      op2,
       op1,
       carryIn: cpu.cpsr.isCarry ? 1 : 0,
     );
@@ -219,7 +220,7 @@ class _ArmInterpreter
       // We don't update it here though, it does during shifting.
 
       // Z (If RES == 0)
-      isZero: result.isZero,
+      isZero: result.isZero32,
 
       // N (If MSB == 1)
       isSigned: result.isSigned,
@@ -336,7 +337,7 @@ class _ArmInterpreter
   void visitCMP(CMPArmInstruction i, [void _]) {
     // Rn - Op2
     final op1 = _readRegister(i.operand1);
-    final op2 = _visitOperand2(i.operand2);
+    final op2 = ~_visitOperand2(i.operand2);
     assert(i.setConditionCodes);
     if (i.destination == Register.filledWith1s) {
       // CMP {P}:
@@ -345,8 +346,12 @@ class _ArmInterpreter
       throw UnimplementedError('CMPP');
     } else {
       // CMP (Standard Arithmetic Operation)
-      final res = _addWithCarry(op1, ~op2, carryIn: 1);
-      print('>>> CMP $op1 - $op2 = $res');
+      // print('>>> CMP: $op1 - $op2');
+      final res = _addWithCarry(
+        op1,
+        op2,
+        carryIn: 1,
+      );
       _writeToAllFlags(res, op1Signed: op1.msb, op2Signed: op2.msb);
     }
   }
@@ -418,6 +423,7 @@ class _ArmInterpreter
     Uint32List accumulate,
     bool asSigned = false,
     bool setFlags = false,
+    bool result64 = false,
   }) {
     Uint32List product;
     if (asSigned) {
@@ -439,6 +445,7 @@ class _ArmInterpreter
         product,
         op1Signed: op1.msb,
         op2Signed: op2.msb,
+        result64: result64,
       );
     }
     return product;
@@ -482,6 +489,7 @@ class _ArmInterpreter
       op2,
       setFlags: i.setConditionCodes,
       asSigned: true,
+      result64: true,
     );
     _writeRegister(i.destinationHiBits, Uint32(res.hi));
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
@@ -502,6 +510,7 @@ class _ArmInterpreter
         ..lo = op3Lo.value,
       setFlags: i.setConditionCodes,
       asSigned: true,
+      result64: true,
     );
     _writeRegister(i.destinationHiBits, Uint32(res.hi));
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
@@ -516,6 +525,7 @@ class _ArmInterpreter
       op1,
       op2,
       setFlags: i.setConditionCodes,
+      result64: true,
     );
     _writeRegister(i.destinationHiBits, Uint32(res.hi));
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
@@ -535,6 +545,7 @@ class _ArmInterpreter
         ..hi = op3Hi.value
         ..lo = op3Lo.value,
       setFlags: i.setConditionCodes,
+      result64: true,
     );
     _writeRegister(i.destinationHiBits, Uint32(res.hi));
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
@@ -896,9 +907,9 @@ class _ArmInterpreter
 
   void _branch(int offset) {
     // PC = PC + 8 + Offset * 4
-    var pc = cpu.programCounter.value;
-    pc += 8 + offset * 4;
-    cpu.programCounter = Uint32(pc);
+    final origin = cpu.programCounter.value;
+    final destination = origin + (offset * 4) + 8;
+    cpu.programCounter = Uint32(destination);
   }
 
   @override

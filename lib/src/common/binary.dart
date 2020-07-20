@@ -443,13 +443,20 @@ extension BinaryUint64HiLoX on Uint32List {
     ..lo = lo;
 
   /// Returns whether the operands that creates this int that overflow occured.
-  bool hadOverflow(bool aSigned, bool bSigned) => aSigned == bSigned ^ isSigned;
+  bool hadOverflow(bool aSigned, bool bSigned) {
+    if (aSigned && bSigned) return !isSigned;
+    if (!aSigned && !bSigned) return isSigned;
+    return false;
+  }
 
   /// Whether the MSB of [lo] was discarded (shifted into [hi]).
   bool get isCarry => hi != 0 ? msb(1) : false;
 
-  /// Whether this value represents `0`.
-  bool get isZero => hi == 0 && lo == 0;
+  /// Whether this value is 32-bits, and will end up representing `0`.
+  bool get isZero32 => lo == 0;
+
+  /// Whethr this value is 64-bits, and will end up representing `0`.
+  bool get isZero64 => hi == 0 && lo == 0;
 
   /// Whether the most significant bit is `1`.
   bool get isSigned => msb(hi == 0 ? 1 : 0);
