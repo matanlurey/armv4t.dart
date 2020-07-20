@@ -80,8 +80,6 @@ void main() {
       program = await File(
         path.join(
           'test',
-          'emulator',
-          'interpreter',
           'e2e',
           'gcd.branches.bin',
         ),
@@ -106,8 +104,6 @@ void main() {
       program = await File(
         path.join(
           'test',
-          'emulator',
-          'interpreter',
           'e2e',
           'gcd.conditional.bin',
         ),

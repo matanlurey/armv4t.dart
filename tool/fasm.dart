@@ -128,14 +128,10 @@ final _build = {
   // test/emulator/interpreter/e2e/gcd.branches.asm
   path.join(
     'test',
-    'emulator',
-    'interpreter',
     'e2e',
     'gcd.branches.asm',
   ): path.join(
     'test',
-    'emulator',
-    'interpreter',
     'e2e',
     'gcd.branches.bin',
   ),
@@ -143,14 +139,10 @@ final _build = {
   // test/emulator/interpreter/e2e/gcd.conditional.asm
   path.join(
     'test',
-    'emulator',
-    'interpreter',
     'e2e',
     'gcd.conditional.asm',
   ): path.join(
     'test',
-    'emulator',
-    'interpreter',
     'e2e',
     'gcd.conditional.bin',
   ),
