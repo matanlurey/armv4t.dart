@@ -10,17 +10,8 @@ import 'package:binary/binary.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-// TODO: Refactor some of this code into a general purpose emulator class.
 void main() {
-  ArmInterpreter interpreter;
-  Arm7Processor cpu;
-  Memory memory;
-
-  String disassemble(Uint32 bits) {
-    final format = const ArmFormatDecoder().convert(bits);
-    final decode = format.accept(const ArmInstructionDecoder());
-    return decode.accept(const ArmInstructionPrinter());
-  }
+  ArmVM vm;
 
   /// Reference implementation of greatest-common-denominator (gcd).
   int gcd(int a, int b) {
@@ -34,49 +25,50 @@ void main() {
     return a;
   }
 
+  Arm7Processor cpu;
+
   void start(int a, int b, Uint8List program) {
-    cpu = Arm7Processor();
-    cpu[0] = Uint32(a);
-    cpu[1] = Uint32(b);
+    cpu = Arm7Processor()
+      ..[0] = Uint32(a)
+      ..[1] = Uint32(b);
+
+    // TODO(https://github.com/matanlurey/armv4t.dart/issues/33): Remove.
     final pc = 'pc'.padRight(16, ' ');
     final r0 = 'r0'.padRight(16, ' ');
     final r1 = 'r1'.padRight(16, ' ');
     print('$pc$r0$r1' 'Instruction');
     print(''.padRight(16 * 5, '-'));
 
-    interpreter = ArmInterpreter(cpu, memory = Memory(64, data: program));
+    vm = ArmVM(
+      cpu: cpu,
+      memory: Memory(program.lengthInBytes, data: program),
+    );
   }
 
-  int limit;
+  int count = 0;
 
-  setUp((() => limit = 50));
+  setUp(() {
+    count = 0;
+  });
 
-  void execute(int eof) {
-    if (limit-- == 0) {
-      throw StateError('Program executed more than 50 instructions');
+  void execute() {
+    String disassemble(ArmInstruction instruction) {
+      return instruction.accept(const ArmInstructionPrinter());
     }
 
     final c = cpu.programCounter.value;
     final p = ('0x' + c.toString()).padRight(16, ' ');
     final a = cpu[0].value.toString().padRight(16, ' ');
     final b = cpu[1].value.toString().padRight(16, ' ');
-    final i = memory.loadWord(cpu.programCounter);
+    final i = vm.peek();
     print('$p$a$b' '${disassemble(i)}');
 
-    final f = const ArmFormatDecoder().convert(i);
-    final d = f.accept(const ArmInstructionDecoder());
-    final e = interpreter.execute(d);
+    if (count++ > 100) {
+      fail('Program may never complete. There might be a bug or error');
+    }
 
-    if ((cpu.programCounter.value + 4) ~/ 4 >= eof) {
-      print(''.padRight(16 * 5, '-'));
-      print('EXIT @ ${cpu.programCounter.value}, EOF = ${eof * 4}');
-      return;
-    } else {
-      // TODO(https://github.com/matanlurey/armv4t.dart/issues/58).
-      if (!e || d is! BArmInstruction) {
-        cpu.programCounter = Uint32(cpu.programCounter.value + 4);
-      }
-      execute(eof);
+    if (vm.step()) {
+      execute();
     }
   }
 
@@ -96,27 +88,11 @@ void main() {
       ).readAsBytes();
     });
 
-    test('[disassembled]', () {
-      final opcodes = Uint32List.view(program.buffer);
-      expect(
-        opcodes.map((v) => Uint32(v)).map(disassemble),
-        [
-          'cmp r0, r1',
-          'beq 4',
-          'blt 1',
-          'sub r0, r0, r1',
-          'b -6',
-          'sub r1, r1, r0',
-          'b -8',
-        ],
-      );
-    });
-
     test('gcd(54, 24)', () {
       final expected = 6;
       expect(expected, gcd(54, 24), reason: 'Verify reference implementation');
       start(54, 24, program);
-      execute(6);
+      execute();
 
       expect(cpu[0], Uint32(expected), reason: 'Found GCD');
     });
@@ -138,24 +114,11 @@ void main() {
       ).readAsBytes();
     });
 
-    test('[disassembled]', () {
-      final opcodes = Uint32List.view(program.buffer);
-      expect(
-        opcodes.map((v) => Uint32(v)).map(disassemble),
-        [
-          'cmp r0, r1',
-          'subgt r0, r0, r1',
-          'sublt r1, r1, r0',
-          'bne -5',
-        ],
-      );
-    });
-
     test('gcd(54, 24)', () {
       final expected = 6;
       expect(expected, gcd(54, 24), reason: 'Verify reference implementation');
       start(54, 24, program);
-      execute(4);
+      execute();
 
       expect(cpu[0], Uint32(expected), reason: 'Found GCD');
     });

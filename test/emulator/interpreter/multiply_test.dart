@@ -2,7 +2,7 @@ import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/emulator/interpreter.dart';
 import 'package:armv4t/src/emulator/memory.dart';
-import 'package:armv4t/src/processor.dart';
+import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
@@ -39,7 +39,7 @@ void main() {
 
       cpu[1] = Uint32(1000);
       cpu[2] = Uint32(32);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[0], Uint32(1000 * 32));
     });
@@ -62,7 +62,7 @@ void main() {
       cpu[0] = Uint32(512);
       cpu[1] = Uint32(1000);
       cpu[2] = Uint32(32);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[0], Uint32(1000 * 32 + 512));
     });
@@ -84,7 +84,7 @@ void main() {
 
       cpu[2] = Uint32(4294967295);
       cpu[3] = Uint32(2);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[0], Uint32(1));
       expect(cpu[1], Uint32(4294967294));
@@ -109,7 +109,7 @@ void main() {
       cpu[1] = Uint32(2);
       cpu[2] = Uint32(4294967295);
       cpu[3] = Uint32(2);
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[0], Uint32(3));
       expect(cpu[1], Uint32(0));
@@ -132,7 +132,7 @@ void main() {
 
       cpu[2] = Int32(-2147483648).toUnsigned();
       cpu[3] = Int32(2).toUnsigned();
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[0], Int32(-1).toUnsigned());
       expect(cpu[1], Int32(0).toUnsigned());
@@ -157,7 +157,7 @@ void main() {
       cpu[1] = Int32(-1).toUnsigned();
       cpu[2] = Int32(-2147483648).toUnsigned();
       cpu[3] = Int32(2).toUnsigned();
-      interpreter.execute(instruction);
+      interpreter.run(instruction);
 
       expect(cpu[0], Int32(-3).toUnsigned());
       expect(cpu[1], Int32(-1).toUnsigned());

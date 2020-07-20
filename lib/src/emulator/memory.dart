@@ -33,6 +33,9 @@ abstract class Memory {
   /// Creates a null memory implemenation that throws on reads and writes.
   const factory Memory.none() = _NullMemory;
 
+  /// Length of memory, in bytes.
+  int get length;
+
   /// Loads an 8-bit (byte) data from [address].
   Uint8 loadByte(Uint32 address);
 
@@ -61,6 +64,9 @@ class _Memory implements Memory {
   _Memory(this._bytes)
       : _halfWords = Uint16List.view(_bytes.buffer),
         _words = Uint32List.view(_bytes.buffer);
+
+  @override
+  int get length => _bytes.length;
 
   @override
   Uint8 loadByte(Uint32 address) => Uint8(_bytes[address.value]);
@@ -141,6 +147,9 @@ class _NullMemory implements Memory {
   @alwaysThrows
   // ignore: prefer_void_to_null
   static Null _throw() => throw UnsupportedError('Cannot access null memory');
+
+  @override
+  int get length => 0;
 
   @override
   Uint8 loadByte(Uint32 address) => _throw();
