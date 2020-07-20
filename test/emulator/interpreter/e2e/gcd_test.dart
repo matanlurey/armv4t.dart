@@ -158,6 +158,6 @@ void main() {
       execute(4);
 
       expect(cpu[0], Uint32(expected), reason: 'Found GCD');
-    }, skip: 'Not yet working');
+    });
   });
 }
