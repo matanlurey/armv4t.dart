@@ -67,7 +67,7 @@ void main() {
     final d = f.accept(const ArmInstructionDecoder());
     final e = interpreter.execute(d);
 
-    if ((cpu.programCounter.value + 4) ~/ 4 > eof) {
+    if ((cpu.programCounter.value + 4) ~/ 4 >= eof) {
       print(''.padRight(16 * 5, '-'));
       print('EXIT @ ${cpu.programCounter.value}, EOF = ${eof * 4}');
       return;

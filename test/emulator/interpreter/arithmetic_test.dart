@@ -126,7 +126,7 @@ void main() {
       interpreter.execute(instruction);
 
       expect(cpu[2], Uint32(0xffffffff));
-      expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: true));
+      expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: false));
     });
   });
 
