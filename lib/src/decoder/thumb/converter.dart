@@ -355,7 +355,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
   ]) {
     return BArmInstruction(
       condition: Condition.parse(format.condition.value),
-      offset: Uint24(format.offset.value),
+      offset: Uint24(format.offset.value).toSigned(),
     );
   }
 
@@ -741,7 +741,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     // TODO: Correctly implement BL.
     return BLArmInstruction(
       condition: _always,
-      offset: Uint24(format.offset.value),
+      offset: Uint24(format.offset.value).toSigned(),
     );
   }
 
@@ -1009,7 +1009,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
   ]) {
     return BArmInstruction(
       condition: _always,
-      offset: Uint24(format.offset.value),
+      offset: Uint24(format.offset.value).toSigned(),
     );
   }
 }

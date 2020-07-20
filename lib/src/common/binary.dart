@@ -344,6 +344,10 @@ class Uint24 extends Integral<Uint24> {
   String toDebugString() => '$_name {$value}';
 }
 
+extension Uint24X on Uint24 {
+  Int24 toSigned() => Int24(value.toSigned(24));
+}
+
 /// Encapsulates an signed 24-bit aggregation.
 @sealed
 class Int24 extends Integral<Int24> {
@@ -440,14 +444,19 @@ extension BinaryUint64HiLoX on Uint32List {
 
   /// Returns whether the operands that creates this int that overflow occured.
   bool hadOverflow(bool aSigned, bool bSigned) {
-    return aSigned == bSigned && aSigned != isSigned;
+    if (aSigned && bSigned) return !isSigned;
+    if (!aSigned && !bSigned) return isSigned;
+    return false;
   }
 
   /// Whether the MSB of [lo] was discarded (shifted into [hi]).
   bool get isCarry => hi != 0 ? msb(1) : false;
 
-  /// Whether this value represents `0`.
-  bool get isZero => hi == 0 && lo == 0;
+  /// Whether this value is 32-bits, and will end up representing `0`.
+  bool get isZero32 => lo == 0;
+
+  /// Whethr this value is 64-bits, and will end up representing `0`.
+  bool get isZero64 => hi == 0 && lo == 0;
 
   /// Whether the most significant bit is `1`.
   bool get isSigned => msb(hi == 0 ? 1 : 0);

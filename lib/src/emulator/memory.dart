@@ -13,18 +13,21 @@ abstract class Memory {
     if (size % 4 != 0) {
       throw ArgumentError.value(size, 'size', 'Must be divisible by 4');
     }
-    final data = Uint8List(size);
+    final bytes = Uint8List(size);
     if (data != null) {
       final Object upcast = data;
       Uint8List view;
+      int length;
       if (upcast is TypedData) {
         view = Uint8List.view(upcast.buffer);
+        length = view.lengthInBytes;
       } else {
         view = Uint8List.fromList(data);
+        length = data.length;
       }
-      data.setRange(0, view.length, view);
+      bytes.setRange(0, length, view);
     }
-    return _Memory(data);
+    return _Memory(bytes);
   }
 
   /// Creates a null memory implemenation that throws on reads and writes.
@@ -122,8 +125,9 @@ class _Memory implements Memory {
   }
 
   @override
-  Uint32 loadWord(Uint32 address) =>
-      Uint32(_words[_wordAligned(address.value)]);
+  Uint32 loadWord(Uint32 address) {
+    return Uint32(_words[_wordAligned(address.value)]);
+  }
 
   @override
   void storeWord(Uint32 address, Uint32 word) {

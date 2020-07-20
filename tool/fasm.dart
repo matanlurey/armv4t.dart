@@ -124,4 +124,34 @@ final _build = {
     'thumb',
     'fasmarm_test.bin',
   ),
+
+  // test/emulator/interpreter/e2e/gcd.branches.asm
+  path.join(
+    'test',
+    'emulator',
+    'interpreter',
+    'e2e',
+    'gcd.branches.asm',
+  ): path.join(
+    'test',
+    'emulator',
+    'interpreter',
+    'e2e',
+    'gcd.branches.bin',
+  ),
+
+  // test/emulator/interpreter/e2e/gcd.conditional.asm
+  path.join(
+    'test',
+    'emulator',
+    'interpreter',
+    'e2e',
+    'gcd.conditional.asm',
+  ): path.join(
+    'test',
+    'emulator',
+    'interpreter',
+    'e2e',
+    'gcd.conditional.bin',
+  ),
 };

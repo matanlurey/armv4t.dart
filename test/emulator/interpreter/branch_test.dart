@@ -1,4 +1,5 @@
 import 'package:armv4t/decode.dart';
+import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/emulator/interpreter.dart';
 import 'package:armv4t/src/emulator/memory.dart';
 import 'package:armv4t/src/processor.dart';
@@ -24,13 +25,13 @@ void main() {
     test('PC += 8 + 16 * 4', () {
       instruction = BArmInstruction(
         condition: Condition.al,
-        offset: Uint24(16),
+        offset: Int24(4),
       );
-      expect(decode(instruction), 'b 16');
+      expect(decode(instruction), 'b 4');
 
       interpreter.execute(instruction);
 
-      expect(cpu.programCounter, Uint32(0 + 8 + 16 * 4));
+      expect(cpu.programCounter, Uint32(24));
     });
   });
 
@@ -40,15 +41,15 @@ void main() {
     test('PC += 8 + 16 * 4', () {
       instruction = BLArmInstruction(
         condition: Condition.al,
-        offset: Uint24(16),
+        offset: Int24(4),
       );
-      expect(decode(instruction), 'bl 16');
+      expect(decode(instruction), 'bl 4');
 
       cpu.programCounter = Uint32(16);
       interpreter.execute(instruction);
 
-      expect(cpu.programCounter, Uint32(16 + 8 + 16 * 4));
-      expect(cpu.linkRegister, Uint32(16 + 4));
+      expect(cpu.programCounter, Uint32(40));
+      expect(cpu.linkRegister, Uint32(20));
     });
   });
 

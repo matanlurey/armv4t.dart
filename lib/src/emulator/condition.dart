@@ -13,7 +13,7 @@ mixin ConditionEvaluator {
   bool evaluateCondition(Condition condition) {
     final psr = cpu.cpsr;
     switch (condition) {
-      case Condition.eq: // Equal                 Z= = 1
+      case Condition.eq: // Equal                 Z == 1
         return psr.isZero;
       case Condition.ne: // Not Equal             Z == 0
         return !psr.isZero;

@@ -126,7 +126,7 @@ void main() {
       interpreter.execute(instruction);
 
       expect(cpu[2], Uint32(0xffffffff));
-      expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: true));
+      expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: false));
     });
   });
 
@@ -366,7 +366,7 @@ void main() {
   group('CMP', () {
     CMPArmInstruction instruction;
 
-    test('r1 - r2', () {
+    test('r1 - r2 [6 - 24]', () {
       instruction = CMPArmInstruction(
         condition: Condition.al,
         operand1: r1,
@@ -376,11 +376,28 @@ void main() {
         ),
       );
 
-      cpu[1] = Uint32(1);
-      cpu[2] = Uint32(2);
+      cpu[1] = Uint32(6);
+      cpu[2] = Uint32(24);
       interpreter.execute(instruction);
 
-      expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: true));
+      expect(cpu.cpsr, defaultPSR.update(isSigned: true, isOverflow: false));
+    });
+
+    test('r1 - r2 [54 - 24]', () {
+      instruction = CMPArmInstruction(
+        condition: Condition.al,
+        operand1: r1,
+        destination: Register.filledWith0s,
+        operand2: Or3.left(
+          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint4.zero)),
+        ),
+      );
+
+      cpu[1] = Uint32(54);
+      cpu[2] = Uint32(24);
+      interpreter.execute(instruction);
+
+      expect(cpu.cpsr, defaultPSR.update(isSigned: false, isOverflow: false));
     });
   });
 
