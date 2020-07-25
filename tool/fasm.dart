@@ -146,4 +146,15 @@ final _build = {
     'e2e',
     'gcd.conditional.bin',
   ),
+
+  // test/emulator/interpreter/e2e/gcd.conditional.asm
+  path.join(
+    'test',
+    'e2e',
+    'gcd.thumb.asm',
+  ): path.join(
+    'test',
+    'e2e',
+    'gcd.thumb.bin',
+  ),
 };

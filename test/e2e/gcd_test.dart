@@ -119,4 +119,27 @@ void main() {
       expect(cpu[0], Uint32(expected), reason: 'Found GCD');
     });
   });
+
+  group('gcd.thumb.asm', () {
+    Uint8List program;
+
+    setUpAll(() async {
+      program = await File(
+        path.join(
+          'test',
+          'e2e',
+          'gcd.thumb.bin',
+        ),
+      ).readAsBytes();
+    });
+
+    test('gcd(54, 24)', () {
+      final expected = 6;
+      expect(expected, gcd(54, 24), reason: 'Verify reference implementation');
+      start(54, 24, program);
+      execute();
+
+      expect(cpu[0], Uint32(expected), reason: 'Found GCD');
+    });
+  }, solo: true);
 }

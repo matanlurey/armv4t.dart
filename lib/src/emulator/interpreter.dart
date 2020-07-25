@@ -970,8 +970,10 @@ class _ArmInterpreter
 
   void _branch(int offset) {
     // PC = PC + 8 + Offset * 4
+    final isThumb = cpu.cpsr.thumbState;
+    final numBytes = isThumb ? 2 : 4;
     final origin = cpu.programCounter.value;
-    final destination = origin + (offset * 4) + 8;
+    final destination = origin + (offset * numBytes) + (2 * numBytes);
     cpu.programCounter = Uint32(destination);
     _executedBranch = true;
   }
