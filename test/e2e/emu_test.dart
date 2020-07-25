@@ -1,4 +1,5 @@
 @TestOn('vm')
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -9,21 +10,89 @@ import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
 void main() {
+  Uint32List results;
+
+  int read(int address) => results[address ~/ 4];
+
   test('arm0.asm', () async {
     final program = await _TestProgram.load('arm0');
-    final results = program.run();
+    results = program.run();
 
-    expect(results[0x100], 5);
-    expect(results[0x104], 0);
+    expect(read(0x100), 5);
+    expect(read(0x104), 0);
   });
 
   test('arm1.asm', () async {
     final program = await _TestProgram.load('arm1');
-    final results = program.run();
+    results = program.run();
 
-    expect(results[0x100], 5);
-    expect(results[0x104], 5);
-    expect(results[0x108], 5);
+    expect(read(0x100), 5);
+    expect(read(0x104), 5);
+    expect(read(0x108), 5);
+  });
+
+  test('arm2.asm', () async {
+    final program = await _TestProgram.load('arm2');
+    results = program.run();
+
+    expect(read(0x100), 6);
+    expect(read(0x104), 0x200000e1);
+    expect(read(0x108), 0xe100001c);
+  });
+
+  test('arm3.asm', () async {
+    final program = await _TestProgram.load('arm3');
+    results = program.run();
+
+    expect(read(0x100), 64);
+  });
+
+  test('arm4.asm', () async {
+    final program = await _TestProgram.load('arm4');
+    results = program.run();
+
+    expect(read(0x100), 6);
+    expect(read(0x104), 0x200000e1);
+    expect(read(0x108), 0xe100001c);
+    expect(read(0x10c), 6);
+    expect(read(0x110), 6 * 0x100);
+  });
+
+  test('arm5.asm', () async {
+    final program = await _TestProgram.load('arm5');
+    results = program.run();
+
+    expect(read(0x100), 0xf000);
+    expect(read(0x104), 0xfff0);
+    expect(read(0x108), 0x104);
+  });
+
+  test('arm6.asm', () async {
+    final program = await _TestProgram.load('arm6');
+    results = program.run();
+
+    expect(read(0x1f4), 0xa);
+    expect(read(0x1f8), 0xc);
+    expect(read(0x1fc), 0x10);
+    expect(read(0x200), 6);
+    expect(read(0x204), 0x200);
+  });
+
+  test('arm7.asm', () async {
+    final program = await _TestProgram.load('arm7');
+    results = program.run();
+
+    expect(read(0x1fc), 1);
+    expect(read(0x200), 1);
+    expect(read(0x204), 0x200);
+  }, solo: true);
+
+  test('arm8.asm', () async {
+    final program = await _TestProgram.load('arm8');
+    results = program.run();
+
+    expect(read(0x200), 10);
+    expect(read(0x204), 83);
   });
 }
 
@@ -36,8 +105,8 @@ class _TestProgram {
       '$name.bin',
     )).readAsBytesSync();
 
-    // Create 512 bytes, and add the program to the first N bytes.
-    final space = Uint8List(512)..setRange(0, bytes.length, bytes);
+    // Create 1024 bytes, and add the program to the first N bytes.
+    final space = Uint8List(1024)..setRange(0, bytes.length, bytes);
 
     // Make the program itself memory protected.
     var memory = Memory.from(space);
@@ -49,7 +118,8 @@ class _TestProgram {
   final int _programSize;
 
   const _TestProgram(this._memory, this._programSize);
-  Uint8List run({Arm7Processor cpu}) {
+
+  Uint32List run({Arm7Processor cpu}) {
     cpu ??= Arm7Processor();
     final debugger = ArmDebugger(cpu);
     final vm = ArmVM(
@@ -75,7 +145,7 @@ class _TestProgram {
         rethrow;
       }
     }
-    return _memory.copyBytes();
+    return _memory.copyBytes().buffer.asUint32List();
   }
 }
 

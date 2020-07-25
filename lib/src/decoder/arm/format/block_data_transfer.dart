@@ -6,7 +6,7 @@ class BlockDataTransferArmFormat extends ArmFormat {
   /// Whether to add offset before transfer (`1`) or after (`0`).
   final bool preIndexingBit;
 
-  /// Whether to add offset]to base (`1`) or subtract (`0`).
+  /// Whether to add offset to base (`1`) or subtract (`0`).
   final bool addOffsetBit;
 
   /// Whether to load PSR or force user mode (`1`) or not (`0`).
