@@ -5,7 +5,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:armv4t/armv4t.dart';
-import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/emulator/debugger.dart';
 import 'package:binary/binary.dart';
 import 'package:path/path.dart' as path;

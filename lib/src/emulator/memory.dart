@@ -62,6 +62,9 @@ abstract class Memory {
 
   /// Stores a [word] into [address].
   void storeWord(Uint32 address, Uint32 word);
+
+  /// Returns a copy of the data.
+  Uint8List copyBytes();
 }
 
 class _ReadOnlyMemory implements Memory {
@@ -97,6 +100,9 @@ class _ReadOnlyMemory implements Memory {
 
   @override
   void storeWord(Uint32 address, Uint32 word) => _protected(address);
+
+  @override
+  Uint8List copyBytes() => _delegate.copyBytes();
 }
 
 class _ProtectedMemory extends _ReadOnlyMemory {
@@ -226,6 +232,9 @@ class _Memory implements Memory {
   void storeWord(Uint32 address, Uint32 word) {
     _words[_wordAligned(address.value)] = word.value;
   }
+
+  @override
+  Uint8List copyBytes() => Uint8List.fromList(_bytes);
 }
 
 class _NullMemory implements Memory {
@@ -255,4 +264,7 @@ class _NullMemory implements Memory {
 
   @override
   void storeWord(Uint32 address, Uint32 word) => _throw();
+
+  @override
+  Uint8List copyBytes() => Uint8List(0);
 }
