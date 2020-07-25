@@ -1,5 +1,5 @@
+import 'package:armv4t/armv4t.dart';
 import 'package:armv4t/decode.dart';
-import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -11,9 +11,17 @@ import 'package:meta/meta.dart';
 mixin OperandEvaluator {
   static final _maxUint32 = Uint32(0xffffffff);
 
-  /// Provides an implementation of the CPU to access registers and PSR.
+  /// Provides access to registers.
   @protected
-  Arm7Processor get cpu;
+  Uint32 readRegister(Register register);
+
+  /// Provides access to read the CPSR.
+  @protected
+  StatusRegister readCpsr();
+
+  /// PRovides access to write to the CPSR.
+  @protected
+  void writeCpsr(StatusRegister psr);
 
   /// Returns the result for the provided [immediate] value.
   ///
@@ -62,8 +70,7 @@ mixin OperandEvaluator {
     ShiftedRegister<Immediate, Register> register, {
     bool setFlags = false,
   }) {
-    final index = register.operand.index.value;
-    final input = cpu[index];
+    final input = readRegister(register.operand);
     final shift = register.type;
     final value = register.by.value.value;
     return _performShifts(input, shift, value, setFlags: setFlags);
@@ -76,10 +83,9 @@ mixin OperandEvaluator {
     ShiftedRegister<Register, Register> register, {
     bool setFlags = false,
   }) {
-    final index = register.operand.index.value;
-    final input = cpu[index];
+    final input = readRegister(register.operand);
     final shift = register.type;
-    final value = cpu[register.by.index.value].value;
+    final value = readRegister(register.by).value;
     return _performShifts(input, shift, value, setFlags: setFlags);
   }
 
@@ -116,11 +122,11 @@ mixin OperandEvaluator {
   }) {
     if (n == 0) {
       final msb = value.msb;
-      cpu.cpsr = cpu.cpsr.update(isCarry: msb);
+      writeCpsr(readCpsr().update(isCarry: msb));
       return msb ? _maxUint32 : Uint32.zero;
     }
     if (setFlags) {
-      cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(n));
+      writeCpsr(readCpsr().update(isCarry: value.isSet(n)));
     }
     return value.signedRightShift(n);
   }
@@ -157,11 +163,11 @@ mixin OperandEvaluator {
     // Special case: Return zero, shift the most significant bit to _carry_.
     // This is basically a shortcut to just move the nth-bit to carry.
     if (n == 0) {
-      cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(31));
+      writeCpsr(readCpsr().update(isCarry: value.isSet(31)));
       return Uint32.zero;
     }
     if (setFlags) {
-      cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(n));
+      writeCpsr(readCpsr().update(isCarry: value.isSet(n)));
     }
     return value >> Uint32(n);
   }
@@ -202,7 +208,7 @@ mixin OperandEvaluator {
       return value;
     }
     if (setFlags) {
-      cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(32 - n));
+      writeCpsr(readCpsr().update(isCarry: value.isSet(32 - n)));
     }
     return value << Uint32(n);
   }
@@ -241,7 +247,7 @@ mixin OperandEvaluator {
       return rotateRightOneBitWithExtend(value, setFlags: setFlags);
     }
     if (setFlags) {
-      cpu.cpsr = cpu.cpsr.update(isCarry: value.isSet(0));
+      writeCpsr(readCpsr().update(isCarry: value.isSet(0)));
     }
     return value.rotateRightShift(n);
   }
@@ -258,10 +264,10 @@ mixin OperandEvaluator {
     bool setFlags = false,
   }) {
     final bit0 = value.isSet(0);
-    final oldC = cpu.cpsr.isCarry;
+    final oldC = readCpsr().isCarry;
     value = rotateRightShift(value, 1).toggleBit(31, oldC);
     if (setFlags) {
-      cpu.cpsr = cpu.cpsr.update(isCarry: bit0);
+      writeCpsr(readCpsr().update(isCarry: bit0));
     }
     return value;
   }

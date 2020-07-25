@@ -50,6 +50,9 @@ abstract class ArmInterpreter {
 class ArmDebugHooks {
   const ArmDebugHooks();
 
+  /// Invoked when [ArmInstruction] will be executed.
+  void onInstructionExecuting(ArmInstruction instruction) {}
+
   /// Invoked when [ArmInstruction.condition] skips execution based on [cpsr].
   void onInstructionSkipped(ArmInstruction instruction, StatusRegister cpsr) {}
 
@@ -120,6 +123,18 @@ class _ArmInterpreter
   ]) : _debugHooks = debugHooks ?? const ArmDebugHooks();
 
   @override
+  @protected
+  Uint32 readRegister(Register register) => _readRegister(register);
+
+  @override
+  @protected
+  StatusRegister readCpsr() => cpu.cpsr;
+
+  @override
+  @protected
+  void writeCpsr(StatusRegister psr) => cpu.cpsr = psr;
+
+  @override
   bool get atEndOfMemory {
     final nextByte = cpu.programCounter.value;
     return nextByte >= _memory.length;
@@ -128,6 +143,7 @@ class _ArmInterpreter
   @override
   bool run(ArmInstruction instruction) {
     if (evaluateCondition(instruction.condition)) {
+      _debugHooks.onInstructionExecuting(instruction);
       instruction.accept(this);
       return true;
     } else {

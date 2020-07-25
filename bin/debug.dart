@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:armv4t/armv4t.dart';
-import 'package:armv4t/decode.dart';
+import 'package:armv4t/debug.dart';
 import 'package:binary/binary.dart';
 
 void main(List<String> args) {
@@ -18,9 +18,11 @@ void main(List<String> args) {
 
   final program = path.readAsBytesSync();
   final processor = Arm7Processor();
+  final debugger = ArmDebugger(processor);
   final emulator = ArmVM(
     cpu: processor,
     memory: Memory.from(program),
+    debugHooks: debugger,
   );
 
   stdout.writeln('Read ${program.length} bytes into memory');
@@ -44,19 +46,12 @@ void main(List<String> args) {
   }
 
   void execute() {
-    final next = emulator.peek();
-    final decoded = next.accept(const ArmInstructionPrinter());
-    final counter = '0x${processor.programCounter.value.toRadixString(16)}';
-    stdout.writeln('@${counter.padLeft(8, '0')}; $decoded');
     if (emulator.step()) {
+      stdout.writeln(debugger.events.join('\n'));
       execute();
     }
   }
 
   execute();
   stdout.writeln('\n~~~ Execution complete ~~~\n');
-
-  for (var i = 0; i < 16; i++) {
-    stdout.writeln('r${i.toString().padLeft(2, '0')} = ${processor[i].value}');
-  }
 }
