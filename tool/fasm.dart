@@ -1,25 +1,40 @@
 import 'dart:io';
 
+import 'package:glob/glob.dart';
 import 'package:path/path.dart' as path;
 
 /// Uses the bundled FASMARM compile (third_party/fasmarm) to build outputs.
 void main() {
   var didError = false;
-  _build.forEach((source, output) {
-    stdout.writeln('$_tool: $source -> $output');
-    final result = Process.runSync(_tool, [
-      source,
-      output,
-    ]);
-    if (result.stdout != null) {
-      stdout.writeln(result.stdout);
+  var didWrite = false;
+
+  for (final glob in _build) {
+    for (final source in glob.listSync().map((f) => f.path)) {
+      if (source.endsWith('.golden.asm')) {
+        continue;
+      }
+      final output = '${path.withoutExtension(source)}.bin';
+      stdout.writeln('$_tool $source $output');
+      final result = Process.runSync(_tool, [
+        source,
+        output,
+      ]);
+      if (result.stdout != null) {
+        stdout.writeln(result.stdout);
+        didWrite = true;
+      }
+      if (result.exitCode != 0) {
+        stderr.writeln('${result.exitCode}: ${result.stderr}');
+        didError = true;
+      }
     }
-    if (result.stderr != null) {
-      stderr.writeln(result.stderr);
-      didError = true;
-    }
-  });
+  }
+
   if (didError) {
+    stderr.writeln('One or more errors occurred.');
+    exitCode = 1;
+  } else if (!didWrite) {
+    stderr.writeln('No output. Something is wrong: $_build');
     exitCode = 1;
   }
 }
@@ -36,140 +51,9 @@ final _tool = (() {
   }
 })();
 
-final _build = {
-  // test/decoder/arm/fasmarm/arithmetic.asm
-  path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'arithmetic.asm',
-  ): path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'arithmetic.bin',
-  ),
-
-  // test/decoder/arm/fasmarm/conditions.asm
-  path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'conditions.asm',
-  ): path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'conditions.bin',
-  ),
-
-  // test/decoder/arm/fasmarm/logical.asm
-  path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'logical.asm',
-  ): path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'logical.bin',
-  ),
-
-  // test/decoder/arm/fasmarm/memory.asm
-  path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'memory.asm',
-  ): path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'memory.bin',
-  ),
-
-  // test/decoder/arm/fasmarm/multiply.asm
-  path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'multiply.asm',
-  ): path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'multiply.bin',
-  ),
-
-  // test/decoder/arm/fasmarm/others.asm
-  path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'others.asm',
-  ): path.join(
-    'test',
-    'decoder',
-    'arm',
-    'fasmarm',
-    'others.bin',
-  ),
-
-  // test/decoder/thumb/fasmarm_test.asm
-  path.join(
-    'test',
-    'decoder',
-    'thumb',
-    'fasmarm_test.asm',
-  ): path.join(
-    'test',
-    'decoder',
-    'thumb',
-    'fasmarm_test.bin',
-  ),
-
-  // test/emulator/interpreter/e2e/gcd.branches.asm
-  path.join(
-    'test',
-    'e2e',
-    'gcd.branches.asm',
-  ): path.join(
-    'test',
-    'e2e',
-    'gcd.branches.bin',
-  ),
-
-  // test/emulator/interpreter/e2e/gcd.conditional.asm
-  path.join(
-    'test',
-    'e2e',
-    'gcd.conditional.asm',
-  ): path.join(
-    'test',
-    'e2e',
-    'gcd.conditional.bin',
-  ),
-
-  // test/emulator/interpreter/e2e/gcd.conditional.asm
-  path.join(
-    'test',
-    'e2e',
-    'gcd.thumb.asm',
-  ): path.join(
-    'test',
-    'e2e',
-    'gcd.thumb.bin',
-  ),
-};
+final _build = [
+  path.posix.join('test', 'decoder', 'arm', 'fasmarm', '*.asm'),
+  path.posix.join('test', 'decoder', 'thumb', '*.asm'),
+  path.posix.join('test', 'e2e', '*.asm'),
+  path.posix.join('test', 'e2e', 'data', '*.asm'),
+].map((p) => Glob(p)).toSet();

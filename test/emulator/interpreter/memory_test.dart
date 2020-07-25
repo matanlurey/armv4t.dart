@@ -514,6 +514,32 @@ void main() {
         expect(cpu.forceUserModeRead(9), Uint32(2));
         expect(cpu.forceUserModeRead(10), Uint32(3));
       });
+
+      test('With r13 as a base, store r0 and r13', () {
+        instruction = STMArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          forceNonPrivilegedAccess: false,
+          base: RegisterAny(Uint4(13)),
+          registerList: RegisterList({0, 13}),
+        );
+        expect(decode(instruction), 'stmib r13, {r0, r13}');
+
+        // We need more memory for this test, so create a local environment.
+        final memory = Memory.empty(1024);
+        final interpreter = ArmInterpreter(cpu, memory);
+
+        cpu
+          ..[0] = Uint32(1)
+          ..[13] = Uint32(512);
+
+        interpreter.run(instruction);
+
+        expect(memory.loadWord(Uint32(516)), Uint32(1));
+        expect(memory.loadWord(Uint32(520)), Uint32(516));
+      }, solo: true);
     });
   });
 

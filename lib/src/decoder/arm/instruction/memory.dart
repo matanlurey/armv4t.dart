@@ -4,7 +4,7 @@ abstract class DataTransferArmInstruction extends ArmInstruction {
   /// `P`: Whether to add offset before transfer (`1`), otherwise after (`0`).
   final bool addOffsetBeforeTransfer;
 
-  /// `U`: Whether to add offset to base (`1`), otherwise subtract from (`1`).
+  /// `U`: Whether to add offset to base (`1`), otherwise subtract from (`0`).
   final bool addOffsetToBase;
 
   /// Depending on the instruction, this is either the `W` or `T` bit.

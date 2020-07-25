@@ -1014,13 +1014,14 @@ class _ArmInterpreter
     );
     // Stores into multiple memory locations from multiple registers.
     for (final register in i.registerList.registers) {
+      final source = _readRegister(
+        register,
+        forceUserMode: i.forceNonPrivilegedAccess,
+      );
       _storeMemory(
         i.base,
         Uint32(4),
-        _readRegister(
-          register,
-          forceUserMode: i.forceNonPrivilegedAccess,
-        ),
+        source,
         size: _Size.word,
         // Addressing mode:
         //   IA: Increment address after each transfer  (e.g. FD)
@@ -1049,7 +1050,7 @@ class _ArmInterpreter
   void visitSWP(SWPArmInstruction i, [void _]) {
     // Rd = [Rm]
     final result = _loadMemory(
-      i.source,
+      i.base,
       Uint32.zero,
       size: i.transferByte ? _Size.byte : _Size.word,
       signed: false,

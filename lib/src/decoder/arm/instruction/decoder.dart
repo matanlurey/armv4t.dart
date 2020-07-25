@@ -304,7 +304,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
       return MULArmInstruction(
         condition: condition,
         setConditionCodes: setConditionCodes,
-        operand1: operand1,
+        operand1: operand3,
         operand2: operand2,
         destination: destination,
       );
@@ -532,8 +532,8 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     void _,
   ]) {
     final condition = Condition.parse(format.condition.value);
-    final addOffsetBeforeTransfer = format.preIndexingBit;
-    final addOffsetToBase = format.addOffsetBit;
+    final addOffsetBeforeTransfer = !format.preIndexingBit;
+    final addOffsetToBase = !format.addOffsetBit;
     final writeAddressIntoBase = format.writeAddressBit;
     final base = RegisterAny(format.baseRegister);
     final registerList = RegisterList<RegisterAny>.parse(
