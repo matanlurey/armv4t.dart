@@ -15,8 +15,9 @@ import 'package:meta/meta.dart';
 abstract class ArmInterpreter {
   factory ArmInterpreter(
     Arm7Processor cpu,
-    Memory memory,
-  ) = _ArmInterpreter;
+    Memory memory, [
+    ArmDebugHooks debugHooks,
+  ]) = _ArmInterpreter;
 
   /// Whether [Arm7Processor.programCounter] has exceeded [Memory.length];
   bool get atEndOfMemory;
@@ -44,6 +45,62 @@ abstract class ArmInterpreter {
   Arm7Processor get cpu;
 }
 
+/// May be extended and invoked by [ArmInterpreter] when provided.
+@experimental
+class ArmDebugHooks {
+  const ArmDebugHooks();
+
+  /// Invoked when [ArmInstruction] will be executed.
+  void onInstructionExecuting(ArmInstruction instruction) {}
+
+  /// Invoked when [ArmInstruction.condition] skips execution based on [cpsr].
+  void onInstructionSkipped(ArmInstruction instruction, StatusRegister cpsr) {}
+
+  /// Invoked when [register] is read as a result of execution.
+  void onRegisterRead(
+    Register register,
+    Uint32 value, {
+    @required bool forcedUserMode,
+  }) {}
+
+  /// Invoked when [register] is written to as a result of execution.
+  ///
+  /// This hook occurs right before writing, so it is possible to read from
+  /// [register] and the _previous_ value before overwritten by [newValue], if
+  /// desired.
+  ///
+  /// **NOTE**: This method is called even if the value is the same.
+  void onRegisterWrite(
+    Register register,
+    Uint32 newValue, {
+    @required bool forcedUserMode,
+  }) {}
+
+  /// Invoked when [StatusRegister] is updated as a result of execution.
+  ///
+  /// This hook occurs right after updating, so it is possible to compare
+  /// [previous] to the _current_ value.
+  ///
+  /// **NOTE**: This method is _not_ called if no flags were updated.
+  void onFlagsUpdated(StatusRegister previous) {}
+
+  /// Invoked when a memory [address] was read (as [value]).
+  ///
+  /// **NOTE**: This method is not informed what the size of the data read was
+  /// (e.g. [value] could be representing a byte, half-word, or a word).
+  void onMemoryRead(Uint32 address, Uint32 value) {}
+
+  /// Invoked when a memory [address] is written to (with [newValue]).
+  ///
+  /// This hook occurs right before writing, so it is possible to read from
+  /// [Memory] and the _previous_ value before being overwrriten by [newValue],
+  /// if desired.
+  ///
+  /// **NOTE**: This method is not informed what the size of the data written
+  /// was (e.g. [newValue] could be representing a byte, half-word, or a word).
+  void onMemoryWrite(Uint32 address, Uint32 newValue) {}
+}
+
 class _ArmInterpreter
     /**/ extends ArmInstructionVisitor<void, void>
     /**/ with
@@ -56,7 +113,26 @@ class _ArmInterpreter
 
   final Memory _memory;
 
-  _ArmInterpreter(this.cpu, this._memory);
+  @protected
+  final ArmDebugHooks _debugHooks;
+
+  _ArmInterpreter(
+    this.cpu,
+    this._memory, [
+    ArmDebugHooks debugHooks,
+  ]) : _debugHooks = debugHooks ?? const ArmDebugHooks();
+
+  @override
+  @protected
+  Uint32 readRegister(Register register) => _readRegister(register);
+
+  @override
+  @protected
+  StatusRegister readCpsr() => cpu.cpsr;
+
+  @override
+  @protected
+  void writeCpsr(StatusRegister psr) => cpu.cpsr = psr;
 
   @override
   bool get atEndOfMemory {
@@ -67,9 +143,11 @@ class _ArmInterpreter
   @override
   bool run(ArmInstruction instruction) {
     if (evaluateCondition(instruction.condition)) {
+      _debugHooks.onInstructionExecuting(instruction);
       instruction.accept(this);
       return true;
     } else {
+      _debugHooks.onInstructionSkipped(instruction, cpu.cpsr);
       return false;
     }
   }
@@ -92,20 +170,33 @@ class _ArmInterpreter
   // SHARED / COMMON
 
   Uint32 _readRegister(
-    Register r, {
-    bool forceUserMode = false,
-  }) =>
-      cpu[r.index.value];
-
-  Uint32 _writeRegister(
-    Register r,
-    Uint32 v, {
+    Register register, {
     bool forceUserMode = false,
   }) {
-    if (r.isProgramCounter) {
+    Uint32 value;
+    if (forceUserMode) {
+      value = cpu.forceUserModeRead(register.index.value);
+    } else {
+      value = cpu[register.index.value];
+    }
+    _debugHooks.onRegisterRead(register, value, forcedUserMode: forceUserMode);
+    return value;
+  }
+
+  void _writeRegister(
+    Register register,
+    Uint32 value, {
+    bool forceUserMode = false,
+  }) {
+    if (register.isProgramCounter) {
       _executedBranch = true;
     }
-    return cpu[r.index.value] = v;
+    _debugHooks.onRegisterWrite(register, value, forcedUserMode: forceUserMode);
+    if (forceUserMode) {
+      cpu.forceUserModeWrite(register.index.value, value);
+    } else {
+      cpu[register.index.value] = value;
+    }
   }
 
   Uint32 _visitOperand2(
@@ -128,7 +219,8 @@ class _ArmInterpreter
     @required bool op2Signed,
     bool result64 = false,
   }) {
-    cpu.cpsr = cpu.cpsr.update(
+    final previous = cpu.cpsr;
+    final updated = cpu.cpsr = previous.update(
       // V (If + and + is -, or - and - is +)
       isOverflow: result.hadOverflow(op1Signed, op2Signed),
 
@@ -141,6 +233,9 @@ class _ArmInterpreter
       // N (If MSB == 1)
       isSigned: result.isSigned,
     );
+    if (previous != updated) {
+      _debugHooks.onFlagsUpdated(previous);
+    }
   }
 
   // DATA PROCESSING
@@ -279,7 +374,8 @@ class _ArmInterpreter
   }
 
   void _writeToCZN(Uint32List result) {
-    cpu.cpsr = cpu.cpsr.update(
+    final previous = cpu.cpsr;
+    final updated = cpu.cpsr = previous.update(
       // C (Carry Flag of Shift Operation, Ignored if LSL #0 or Rs=00h)
       //
       // We don't update it here though, it does during shifting.
@@ -290,6 +386,9 @@ class _ArmInterpreter
       // N (If MSB == 1)
       isSigned: result.isSigned,
     );
+    if (previous != updated) {
+      _debugHooks.onFlagsUpdated(previous);
+    }
   }
 
   @override
@@ -643,6 +742,7 @@ class _ArmInterpreter
       default:
         throw StateError('Unexpected: $size');
     }
+    _debugHooks.onMemoryRead(address, result);
     return result;
   }
 
@@ -715,6 +815,7 @@ class _ArmInterpreter
     Uint32 address;
 
     void store() {
+      _debugHooks.onMemoryWrite(address, source);
       switch (size) {
         case _Size.byte:
           _memory.storeByte(address, Uint8(source.bitRange(7, 0).value));

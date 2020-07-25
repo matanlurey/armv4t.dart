@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:armv4t/armv4t.dart';
 import 'package:armv4t/decode.dart';
+import 'package:armv4t/src/emulator/debugger.dart';
 import 'package:binary/binary.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
@@ -26,22 +27,18 @@ void main() {
   }
 
   Arm7Processor cpu;
+  ArmDebugger debugger;
 
   void start(int a, int b, Uint8List program) {
     cpu = Arm7Processor()
       ..[0] = Uint32(a)
       ..[1] = Uint32(b);
 
-    // TODO(https://github.com/matanlurey/armv4t.dart/issues/33): Remove.
-    final pc = 'pc'.padRight(16, ' ');
-    final r0 = 'r0'.padRight(16, ' ');
-    final r1 = 'r1'.padRight(16, ' ');
-    print('$pc$r0$r1' 'Instruction');
-    print(''.padRight(16 * 5, '-'));
-
+    debugger = ArmDebugger(cpu);
     vm = ArmVM(
       cpu: cpu,
-      memory: Memory(program.lengthInBytes, data: program),
+      memory: Memory.from(program),
+      debugHooks: debugger,
     );
   }
 
@@ -52,22 +49,13 @@ void main() {
   });
 
   void execute() {
-    String disassemble(ArmInstruction instruction) {
-      return instruction.accept(const ArmInstructionPrinter());
-    }
-
-    final c = cpu.programCounter.value;
-    final p = ('0x' + c.toString()).padRight(16, ' ');
-    final a = cpu[0].value.toString().padRight(16, ' ');
-    final b = cpu[1].value.toString().padRight(16, ' ');
-    final i = vm.peek();
-    print('$p$a$b' '${disassemble(i)}');
-
+    // TODO(https://github.com/matanlurey/armv4t.dart/issues/61).
     if (count++ > 100) {
       fail('Program may never complete. There might be a bug or error');
     }
 
     if (vm.step()) {
+      print(debugger.events.join('\n'));
       execute();
     }
   }

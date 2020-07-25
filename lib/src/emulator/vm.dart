@@ -23,10 +23,11 @@ class ArmVM {
   factory ArmVM({
     Arm7Processor cpu,
     @required Memory memory,
+    ArmDebugHooks debugHooks,
   }) {
     ArgumentError.checkNotNull(memory, 'memory');
     cpu ??= Arm7Processor();
-    return ArmVM._(cpu, memory, ArmInterpreter(cpu, memory));
+    return ArmVM._(cpu, memory, ArmInterpreter(cpu, memory, debugHooks));
   }
 
   const ArmVM._(

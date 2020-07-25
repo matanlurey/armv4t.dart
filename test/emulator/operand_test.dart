@@ -1,13 +1,22 @@
+import 'package:armv4t/src/decoder/common.dart';
 import 'package:armv4t/src/emulator/operand.dart';
 import 'package:armv4t/src/emulator/processor.dart';
 import 'package:binary/binary.dart';
 import 'package:test/test.dart';
 
 class TestOperandEvaluator with OperandEvaluator {
-  @override
-  final Arm7Processor cpu;
+  final Arm7Processor _cpu;
 
-  TestOperandEvaluator(this.cpu);
+  TestOperandEvaluator(this._cpu);
+
+  @override
+  StatusRegister readCpsr() => _cpu.cpsr;
+
+  @override
+  Uint32 readRegister(Register register) => _cpu[register.index.value];
+
+  @override
+  void writeCpsr(StatusRegister psr) => _cpu.cpsr = psr;
 }
 
 void main() {
