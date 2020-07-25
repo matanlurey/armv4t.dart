@@ -8,7 +8,7 @@ import 'package:meta/meta.dart';
 @sealed
 abstract class Memory {
   /// Creates an initialized memory block by copying [bytes].
-  factory Memory.from(List<int> bytes) {
+  factory Memory.from(List<int> bytes, {int totalSize}) {
     final copy = Uint8List(bytes.length);
     for (var i = 0; i < bytes.length; i++) {
       copy[i] = bytes[i];

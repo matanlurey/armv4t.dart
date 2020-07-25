@@ -49,7 +49,7 @@ void main(List<String> args) {
   for (var i = 0; i < words.length; i++) {
     final decoded = _disassemble(words[i]);
     stdout.writeln(
-      '$decoded'.padRight(20, ' ') + '; 0x${(i * 4).toRadixString(16)}',
+      '$decoded'.padRight(32, ' ') + '; 0x${(i * 4).toRadixString(16)}',
     );
   }
 }
