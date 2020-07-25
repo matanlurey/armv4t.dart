@@ -1049,7 +1049,7 @@ class _ArmInterpreter
   void visitSWP(SWPArmInstruction i, [void _]) {
     // Rd = [Rm]
     final result = _loadMemory(
-      i.source,
+      i.base,
       Uint32.zero,
       size: i.transferByte ? _Size.byte : _Size.word,
       signed: false,
