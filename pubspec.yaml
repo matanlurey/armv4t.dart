@@ -10,6 +10,7 @@ environment:
   sdk: ">=2.8.0 <3.0.0"
 
 dependencies:
+  args: ^1.6.0
   binary: ^1.7.0
   collection: ^1.14.12
   meta: ^1.1.8
@@ -29,3 +30,4 @@ dependency_overrides:
 
 executables:
   debug: debug
+  disassemble:
