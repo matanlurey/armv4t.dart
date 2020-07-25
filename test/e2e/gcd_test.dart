@@ -41,7 +41,7 @@ void main() {
 
     vm = ArmVM(
       cpu: cpu,
-      memory: Memory(program.lengthInBytes, data: program),
+      memory: Memory.from(program),
     );
   }
 

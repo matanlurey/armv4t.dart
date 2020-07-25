@@ -20,10 +20,7 @@ void main(List<String> args) {
   final processor = Arm7Processor();
   final emulator = ArmVM(
     cpu: processor,
-    memory: Memory(
-      program.length,
-      data: program,
-    ),
+    memory: Memory.from(program),
   );
 
   stdout.writeln('Read ${program.length} bytes into memory');
