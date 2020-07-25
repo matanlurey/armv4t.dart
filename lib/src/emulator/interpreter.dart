@@ -101,8 +101,12 @@ class _ArmInterpreter
     Register r,
     Uint32 v, {
     bool forceUserMode = false,
-  }) =>
-      cpu[r.index.value] = v;
+  }) {
+    if (r.isProgramCounter) {
+      _executedBranch = true;
+    }
+    return cpu[r.index.value] = v;
+  }
 
   Uint32 _visitOperand2(
     Or3<
