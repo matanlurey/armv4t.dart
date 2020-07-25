@@ -19,7 +19,14 @@ void main() {
     return decode.accept(const ArmInstructionPrinter());
   }
 
-  ['arithmetic', 'logical', 'memory', 'multiply', 'others'].forEach((key) {
+  [
+    'arithmetic',
+    'conditions',
+    'logical',
+    'memory',
+    'multiply',
+    'others',
+  ].forEach((key) {
     test('$key.bin ($key.asm) -> $key.golden.asm', () async {
       final bytes = await File(path.join(
         'test',

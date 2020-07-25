@@ -52,6 +52,21 @@ final _build = {
     'arithmetic.bin',
   ),
 
+  // test/decoder/arm/fasmarm/conditions.asm
+  path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'conditions.asm',
+  ): path.join(
+    'test',
+    'decoder',
+    'arm',
+    'fasmarm',
+    'conditions.bin',
+  ),
+
   // test/decoder/arm/fasmarm/logical.asm
   path.join(
     'test',
