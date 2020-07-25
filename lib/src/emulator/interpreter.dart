@@ -1014,13 +1014,14 @@ class _ArmInterpreter
     );
     // Stores into multiple memory locations from multiple registers.
     for (final register in i.registerList.registers) {
+      final source = _readRegister(
+        register,
+        forceUserMode: i.forceNonPrivilegedAccess,
+      );
       _storeMemory(
         i.base,
         Uint32(4),
-        _readRegister(
-          register,
-          forceUserMode: i.forceNonPrivilegedAccess,
-        ),
+        source,
         size: _Size.word,
         // Addressing mode:
         //   IA: Increment address after each transfer  (e.g. FD)
