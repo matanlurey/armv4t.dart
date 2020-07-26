@@ -539,14 +539,14 @@ void main() {
 
         expect(
           memory.loadWord(Uint32(512)),
-          Uint32(1),
-          reason: '@512 = r0 = 1',
+          Uint32(512),
+          reason: '@512 = r0 = 512',
         );
 
         expect(
           memory.loadWord(Uint32(508)),
-          Uint32(512),
-          reason: '@508 = r13 = 512',
+          Uint32(1),
+          reason: '@508 = r13 = 1',
         );
 
         expect(cpu.stackPointer, Uint32(512), reason: 'No write-back');
