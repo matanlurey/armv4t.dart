@@ -32,7 +32,4 @@ class STMArmInstruction extends BlockDataTransferArmInstruction {
   R accept<R, C>(ArmInstructionVisitor<R, C> visitor, [C context]) {
     return visitor.visitSTM(this, context);
   }
-
-  @override
-  bool get forceNonPrivilegedAccess => loadPsrOrForceUserMode;
 }

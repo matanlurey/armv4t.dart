@@ -815,28 +815,28 @@ void main() {
       test('IB', () {
         expect(
           decode(encode(createLDM(preIndexingBit: true, addOffsetBit: true))),
-          'ldmda r4, {r5}',
+          'ldmib r4, {r5}',
         );
       });
 
       test('IA', () {
         expect(
           decode(encode(createLDM(preIndexingBit: false, addOffsetBit: true))),
-          'ldmdb r4, {r5}',
+          'ldmia r4, {r5}',
         );
       });
 
       test('DB', () {
         expect(
           decode(encode(createLDM(preIndexingBit: true, addOffsetBit: false))),
-          'ldmia r4, {r5}',
+          'ldmdb r4, {r5}',
         );
       });
 
       test('DA', () {
         expect(
           decode(encode(createLDM(preIndexingBit: false, addOffsetBit: false))),
-          'ldmib r4, {r5}',
+          'ldmda r4, {r5}',
         );
       });
     });
@@ -862,14 +862,14 @@ void main() {
       test('w/ Write-Back', () {
         expect(
           decode(encode(createSTM(writeAddressBit: true))),
-          'stmda r4!, {r5}',
+          'stmib r4!, {r5}',
         );
       });
 
       test('w/ Set S Bit', () {
         expect(
           decode(encode(createSTM(loadPsrOrForceUserMode: true))),
-          'stmda r4, {r5}^',
+          'stmib r4, {r5}^',
         );
       });
 
@@ -878,7 +878,7 @@ void main() {
           decode(encode(createSTM(
             registerList: '0000' '0011' '0100' '1011'.bits,
           ))),
-          'stmda r4, {r0-r1, r3, r6, r8-r9}',
+          'stmib r4, {r0-r1, r3, r6, r8-r9}',
         );
       });
     });

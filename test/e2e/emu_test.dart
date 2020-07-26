@@ -76,16 +76,19 @@ void main() {
     expect(read(0x1fc), 0x10);
     expect(read(0x200), 6);
     expect(read(0x204), 0x200);
-  }, skip: 'Currently fails: Might need to support reading half-word address');
+  });
 
   test('arm7.asm', () async {
     final program = await _TestProgram.load('arm7');
     results = program.run();
 
-    expect(read(0x1fc), 1);
-    expect(read(0x200), 1);
+    //          508     1
+    expect(read(0x1fc), 1, reason: '@0x1fc: Expected to be 0x1');
+    //          512     1
+    expect(read(0x200), 1, reason: '@0x200: Expected to be 0x1 (STMED)');
+    //          516     512
     expect(read(0x204), 0x200);
-  }, skip: 'Currently fails: Unknown reasons, likely bugs in STM');
+  });
 
   test('arm8.asm', () async {
     final program = await _TestProgram.load('arm8');
@@ -130,7 +133,13 @@ class _TestProgram {
 
     bool reachedEndOfProgram() => cpu.programCounter.value >= _programSize;
 
+    var maxCycles = 100;
+
     while (true) {
+      if (maxCycles-- == 0) {
+        fail('Did not complete after 100 instructions.');
+      }
+
       final next = vm.peek();
 
       try {

@@ -146,6 +146,7 @@ void main() {
           destination: r0,
           offset: Or2.left(Immediate(Uint12(4))),
         );
+        expect(decode(instruction), 'ldr r0, [r1], 4');
 
         // Read memory address 0.
         cpu[1] = Uint32(0);
@@ -252,7 +253,7 @@ void main() {
         expect(memory.loadWord(Uint32(0)), Uint32(10240));
       });
 
-      test('[r0] = r1 + O', () {
+      test('[r0] = r1 + O ===', () {
         instruction = STRArmInstruction(
           condition: Condition.al,
           addOffsetBeforeTransfer: false,
@@ -261,16 +262,16 @@ void main() {
           transferByte: false,
           base: r0,
           destination: r1,
-          offset: Or2.left(Immediate(Uint12(3))),
+          offset: Or2.left(Immediate(Uint12(4))),
         );
-        expect(decode(instruction), 'str r1, [r0], 3');
+        expect(decode(instruction), 'str r1, [r0], 4');
 
         // Store r1 into memory location 4.
         cpu[0] = Uint32(4);
         cpu[1] = Uint32(10240);
         interpreter.run(instruction);
 
-        expect(cpu[0], Uint32(7), reason: 'Writeback (Implicit)');
+        expect(cpu[0], Uint32(4 + 4), reason: 'Writeback (Implicit)');
         expect(cpu[1], Uint32(10240));
         expect(memory.loadWord(Uint32(4)), Uint32(10240));
       });
@@ -473,6 +474,39 @@ void main() {
         expect(cpu[2], Uint32(2));
         expect(cpu[3], Uint32(3));
       });
+
+      test('LDMFD', () {
+        instruction = LDMArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: false,
+          addOffsetToBase: true,
+          writeAddressIntoBase: true,
+          loadPsr: false,
+          base: RegisterAny.sp,
+          registerList: RegisterList({1, 2, 3}),
+        );
+        expect(decode(instruction), 'ldmfd r13!, {r1-r3}');
+
+        cpu.stackPointer = Uint32(4);
+        memory
+          ..storeWord(Uint32(0), Uint32(0))
+          ..storeWord(Uint32(4), Uint32(4))
+          ..storeWord(Uint32(8), Uint32(8))
+          ..storeWord(Uint32(12), Uint32(12));
+        interpreter.run(instruction);
+
+        expect([
+          cpu[1],
+          cpu[2],
+          cpu[3]
+        ], [
+          Uint32(4),
+          Uint32(8),
+          Uint32(12),
+        ]);
+
+        expect(cpu.stackPointer, Uint32(16));
+      });
     });
 
     group('STM', () {
@@ -518,14 +552,14 @@ void main() {
       test('With r13 as a base, store r0 and r13', () {
         instruction = STMArmInstruction(
           condition: Condition.al,
-          addOffsetBeforeTransfer: true,
-          addOffsetToBase: true,
+          addOffsetBeforeTransfer: false,
+          addOffsetToBase: false,
           writeAddressIntoBase: false,
           forceNonPrivilegedAccess: false,
           base: RegisterAny(Uint4(13)),
           registerList: RegisterList({0, 13}),
         );
-        expect(decode(instruction), 'stmib r13, {r0, r13}');
+        expect(decode(instruction), 'stmed r13, {r0, r13}');
 
         // We need more memory for this test, so create a local environment.
         final memory = Memory.empty(1024);
@@ -537,36 +571,56 @@ void main() {
 
         interpreter.run(instruction);
 
-        expect(memory.loadWord(Uint32(516)), Uint32(1));
-        expect(memory.loadWord(Uint32(520)), Uint32(516));
-      }, solo: true);
+        expect(
+          memory.loadWord(Uint32(512)),
+          Uint32(512),
+          reason: '@512 = r0 = 512',
+        );
+
+        expect(
+          memory.loadWord(Uint32(508)),
+          Uint32(1),
+          reason: '@508 = r13 = 1',
+        );
+
+        expect(cpu.stackPointer, Uint32(512), reason: 'No write-back');
+      });
     });
   });
 
   group('Single Data Swap', () {
     SWPArmInstruction instruction;
 
-    test('r0 = [r1], [r2] = r1', () {
+    test('r1 = [r13], [r13] = r0', () {
       instruction = SWPArmInstruction(
         condition: Condition.al,
         transferByte: false,
-        base: RegisterNotPC(Uint4(1)),
-        destination: RegisterNotPC(Uint4(0)),
-        source: RegisterNotPC(Uint4(2)),
+        base: RegisterNotPC(Uint4(13)),
+        destination: RegisterNotPC(Uint4(1)),
+        source: RegisterNotPC(Uint4(0)),
       );
-      expect(decode(instruction), 'swp r0, r2, [r1]');
+      expect(decode(instruction), 'swp r1, r0, [r13]');
 
-      // r0 = [r1] (i.e. r0 = 1024)
-      memory.storeWord(Uint32(0), Uint32(1024));
-      cpu[1] = Uint32(0);
+      // We need more memory for this test, so create a local environment.
+      final memory = Memory.empty(1024);
+      final interpreter = ArmInterpreter(cpu, memory);
+
+      memory
+        ..storeWord(Uint32(508), Uint32(512))
+        ..storeWord(Uint32(512), Uint32(1));
+
+      cpu
+        ..[0] = Uint32(1)
+        ..[1] = Uint32.zero
+        ..[13] = Uint32(512);
 
       interpreter.run(instruction);
 
-      expect(cpu[0], Uint32(1024));
-      expect(cpu[1], Uint32(0));
+      expect(cpu[0], Uint32(1));
+      expect(cpu[1], Uint32(1));
+      expect(cpu[13], Uint32(512));
 
-      expect(memory.loadWord(Uint32(0)), Uint32(0));
-      expect(memory.loadWord(Uint32(4)), Uint32(0));
+      expect(memory.loadWord(Uint32(512)), Uint32(1));
     });
   });
 }

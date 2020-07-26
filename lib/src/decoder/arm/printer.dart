@@ -463,9 +463,22 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     void _,
   ]) {
     // <LDM|STM>{cond}<FD|ED|FA|EA|IA|IB|DA|DB> Rn{!},<Rlist>{^}
-    final mnuemonic = super.visitBlockDataTransfer(i);
+    var mnuemonic = super.visitBlockDataTransfer(i);
     final w = i.writeAddressIntoBase ? '!' : '';
     final c = i.loadPsrOrForceUserMode ? '^' : '';
+    // Re-write as a stack operation if using r13.
+    if (i.base.index.value == 13) {
+      mnuemonic = const {
+        'ldmib': 'ldmed',
+        'ldmia': 'ldmfd',
+        'ldmdb': 'ldmea',
+        'ldmda': 'ldmfa',
+        'stmib': 'stmfa',
+        'stmia': 'stmea',
+        'stmdb': 'stmfd',
+        'stmda': 'stmed',
+      }[mnuemonic];
+    }
     return visitComponents([
       '$mnuemonic ${visitRegister(i.base)}$w',
       '{${visitRegisterList(i.registerList)}}$c',
