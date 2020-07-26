@@ -1007,42 +1007,34 @@ class _ArmInterpreter
 
   @override
   void visitSTM(STMArmInstruction i, [void _]) {
-    // If write-back is not used, we want to restore the base register.
-    final base = _readRegister(
-      i.base,
-      forceUserMode: i.forceNonPrivilegedAccess,
-    );
-    // Stores into multiple memory locations from multiple registers.
-    for (final register in i.registerList.registers) {
-      final source = _readRegister(
-        register,
-        forceUserMode: i.forceNonPrivilegedAccess,
-      );
+    final offset = Uint32(4);
+    var registers = 0;
+    for (final source in i.registerList.registers) {
       _storeMemory(
         i.base,
-        Uint32(4),
-        source,
+        offset,
+        _readRegister(source),
         size: _Size.word,
-        // Addressing mode:
-        //   IA: Increment address after each transfer  (e.g. FD)
-        //   IB: Increment address before each transfer (e.g. ED)
-        //   DA: Decrement address after each transfer  (e.g. FA)
-        //   DB: Decrement address before each transfer (e.g. EA)
         before: i.addOffsetBeforeTransfer,
         add: i.addOffsetToBase,
-        // Always "write-back" - e.g. increment/decrement address.
-        write: true,
-        // Whether to write to user-bank registers regardless of current mode.
+        write: false,
         forceUserMode: i.forceNonPrivilegedAccess,
       );
+      registers++;
     }
-    // Restore base register if write-back disabled.
-    if (!i.writeAddressIntoBase) {
-      _writeRegister(
+    if (i.writeAddressIntoBase) {
+      final base = _readRegister(
         i.base,
-        base,
         forceUserMode: i.forceNonPrivilegedAccess,
-      );
+      ).value;
+      int writeBack;
+      if (i.addOffsetToBase) {
+        writeBack = base + 4 * registers;
+      } else {
+        writeBack = base - 4 * registers;
+        writeBack = writeBack.toUnsigned(32);
+      }
+      _writeRegister(i.base, Uint32(writeBack));
     }
   }
 
