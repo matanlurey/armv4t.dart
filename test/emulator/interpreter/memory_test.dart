@@ -539,7 +539,7 @@ void main() {
 
         expect(memory.loadWord(Uint32(516)), Uint32(1));
         expect(memory.loadWord(Uint32(520)), Uint32(516));
-      }, solo: true);
+      });
     });
   });
 
