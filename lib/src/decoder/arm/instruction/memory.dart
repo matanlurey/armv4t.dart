@@ -222,12 +222,6 @@ abstract class BlockDataTransferArmInstruction
         );
 
   @override
-  @protected
-  bool get writeAddressIntoBaseOrForceNonPrivilegedAccess {
-    return super.writeAddressIntoBaseOrForceNonPrivilegedAccess;
-  }
-
-  @override
   List<Object> _values() {
     return [
       condition,

@@ -84,7 +84,7 @@ class ArmDebugger implements ArmDebugHooks {
   ) {
     final a = '0x${address.value.toRadixString(16)}';
     final v = '0x${value.value.toRadixString(16)}';
-    _events.add('  $a > $v');
+    _events.add('  @${a.padRight(8, ' ')} >> $v');
   }
 
   @override
@@ -94,7 +94,7 @@ class ArmDebugger implements ArmDebugHooks {
   ) {
     final a = '0x${address.value.toRadixString(16)}';
     final v = '0x${newValue.value.toRadixString(16)}';
-    _events.add('  $a < $v');
+    _events.add('  @${a.padRight(8, ' ')} << $v');
   }
 
   @override
@@ -105,7 +105,7 @@ class ArmDebugger implements ArmDebugHooks {
   }) {
     final r = 'r${register.index.value}';
     final v = '0x${value.value.toRadixString(16)}';
-    _events.add('  $r > $v');
+    _events.add('  ${r.padRight(9, ' ')} >> $v');
   }
 
   @override
@@ -116,6 +116,6 @@ class ArmDebugger implements ArmDebugHooks {
   }) {
     final r = 'r${register.index.value}';
     final v = '0x${newValue.value.toRadixString(16)}';
-    _events.add('  $r < $v');
+    _events.add('  ${r.padRight(9, ' ')} << $v');
   }
 }

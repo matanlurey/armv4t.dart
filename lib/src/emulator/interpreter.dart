@@ -912,6 +912,9 @@ class _ArmInterpreter
     }
   }
 
+  /// On an empty register list, `r15` is loaded/stored.
+  static List<RegisterAny> _emptyRegisterList() => [RegisterAny.pc];
+
   /// Helper function for LDM and STM ("Multiple" or "Block" data transfers).
   ///
   /// ## Address modes
@@ -948,10 +951,23 @@ class _ArmInterpreter
     BlockDataTransferArmInstruction i, {
     @required bool load,
   }) {
-    final base = _readRegister(i.base);
+    // Read the base address, register list, write-back assumptions.
+    final originalBase = _readRegister(i.base);
+    var regList = i.registerList.registers.toList();
+    var base = originalBase;
+    var writeBack = i.writeAddressIntoBase;
+
+    // Handle "strange effect" of load/store R15 if rList is empty:
+    if (regList.isEmpty) {
+      regList = _emptyRegisterList();
+      base = Uint32(base.value + 0x40); // Rb = Rb +/-40h.
+    }
+
+    // Iterate through the registers/stack addresses.
     final stack = _stack(i, base);
     Uint32 address;
-    for (final register in i.registerList.registers) {
+
+    for (final register in regList) {
       address = stack.next();
       if (load) {
         _writeRegister(
@@ -959,17 +975,30 @@ class _ArmInterpreter
           _loadFromMemory(address),
           forceUserMode: i.forceNonPrivilegedAccess,
         );
+        if (register.isProgramCounter && i.loadPsrOrForceUserMode) {
+          cpu.cpsr = cpu.spsr;
+        }
+        if (register == i.base) {
+          writeBack = false;
+        }
       } else {
-        _storeIntoMemory(
-          address,
-          _readRegister(
+        Uint32 value;
+        if (register == i.base) {
+          writeBack = false;
+        }
+        if (register.isProgramCounter) {
+          value = Uint32(cpu.programCounter.value + 12);
+        } else {
+          value = _readRegister(
             register,
             forceUserMode: i.forceNonPrivilegedAccess,
-          ),
-        );
+          );
+        }
+        _storeIntoMemory(address, value);
       }
     }
-    if (i.writeAddressIntoBase) {
+
+    if (writeBack) {
       _writeRegister(i.base, address);
     }
   }
