@@ -518,14 +518,14 @@ void main() {
       test('With r13 as a base, store r0 and r13', () {
         instruction = STMArmInstruction(
           condition: Condition.al,
-          addOffsetBeforeTransfer: true,
-          addOffsetToBase: true,
+          addOffsetBeforeTransfer: false,
+          addOffsetToBase: false,
           writeAddressIntoBase: false,
           forceNonPrivilegedAccess: false,
           base: RegisterAny(Uint4(13)),
           registerList: RegisterList({0, 13}),
         );
-        expect(decode(instruction), 'stmib r13, {r0, r13}');
+        expect(decode(instruction), 'stmed r13, {r0, r13}');
 
         // We need more memory for this test, so create a local environment.
         final memory = Memory.empty(1024);
@@ -537,8 +537,19 @@ void main() {
 
         interpreter.run(instruction);
 
-        expect(memory.loadWord(Uint32(516)), Uint32(1));
-        expect(memory.loadWord(Uint32(520)), Uint32(516));
+        expect(
+          memory.loadWord(Uint32(512)),
+          Uint32(1),
+          reason: '@512 = r0 = 1',
+        );
+
+        expect(
+          memory.loadWord(Uint32(508)),
+          Uint32(512),
+          reason: '@508 = r13 = 512',
+        );
+
+        expect(cpu.stackPointer, Uint32(512), reason: 'No write-back');
       });
     });
   });
@@ -546,27 +557,36 @@ void main() {
   group('Single Data Swap', () {
     SWPArmInstruction instruction;
 
-    test('r0 = [r1], [r2] = r1', () {
+    test('r1 = [r13], [r13] = r0', () {
       instruction = SWPArmInstruction(
         condition: Condition.al,
         transferByte: false,
-        base: RegisterNotPC(Uint4(1)),
-        destination: RegisterNotPC(Uint4(0)),
-        source: RegisterNotPC(Uint4(2)),
+        base: RegisterNotPC(Uint4(13)),
+        destination: RegisterNotPC(Uint4(1)),
+        source: RegisterNotPC(Uint4(0)),
       );
-      expect(decode(instruction), 'swp r0, r2, [r1]');
+      expect(decode(instruction), 'swp r1, r0, [r13]');
 
-      // r0 = [r1] (i.e. r0 = 1024)
-      memory.storeWord(Uint32(0), Uint32(1024));
-      cpu[1] = Uint32(0);
+      // We need more memory for this test, so create a local environment.
+      final memory = Memory.empty(1024);
+      final interpreter = ArmInterpreter(cpu, memory);
+
+      memory
+        ..storeWord(Uint32(508), Uint32(512))
+        ..storeWord(Uint32(512), Uint32(1));
+
+      cpu
+        ..[0] = Uint32(1)
+        ..[1] = Uint32.zero
+        ..[13] = Uint32(512);
 
       interpreter.run(instruction);
 
-      expect(cpu[0], Uint32(1024));
-      expect(cpu[1], Uint32(0));
+      expect(cpu[0], Uint32(1));
+      expect(cpu[1], Uint32(1));
+      expect(cpu[13], Uint32(512));
 
-      expect(memory.loadWord(Uint32(0)), Uint32(0));
-      expect(memory.loadWord(Uint32(4)), Uint32(0));
+      expect(memory.loadWord(Uint32(512)), Uint32(1));
     });
   });
 }

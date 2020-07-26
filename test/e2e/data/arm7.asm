@@ -19,7 +19,7 @@ swp r1, r0, [r13]     ; load r1 with word associated at r13
                       ;
                       ; r1       = [r13]
                       ; r1       = @512
-                      ; r1       = 512
+                      ; r1       = 1
                       ;
                       ; [r13]    = r0
                       ; @512     = r0
