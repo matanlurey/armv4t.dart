@@ -912,97 +912,6 @@ class _ArmInterpreter
     }
   }
 
-  /// On an empty register list, `r15` is loaded/stored.
-  static List<RegisterAny> _emptyRegisterList() => [RegisterAny.pc];
-
-  /// Helper function for LDM and STM ("Multiple" or "Block" data transfers).
-  ///
-  /// ## Address modes
-  ///
-  /// - `ia` = **Increment** address **after** each transfer.
-  /// - `ib` = **Increment** address **before** each transfer.
-  /// - `da` = **Decrement** address **after** each transfer.
-  /// - `db` = **Decrement** address **before** each transfer.
-  ///
-  /// > FYI: There are also stack aliases (`fd`, `ed`, `fa`, `ea`) that
-  /// > depending on whether [load] is set or not mean one of the above
-  /// > addressing modes.
-  ///
-  /// If [DataTransferArmInstruction.writeAddressIntoBase] is set, then the
-  /// _final_ address is written back into [DataTransferArmInstruction.base].
-  ///
-  /// > FYI: If the base register is in the register list, this is not valid.
-  ///
-  /// There are also some special restrictions for the register list itself:
-  ///
-  /// - Must _not_ contain the `SP` (r13), though some examples do...
-  /// - If [load], must not contain `PC` if it contains the `LR`.
-  /// - If not, must not contain `LR` if it contains the `PC`.
-  ///
-  /// If [DataTransferArmInstruction.forceNonPrivilegedAccess], it forces the
-  /// processor to transfer the saved program status register (`SPSR`) into the
-  /// current program status register (`CPSR`), which saves an instruction:
-  ///
-  /// - If [load] & register list contains `PC`, `CPSR` is restored from `SPSR`.
-  /// - Else, data is transferred into or out of the user mode registers instead
-  ///   of the current mode registers. This seems _not_ to include the base
-  ///   register istelf (for reading or writeback).
-  void _multipleDataTransfer(
-    BlockDataTransferArmInstruction i, {
-    @required bool load,
-  }) {
-    // Read the base address, register list, write-back assumptions.
-    final originalBase = _readRegister(i.base);
-    var regList = i.registerList.registers.toList();
-    var base = originalBase;
-    var writeBack = i.writeAddressIntoBase;
-
-    // Handle "strange effect" of load/store R15 if rList is empty:
-    if (regList.isEmpty) {
-      regList = _emptyRegisterList();
-      base = Uint32(base.value + 0x40); // Rb = Rb +/-40h.
-    }
-
-    // Iterate through the registers/stack addresses.
-    final stack = _stack(i, base);
-    Uint32 address;
-
-    for (final register in regList) {
-      address = stack.next();
-      if (load) {
-        _writeRegister(
-          register,
-          _loadFromMemory(address),
-          forceUserMode: i.forceNonPrivilegedAccess,
-        );
-        if (register.isProgramCounter && i.loadPsrOrForceUserMode) {
-          cpu.cpsr = cpu.spsr;
-        }
-        if (register == i.base) {
-          writeBack = false;
-        }
-      } else {
-        Uint32 value;
-        if (register == i.base) {
-          writeBack = false;
-        }
-        if (register.isProgramCounter) {
-          value = Uint32(cpu.programCounter.value + 12);
-        } else {
-          value = _readRegister(
-            register,
-            forceUserMode: i.forceNonPrivilegedAccess,
-          );
-        }
-        _storeIntoMemory(address, value);
-      }
-    }
-
-    if (writeBack) {
-      _writeRegister(i.base, address);
-    }
-  }
-
   static RegisterStack _stack(
     DataTransferArmInstruction i,
     Uint32 base, [
@@ -1019,12 +928,35 @@ class _ArmInterpreter
 
   @override
   void visitLDM(LDMArmInstruction i, [void _]) {
-    _multipleDataTransfer(i, load: true);
+    throw UnimplementedError();
   }
 
   @override
   void visitSTM(STMArmInstruction i, [void _]) {
-    _multipleDataTransfer(i, load: false);
+    final baseAddress = _readRegister(i.base);
+    final addresses = _stack(i, baseAddress);
+    final registers = i.registerList.registers.toList();
+    final writeBack = i.writeAddressIntoBaseOrForceNonPrivilegedAccess;
+    if (i.loadPsrOrForceUserMode) {
+      throw UnimplementedError();
+    } else {
+      for (final register in registers) {
+        Uint32 value;
+        if (register.isProgramCounter) {
+          value = (cpu.programCounter + Uint32(12)).toUint32();
+        } else if (register == i.base &&
+            register == registers.first &&
+            writeBack) {
+          value = baseAddress;
+        } else {
+          value = _readRegister(register);
+        }
+        _storeIntoMemory(addresses.next(), value);
+      }
+    }
+    if (writeBack) {
+      _writeRegister(i.base, addresses.next());
+    }
   }
 
   @override

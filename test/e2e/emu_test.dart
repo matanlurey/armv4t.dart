@@ -83,9 +83,9 @@ void main() {
     results = program.run();
 
     //          508     1
-    expect(read(0x1fc), 1);
+    expect(read(0x1fc), 1, reason: '@0x1fc: Expected to be 0x1');
     //          512     1
-    expect(read(0x200), 1);
+    expect(read(0x200), 1, reason: '@0x200: Expected to be 0x1 (STMED)');
     //          516     512
     expect(read(0x204), 0x200);
   });
