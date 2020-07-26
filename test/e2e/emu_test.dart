@@ -82,10 +82,13 @@ void main() {
     final program = await _TestProgram.load('arm7');
     results = program.run();
 
+    //          508
     expect(read(0x1fc), 1);
+    //          512
     expect(read(0x200), 1);
+    //          516
     expect(read(0x204), 0x200);
-  }, skip: 'Currently fails: Unknown reasons, likely bugs in STM');
+  });
 
   test('arm8.asm', () async {
     final program = await _TestProgram.load('arm8');
