@@ -718,7 +718,7 @@ class _ArmInterpreter
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
   }
 
-  Uint32 _loadMemory2(
+  Uint32 _loadFromMemory(
     Uint32 address, {
     _Size size = _Size.word,
     bool signed = false,
@@ -747,7 +747,7 @@ class _ArmInterpreter
     return value;
   }
 
-  void _storeMemory2(
+  void _storeIntoMemory(
     Uint32 address,
     Uint32 value, {
     _Size size = _Size.word,
@@ -779,11 +779,11 @@ class _ArmInterpreter
       evaluateShiftRegister,
     );
     final base = _readRegister(i.base);
-    final address = _createStack(i, base, offset.value).next();
+    final address = _stack(i, base, offset.value).next();
 
     _writeRegister(
       i.destination,
-      _loadMemory2(
+      _loadFromMemory(
         address,
         size: i.transferByte ? _Size.byte : _Size.word,
       ),
@@ -802,9 +802,9 @@ class _ArmInterpreter
       evaluateShiftRegister,
     );
     final base = _readRegister(i.base);
-    final address = _createStack(i, base, offset.value).next();
+    final address = _stack(i, base, offset.value).next();
 
-    _storeMemory2(
+    _storeIntoMemory(
       address,
       _readRegister(
         i.source,
@@ -825,11 +825,11 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _createStack(i, base, offset.value).next();
+    final address = _stack(i, base, offset.value).next();
 
     _writeRegister(
       i.destination,
-      _loadMemory2(
+      _loadFromMemory(
         address,
         size: _Size.halfWord,
       ),
@@ -848,11 +848,11 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _createStack(i, base, offset.value).next();
+    final address = _stack(i, base, offset.value).next();
 
     _writeRegister(
       i.destination,
-      _loadMemory2(
+      _loadFromMemory(
         address,
         size: _Size.halfWord,
         signed: true,
@@ -872,11 +872,11 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _createStack(i, base, offset.value).next();
+    final address = _stack(i, base, offset.value).next();
 
     _writeRegister(
       i.destination,
-      _loadMemory2(
+      _loadFromMemory(
         address,
         size: _Size.byte,
         signed: true,
@@ -896,9 +896,9 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _createStack(i, base, offset.value).next();
+    final address = _stack(i, base, offset.value).next();
 
-    _storeMemory2(
+    _storeIntoMemory(
       address,
       _readRegister(
         i.source,
@@ -949,18 +949,18 @@ class _ArmInterpreter
     @required bool load,
   }) {
     final base = _readRegister(i.base);
-    final stack = _createStack(i, base);
+    final stack = _stack(i, base);
     Uint32 address;
     for (final register in i.registerList.registers) {
       address = stack.next();
       if (load) {
         _writeRegister(
           register,
-          _loadMemory2(address),
+          _loadFromMemory(address),
           forceUserMode: i.forceNonPrivilegedAccess,
         );
       } else {
-        _storeMemory2(
+        _storeIntoMemory(
           address,
           _readRegister(
             register,
@@ -974,7 +974,7 @@ class _ArmInterpreter
     }
   }
 
-  static RegisterStack _createStack(
+  static RegisterStack _stack(
     DataTransferArmInstruction i,
     Uint32 base, [
     int offset = 4,
@@ -1005,14 +1005,14 @@ class _ArmInterpreter
     // Rd = [Rm]
     _writeRegister(
       i.destination,
-      _loadMemory2(
+      _loadFromMemory(
         address,
         size: i.transferByte ? _Size.byte : _Size.word,
       ),
     );
 
     // [Rn] = Rm
-    _storeMemory2(
+    _storeIntoMemory(
       address,
       _readRegister(i.source),
       size: i.transferByte ? _Size.byte : _Size.word,
