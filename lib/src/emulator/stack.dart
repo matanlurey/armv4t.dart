@@ -24,25 +24,25 @@ abstract class RegisterStack {
   factory RegisterStack.incrementAfter(
     Uint32 base,
     int offset, {
-    int size,
+    @required int size,
   }) = _IncrementAfter;
 
   factory RegisterStack.incrementBefore(
     Uint32 base,
     int offset, {
-    int size,
+    @required int size,
   }) = _IncrementBefore;
 
   factory RegisterStack.decrementAfter(
     Uint32 base,
     int offset, {
-    int size,
+    @required int size,
   }) = _DecrementAfter;
 
   factory RegisterStack.decrementBefore(
     Uint32 base,
     int offset, {
-    int size,
+    @required int size,
   }) = _DecrementBefore;
 
   /// Original base address (unmodified).
@@ -51,12 +51,15 @@ abstract class RegisterStack {
   /// Offset address.
   final int _offset;
 
+  /// Size of the stack (e.g. number of registers).
+  final int _size;
+
   /// What the next result of [next] will be.
   Uint32 _next;
 
-  RegisterStack._(this.base, this._offset, int registers) {
-    if (registers < 1) {
-      throw RangeError.value(registers, 'regsiters');
+  RegisterStack._(this.base, this._offset, this._size) {
+    if (_size < 1) {
+      throw RangeError.value(_size, 'registers');
     }
   }
 
@@ -69,44 +72,59 @@ abstract class RegisterStack {
     _next = _next + _offset;
     return result;
   }
+
+  /// The address that would be written back, if enabled.
+  Uint32 get writeBack;
 }
 
 class _IncrementAfter extends RegisterStack {
   _IncrementAfter(
     Uint32 base,
     int offset, {
-    int size = 1,
+    @required int size,
   }) : super._(base, offset, size) {
     _next = base;
   }
+
+  @override
+  Uint32 get writeBack => base + _size * _offset;
 }
 
 class _IncrementBefore extends RegisterStack {
   _IncrementBefore(
     Uint32 base,
     int offset, {
-    int size = 1,
+    @required int size,
   }) : super._(base, offset, size) {
     _next = base + _offset;
   }
+
+  @override
+  Uint32 get writeBack => base + _size * _offset;
 }
 
 class _DecrementAfter extends RegisterStack {
   _DecrementAfter(
     Uint32 base,
     int offset, {
-    int size = 1,
+    @required int size,
   }) : super._(base, offset, size) {
     _next = base - ((size - 1) * offset);
   }
+
+  @override
+  Uint32 get writeBack => base - _size * _offset;
 }
 
 class _DecrementBefore extends RegisterStack {
   _DecrementBefore(
     Uint32 base,
     int offset, {
-    int size = 1,
+    @required int size,
   }) : super._(base, offset, size) {
     _next = base - (size * offset);
   }
+
+  @override
+  Uint32 get writeBack => base - _size * _offset;
 }

@@ -115,13 +115,13 @@ ldmia r0, {r1-r2}^               ;e8d00006
 ldmia r0, {r1-r3}^               ;e8d0000e
 ldmia r0, {r1-r3, r5}^           ;e8d0002e
 ldr r1, [r0], 4                  ;e4901004
-ldmia r0, {r1-r2}                ;e8b00006
-ldmia r0, {r1-r3}                ;e8b0000e
-ldmia r0, {r1-r3, r5}            ;e8b0002e
-ldmia r0, {r15}^                 ;e8f08000
-ldmia r0, {r1-r2, r15}^          ;e8f08006
-ldmia r0, {r1-r3, r15}^          ;e8f0800e
-ldmia r0, {r1-r3, r15}^          ;e8f0800e
+ldmia r0!, {r1-r2}               ;e8b00006
+ldmia r0!, {r1-r3}               ;e8b0000e
+ldmia r0!, {r1-r3, r5}           ;e8b0002e
+ldmia r0!, {r15}^                ;e8f08000
+ldmia r0!, {r1-r2, r15}^         ;e8f08006
+ldmia r0!, {r1-r3, r15}^         ;e8f0800e
+ldmia r0!, {r1-r3, r15}^         ;e8f0800e
 str r1, [r0]                     ;e5801000
 stmia r0, {r1-r2}                ;e8800006
 stmia r0, {r1-r3}                ;e880000e
@@ -131,9 +131,9 @@ stmia r0, {r1-r2}^               ;e8c00006
 stmia r0, {r1-r3}^               ;e8c0000e
 stmia r0, {r1-r3, r5}^           ;e8c0002e
 str r1, [r0], 4                  ;e4801004
-stmia r0, {r1-r2}                ;e8a00006
-stmia r0, {r1-r3}                ;e8a0000e
-stmia r0, {r1-r3, r5}            ;e8a0002e
+stmia r0!, {r1-r2}               ;e8a00006
+stmia r0!, {r1-r3}               ;e8a0000e
+stmia r0!, {r1-r3, r5}           ;e8a0002e
 str r1, [r0]                     ;e5801000
 stmda r0, {r1-r2}                ;e8000006
 stmda r0, {r1-r3}                ;e800000e
@@ -143,9 +143,9 @@ stmda r0, {r1-r2}^               ;e8400006
 stmda r0, {r1-r3}^               ;e840000e
 stmda r0, {r1-r3, r5}^           ;e840002e
 str r1, [r0], -4                 ;e4001004
-stmda r0, {r1-r2}                ;e8200006
-stmda r0, {r1-r3}                ;e820000e
-stmda r0, {r1-r3, r5}            ;e820002e
+stmda r0!, {r1-r2}               ;e8200006
+stmda r0!, {r1-r3}               ;e820000e
+stmda r0!, {r1-r3, r5}           ;e820002e
 str r1, [r0, -4]                 ;e5001004
 stmdb r0, {r1-r2}                ;e9000006
 stmdb r0, {r1-r3}                ;e900000e
@@ -167,9 +167,9 @@ stmia r0, {r1-r2}^               ;e8c00006
 stmia r0, {r1-r3}^               ;e8c0000e
 stmia r0, {r1-r3, r5}^           ;e8c0002e
 str r1, [r0], 4                  ;e4801004
-stmia r0, {r1-r2}                ;e8a00006
-stmia r0, {r1-r3}                ;e8a0000e
-stmia r0, {r1-r3, r5}            ;e8a0002e
+stmia r0!, {r1-r2}               ;e8a00006
+stmia r0!, {r1-r3}               ;e8a0000e
+stmia r0!, {r1-r3, r5}           ;e8a0002e
 str r1, [r0]                     ;e5801000
 stmda r0, {r1-r2}                ;e8000006
 stmda r0, {r1-r3}                ;e800000e
@@ -179,9 +179,9 @@ stmda r0, {r1-r2}^               ;e8400006
 stmda r0, {r1-r3}^               ;e840000e
 stmda r0, {r1-r3, r5}^           ;e840002e
 str r1, [r0], -4                 ;e4001004
-stmda r0, {r1-r2}                ;e8200006
-stmda r0, {r1-r3}                ;e820000e
-stmda r0, {r1-r3, r5}            ;e820002e
+stmda r0!, {r1-r2}               ;e8200006
+stmda r0!, {r1-r3}               ;e820000e
+stmda r0!, {r1-r3, r5}           ;e820002e
 str r1, [r0, 4]                  ;e5801004
 stmib r0, {r1-r2}                ;e9800006
 stmib r0, {r1-r3}                ;e980000e
@@ -215,9 +215,9 @@ stmia r0, {r1-r2}^               ;e8c00006
 stmia r0, {r1-r3}^               ;e8c0000e
 stmia r0, {r1-r3, r5}^           ;e8c0002e
 str r1, [r0], 4                  ;e4801004
-stmia r0, {r1-r2}                ;e8a00006
-stmia r0, {r1-r3}                ;e8a0000e
-stmia r0, {r1-r3, r5}            ;e8a0002e
+stmia r0!, {r1-r2}               ;e8a00006
+stmia r0!, {r1-r3}               ;e8a0000e
+stmia r0!, {r1-r3, r5}           ;e8a0002e
 str r1, [r0, 4]                  ;e5801004
 stmib r0, {r1-r2}                ;e9800006
 stmib r0, {r1-r3}                ;e980000e

@@ -1041,7 +1041,7 @@ class _ArmInterpreter
     }
 
     if (writeBack) {
-      _writeRegister(i.base, addresses.next());
+      _writeRegister(i.base, addresses.writeBack);
     }
   }
 
@@ -1079,7 +1079,7 @@ class _ArmInterpreter
       }
     }
     if (writeBack) {
-      _writeRegister(i.base, addresses.next());
+      _writeRegister(i.base, addresses.writeBack);
     }
   }
 

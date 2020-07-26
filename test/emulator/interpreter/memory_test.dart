@@ -146,6 +146,7 @@ void main() {
           destination: r0,
           offset: Or2.left(Immediate(Uint12(4))),
         );
+        expect(decode(instruction), 'ldr r0, [r1], 4');
 
         // Read memory address 0.
         cpu[1] = Uint32(0);
@@ -153,7 +154,7 @@ void main() {
         interpreter.run(instruction);
 
         expect(cpu[0], Uint32(10240));
-        expect(cpu[1], Uint32(0), reason: 'Implicit write back');
+        expect(cpu[1], Uint32(4), reason: 'Implicit write back');
       });
     });
 
@@ -468,10 +469,43 @@ void main() {
           ..storeWord(Uint32(12), Uint32(3));
         interpreter.run(instruction);
 
-        expect(cpu[0], Uint32(16), reason: 'Write-back');
+        expect(cpu[0], Uint32(12), reason: 'Write-back');
         expect(cpu[1], Uint32(1));
         expect(cpu[2], Uint32(2));
         expect(cpu[3], Uint32(3));
+      });
+
+      test('LDMFD', () {
+        instruction = LDMArmInstruction(
+          condition: Condition.al,
+          addOffsetBeforeTransfer: false,
+          addOffsetToBase: true,
+          writeAddressIntoBase: true,
+          loadPsr: false,
+          base: RegisterAny.sp,
+          registerList: RegisterList({1, 2, 3}),
+        );
+        expect(decode(instruction), 'ldmfd r13!, {r1-r3}');
+
+        cpu.stackPointer = Uint32(4);
+        memory
+          ..storeWord(Uint32(0), Uint32(0))
+          ..storeWord(Uint32(4), Uint32(4))
+          ..storeWord(Uint32(8), Uint32(8))
+          ..storeWord(Uint32(12), Uint32(12));
+        interpreter.run(instruction);
+
+        expect([
+          cpu[1],
+          cpu[2],
+          cpu[3]
+        ], [
+          Uint32(4),
+          Uint32(8),
+          Uint32(12),
+        ]);
+
+        expect(cpu.stackPointer, Uint32(16));
       });
     });
 
