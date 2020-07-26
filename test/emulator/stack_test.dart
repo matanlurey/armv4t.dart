@@ -13,49 +13,49 @@ void main() {
     RegisterStack stack;
 
     test('.incrementAfter', () {
-      stack = RegisterStack.incrementAfter(base, 4);
+      stack = RegisterStack.incrementAfter(base, 4, size: 3);
       expect(
         List.generate(3, (_) => stack.next()),
         [
-          Uint32(0x200),
-          Uint32(0x200 + 4),
-          Uint32(0x200 + 8),
+          Uint32(base.value),
+          Uint32(base.value + 4),
+          Uint32(base.value + 8),
         ],
       );
     });
 
     test('.incrementBefore', () {
-      stack = RegisterStack.incrementBefore(base, 4);
+      stack = RegisterStack.incrementBefore(base, 4, size: 3);
       expect(
         List.generate(3, (_) => stack.next()),
         [
-          Uint32(0x200 + 4),
-          Uint32(0x200 + 8),
-          Uint32(0x200 + 12),
+          Uint32(base.value + 4),
+          Uint32(base.value + 8),
+          Uint32(base.value + 12),
         ],
       );
     });
 
     test('.decrementAfter', () {
-      stack = RegisterStack.decrementAfter(base, 4);
+      stack = RegisterStack.decrementAfter(base, 4, size: 3);
       expect(
         List.generate(3, (_) => stack.next()),
         [
-          Uint32(0x200),
-          Uint32(0x200 - 4),
-          Uint32(0x200 - 8),
+          Uint32(base.value - 8),
+          Uint32(base.value - 4),
+          Uint32(base.value),
         ],
       );
     });
 
     test('.decrementBefore', () {
-      stack = RegisterStack.decrementBefore(base, 4);
+      stack = RegisterStack.decrementBefore(base, 4, size: 3);
       expect(
         List.generate(3, (_) => stack.next()),
         [
-          Uint32(0x200 - 4),
-          Uint32(0x200 - 8),
-          Uint32(0x200 - 12),
+          Uint32(base.value - 12),
+          Uint32(base.value - 8),
+          Uint32(base.value - 4),
         ],
       );
     });

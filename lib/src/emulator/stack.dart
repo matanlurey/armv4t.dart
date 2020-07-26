@@ -23,23 +23,27 @@ extension on Uint32 {
 abstract class RegisterStack {
   factory RegisterStack.incrementAfter(
     Uint32 base,
-    int offset,
-  ) = _IncrementAfter;
+    int offset, {
+    int size,
+  }) = _IncrementAfter;
 
   factory RegisterStack.incrementBefore(
     Uint32 base,
-    int offset,
-  ) = _IncrementBefore;
+    int offset, {
+    int size,
+  }) = _IncrementBefore;
 
   factory RegisterStack.decrementAfter(
     Uint32 base,
-    int offset,
-  ) = _DecrementAfter;
+    int offset, {
+    int size,
+  }) = _DecrementAfter;
 
   factory RegisterStack.decrementBefore(
     Uint32 base,
-    int offset,
-  ) = _DecrementBefore;
+    int offset, {
+    int size,
+  }) = _DecrementBefore;
 
   /// Original base address (unmodified).
   final Uint32 base;
@@ -50,52 +54,59 @@ abstract class RegisterStack {
   /// What the next result of [next] will be.
   Uint32 _next;
 
-  RegisterStack._(this.base, this._offset);
-
-  @visibleForOverriding
-  Uint32 _computeNext();
+  RegisterStack._(this.base, this._offset, int registers) {
+    if (registers < 1) {
+      throw RangeError.value(registers, 'regsiters');
+    }
+  }
 
   /// Returns the next memory location based on the addressing mode.
+  ///
+  /// This is guaranteed to return the _lowest_ address first, moving upwards.
   @nonVirtual
   Uint32 next() {
     final result = _next;
-    _next = _computeNext();
+    _next = _next + _offset;
     return result;
   }
 }
 
 class _IncrementAfter extends RegisterStack {
-  _IncrementAfter(Uint32 base, int offset) : super._(base, offset) {
+  _IncrementAfter(
+    Uint32 base,
+    int offset, {
+    int size = 1,
+  }) : super._(base, offset, size) {
     _next = base;
   }
-
-  @override
-  Uint32 _computeNext() => _next + _offset;
 }
 
 class _IncrementBefore extends RegisterStack {
-  _IncrementBefore(Uint32 base, int offset) : super._(base, offset) {
+  _IncrementBefore(
+    Uint32 base,
+    int offset, {
+    int size = 1,
+  }) : super._(base, offset, size) {
     _next = base + _offset;
   }
-
-  @override
-  Uint32 _computeNext() => _next + _offset;
 }
 
 class _DecrementAfter extends RegisterStack {
-  _DecrementAfter(Uint32 base, int offset) : super._(base, offset) {
-    _next = base;
+  _DecrementAfter(
+    Uint32 base,
+    int offset, {
+    int size = 1,
+  }) : super._(base, offset, size) {
+    _next = base - ((size - 1) * offset);
   }
-
-  @override
-  Uint32 _computeNext() => _next - _offset;
 }
 
 class _DecrementBefore extends RegisterStack {
-  _DecrementBefore(Uint32 base, int offset) : super._(base, offset) {
-    _next = base - _offset;
+  _DecrementBefore(
+    Uint32 base,
+    int offset, {
+    int size = 1,
+  }) : super._(base, offset, size) {
+    _next = base - (size * offset);
   }
-
-  @override
-  Uint32 _computeNext() => _next - _offset;
 }

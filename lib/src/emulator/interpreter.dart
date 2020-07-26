@@ -779,7 +779,7 @@ class _ArmInterpreter
       evaluateShiftRegister,
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset.value).next();
+    final address = _stack(i, base, offset: offset.value).next();
 
     _writeRegister(
       i.destination,
@@ -802,7 +802,7 @@ class _ArmInterpreter
       evaluateShiftRegister,
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset.value).next();
+    final address = _stack(i, base, offset: offset.value).next();
 
     _storeIntoMemory(
       address,
@@ -825,7 +825,7 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset.value).next();
+    final address = _stack(i, base, offset: offset.value).next();
 
     _writeRegister(
       i.destination,
@@ -848,7 +848,7 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset.value).next();
+    final address = _stack(i, base, offset: offset.value).next();
 
     _writeRegister(
       i.destination,
@@ -872,7 +872,7 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset.value).next();
+    final address = _stack(i, base, offset: offset.value).next();
 
     _writeRegister(
       i.destination,
@@ -896,7 +896,7 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset.value).next();
+    final address = _stack(i, base, offset: offset.value).next();
 
     _storeIntoMemory(
       address,
@@ -914,31 +914,62 @@ class _ArmInterpreter
 
   static RegisterStack _stack(
     DataTransferArmInstruction i,
-    Uint32 base, [
+    Uint32 base, {
     int offset = 4,
-  ]) {
+    int size = 1,
+  }) {
     return i.addOffsetToBase
         ? i.addOffsetBeforeTransfer
-            ? RegisterStack.incrementBefore(base, offset)
-            : RegisterStack.incrementAfter(base, offset)
+            ? RegisterStack.incrementBefore(base, offset, size: size)
+            : RegisterStack.incrementAfter(base, offset, size: size)
         : i.addOffsetBeforeTransfer
-            ? RegisterStack.decrementBefore(base, offset)
-            : RegisterStack.decrementAfter(base, offset);
+            ? RegisterStack.decrementBefore(base, offset, size: size)
+            : RegisterStack.decrementAfter(base, offset, size: size);
   }
 
   @override
   void visitLDM(LDMArmInstruction i, [void _]) {
-    throw UnimplementedError();
+    final baseAddress = _readRegister(i.base);
+    final registers = i.registerList.registers.toList();
+    final addresses = _stack(i, baseAddress, size: registers.length);
+    final writeBack = i.writeAddressIntoBaseOrForceNonPrivilegedAccess;
+    if (i.loadPsrOrForceUserMode && !registers.contains(RegisterAny.pc)) {
+      for (final register in registers) {
+        _writeRegister(
+          register,
+          _loadFromMemory(addresses.next()),
+          forceUserMode: true,
+        );
+      }
+    } else {
+      for (final register in registers) {
+        _writeRegister(register, _loadFromMemory(addresses.next()));
+        if (register.isProgramCounter) {
+          cpu.cpsr = cpu.spsr;
+        }
+      }
+    }
+    if (writeBack) {
+      _writeRegister(i.base, addresses.next());
+    }
   }
 
   @override
   void visitSTM(STMArmInstruction i, [void _]) {
     final baseAddress = _readRegister(i.base);
-    final addresses = _stack(i, baseAddress);
     final registers = i.registerList.registers.toList();
+    final addresses = _stack(i, baseAddress, size: registers.length);
     final writeBack = i.writeAddressIntoBaseOrForceNonPrivilegedAccess;
     if (i.loadPsrOrForceUserMode) {
-      throw UnimplementedError();
+      for (final register in registers) {
+        _storeIntoMemory(
+          addresses.next(),
+          _readRegister(
+            register,
+            forceUserMode: true,
+          ),
+        );
+      }
     } else {
       for (final register in registers) {
         Uint32 value;

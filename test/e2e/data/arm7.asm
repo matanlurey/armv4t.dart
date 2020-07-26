@@ -11,15 +11,15 @@ mov r0, #1            ; r0       = 1
 stmed r13, {r0, r13}  ; starting @512 store memory
                       ; ed == da == decrement after
                       ;
-                      ; @512     = r0  = 1
-                      ; @508     = r13 = 512
+                      ; @508     = r0  = 1
+                      ; @512     = r13 = 512
 
 swp r1, r0, [r13]     ; load r1 with word associated at r13
                       ; store r0 at r13
                       ;
                       ; r1       = [r13]
                       ; r1       = @512
-                      ; r1       = 1
+                      ; r1       = 512
                       ;
                       ; [r13]    = r0
                       ; @512     = r0
