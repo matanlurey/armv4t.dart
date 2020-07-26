@@ -153,7 +153,7 @@ void main() {
         interpreter.run(instruction);
 
         expect(cpu[0], Uint32(10240));
-        expect(cpu[1], Uint32(4), reason: 'Implicit write back');
+        expect(cpu[1], Uint32(0), reason: 'Implicit write back');
       });
     });
 
@@ -252,7 +252,7 @@ void main() {
         expect(memory.loadWord(Uint32(0)), Uint32(10240));
       });
 
-      test('[r0] = r1 + O', () {
+      test('[r0] = r1 + O ===', () {
         instruction = STRArmInstruction(
           condition: Condition.al,
           addOffsetBeforeTransfer: false,
@@ -261,16 +261,16 @@ void main() {
           transferByte: false,
           base: r0,
           destination: r1,
-          offset: Or2.left(Immediate(Uint12(3))),
+          offset: Or2.left(Immediate(Uint12(4))),
         );
-        expect(decode(instruction), 'str r1, [r0], 3');
+        expect(decode(instruction), 'str r1, [r0], 4');
 
         // Store r1 into memory location 4.
         cpu[0] = Uint32(4);
         cpu[1] = Uint32(10240);
         interpreter.run(instruction);
 
-        expect(cpu[0], Uint32(7), reason: 'Writeback (Implicit)');
+        expect(cpu[0], Uint32(4 + 4), reason: 'Writeback (Implicit)');
         expect(cpu[1], Uint32(10240));
         expect(memory.loadWord(Uint32(4)), Uint32(10240));
       });
@@ -468,7 +468,7 @@ void main() {
           ..storeWord(Uint32(12), Uint32(3));
         interpreter.run(instruction);
 
-        expect(cpu[0], Uint32(12), reason: 'Write-back');
+        expect(cpu[0], Uint32(16), reason: 'Write-back');
         expect(cpu[1], Uint32(1));
         expect(cpu[2], Uint32(2));
         expect(cpu[3], Uint32(3));

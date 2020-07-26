@@ -779,7 +779,19 @@ class _ArmInterpreter
       evaluateShiftRegister,
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset: offset.value).next();
+    var address = base;
+
+    void moveAddress() {
+      if (i.addOffsetToBase) {
+        address = (address + offset).toUint32();
+      } else {
+        address = (address - offset).toUint32();
+      }
+    }
+
+    if (i.addOffsetBeforeTransfer) {
+      moveAddress();
+    }
 
     _writeRegister(
       i.destination,
@@ -791,6 +803,9 @@ class _ArmInterpreter
     );
 
     if (i.writeAddressIntoBase) {
+      if (!i.addOffsetBeforeTransfer) {
+        moveAddress();
+      }
       _writeRegister(i.base, address);
     }
   }
@@ -802,7 +817,19 @@ class _ArmInterpreter
       evaluateShiftRegister,
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset: offset.value).next();
+    var address = base;
+
+    void moveAddress() {
+      if (i.addOffsetToBase) {
+        address = (address + offset).toUint32();
+      } else {
+        address = (address - offset).toUint32();
+      }
+    }
+
+    if (i.addOffsetBeforeTransfer) {
+      moveAddress();
+    }
 
     _storeIntoMemory(
       address,
@@ -814,6 +841,9 @@ class _ArmInterpreter
     );
 
     if (i.writeAddressIntoBase) {
+      if (!i.addOffsetBeforeTransfer) {
+        moveAddress();
+      }
       _writeRegister(i.base, address);
     }
   }
@@ -825,7 +855,19 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset: offset.value).next();
+    var address = base;
+
+    void moveAddress() {
+      if (i.addOffsetToBase) {
+        address = (address + offset).toUint32();
+      } else {
+        address = (address - offset).toUint32();
+      }
+    }
+
+    if (i.addOffsetBeforeTransfer) {
+      moveAddress();
+    }
 
     _writeRegister(
       i.destination,
@@ -837,6 +879,9 @@ class _ArmInterpreter
     );
 
     if (i.writeAddressIntoBase) {
+      if (!i.addOffsetBeforeTransfer) {
+        moveAddress();
+      }
       _writeRegister(i.base, address);
     }
   }
@@ -848,7 +893,19 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset: offset.value).next();
+    var address = base;
+
+    void moveAddress() {
+      if (i.addOffsetToBase) {
+        address = (address + offset).toUint32();
+      } else {
+        address = (address - offset).toUint32();
+      }
+    }
+
+    if (i.addOffsetBeforeTransfer) {
+      moveAddress();
+    }
 
     _writeRegister(
       i.destination,
@@ -861,6 +918,9 @@ class _ArmInterpreter
     );
 
     if (i.writeAddressIntoBase) {
+      if (!i.addOffsetBeforeTransfer) {
+        moveAddress();
+      }
       _writeRegister(i.base, address);
     }
   }
@@ -872,7 +932,19 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset: offset.value).next();
+    var address = base;
+
+    void moveAddress() {
+      if (i.addOffsetToBase) {
+        address = (address + offset).toUint32();
+      } else {
+        address = (address - offset).toUint32();
+      }
+    }
+
+    if (i.addOffsetBeforeTransfer) {
+      moveAddress();
+    }
 
     _writeRegister(
       i.destination,
@@ -885,6 +957,9 @@ class _ArmInterpreter
     );
 
     if (i.writeAddressIntoBase) {
+      if (!i.addOffsetBeforeTransfer) {
+        moveAddress();
+      }
       _writeRegister(i.base, address);
     }
   }
@@ -896,7 +971,19 @@ class _ArmInterpreter
       (i) => Uint32(i.value.value),
     );
     final base = _readRegister(i.base);
-    final address = _stack(i, base, offset: offset.value).next();
+    var address = base;
+
+    void moveAddress() {
+      if (i.addOffsetToBase) {
+        address = (address + offset).toUint32();
+      } else {
+        address = (address - offset).toUint32();
+      }
+    }
+
+    if (i.addOffsetBeforeTransfer) {
+      moveAddress();
+    }
 
     _storeIntoMemory(
       address,
@@ -908,6 +995,9 @@ class _ArmInterpreter
     );
 
     if (i.writeAddressIntoBase) {
+      if (!i.addOffsetBeforeTransfer) {
+        moveAddress();
+      }
       _writeRegister(i.base, address);
     }
   }
@@ -933,7 +1023,7 @@ class _ArmInterpreter
     final registers = i.registerList.registers.toList();
     final addresses = _stack(i, baseAddress, size: registers.length);
     final writeBack = i.writeAddressIntoBaseOrForceNonPrivilegedAccess;
-    if (i.loadPsrOrForceUserMode && !registers.contains(RegisterAny.pc)) {
+    if (i.loadPsrOrForceUserMode || registers.contains(RegisterAny.pc)) {
       for (final register in registers) {
         _writeRegister(
           register,

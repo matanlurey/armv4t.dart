@@ -76,7 +76,7 @@ void main() {
     expect(read(0x1fc), 0x10);
     expect(read(0x200), 6);
     expect(read(0x204), 0x200);
-  }, skip: 'Currently fails: Might need to support reading half-word address');
+  });
 
   test('arm7.asm', () async {
     final program = await _TestProgram.load('arm7');
