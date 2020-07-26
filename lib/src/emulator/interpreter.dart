@@ -7,6 +7,7 @@ import 'package:armv4t/src/emulator/condition.dart';
 import 'package:armv4t/src/emulator/memory.dart';
 import 'package:armv4t/src/emulator/operand.dart';
 import 'package:armv4t/src/emulator/processor.dart';
+import 'package:armv4t/src/emulator/stack.dart';
 import 'package:binary/binary.dart';
 import 'package:meta/meta.dart';
 
@@ -717,352 +718,304 @@ class _ArmInterpreter
     _writeRegister(i.destinationLoBits, Uint32(res.lo));
   }
 
-  Uint32 _loadFromAddress(
-    Uint32 address,
-    _Size size, {
-    @required bool signed,
+  Uint32 _loadMemory2(
+    Uint32 address, {
+    _Size size = _Size.word,
+    bool signed = false,
   }) {
-    Uint32 result;
+    Uint32 value;
     switch (size) {
       case _Size.byte:
-        result = Uint32(_memory.loadByte(address).value);
+        value = Uint32(_memory.loadByte(address).value);
         if (signed) {
-          result = result.signExtend(7);
+          value = value.signExtend(7);
         }
         break;
       case _Size.halfWord:
-        result = Uint32(_memory.loadHalfWord(address).value);
+        value = Uint32(_memory.loadHalfWord(address).value);
         if (signed) {
-          result = result.signExtend(15);
+          value = value.signExtend(15);
         }
         break;
       case _Size.word:
-        result = Uint32(_memory.loadWord(address).value);
+        value = _memory.loadWord(address);
         break;
       default:
         throw StateError('Unexpected: $size');
     }
-    _debugHooks.onMemoryRead(address, result);
-    return result;
+    _debugHooks.onMemoryRead(address, value);
+    return value;
   }
 
-  Uint32 _loadMemory(
-    Register baseRegister,
-    Uint32 offset, {
-    @required _Size size,
-    @required bool signed,
-    @required bool before,
-    @required bool add,
-    @required bool write,
-    @required bool forceUserMode,
+  void _storeMemory2(
+    Uint32 address,
+    Uint32 value, {
+    _Size size = _Size.word,
+    bool signed = false,
   }) {
-    Uint32 result;
-    Uint32 address;
-
-    final base = _readRegister(baseRegister, forceUserMode: forceUserMode);
-    if (before) {
-      address = (add ? (base + offset) : (base - offset)).toUint32();
-      result = _loadFromAddress(address, size, signed: signed);
-    } else {
-      address = base;
-      result = _loadFromAddress(address, size, signed: signed);
-      if (add) {
-        address = (address + offset).toUint32();
-      } else {
-        address = (address - offset).toUint32();
-      }
+    _debugHooks.onMemoryWrite(address, value);
+    switch (size) {
+      case _Size.byte:
+        return _memory.storeByte(
+          address,
+          Uint8(value.bitRange(7, 0).value),
+        );
+      case _Size.halfWord:
+        return _memory.storeHalfWord(
+          address,
+          Uint16(value.bitRange(15, 0).value),
+        );
+      case _Size.word:
+        return _memory.storeWord(address, value);
+      default:
+        throw StateError('Unexpected: $size');
     }
-    if (write) {
-      _writeRegister(baseRegister, address, forceUserMode: forceUserMode);
-    }
-    return result;
   }
 
   @override
   void visitLDR(LDRArmInstruction i, [void _]) {
-    // Rd = [Rn +/- Offset]
-    // (Loads from memory into a register)
-    final memory = _loadMemory(
-      i.base,
-      i.offset.pick(
-        (i) => Uint32(i.value.value),
-        evaluateShiftRegister,
-      ),
-      size: i.transferByte ? _Size.byte : _Size.word,
-      signed: false,
-      before: i.addOffsetBeforeTransfer,
-      add: i.addOffsetToBase,
-      write: i.writeAddressIntoBase,
-      forceUserMode: i.forceNonPrivilegedAccess,
+    final offset = i.offset.pick(
+      (i) => Uint32(i.value.value),
+      evaluateShiftRegister,
     );
+    final base = _readRegister(i.base);
+    final address = _createStack(i, base, offset.value).next();
+
     _writeRegister(
       i.destination,
-      memory,
+      _loadMemory2(
+        address,
+        size: i.transferByte ? _Size.byte : _Size.word,
+      ),
       forceUserMode: i.forceNonPrivilegedAccess,
     );
-  }
 
-  void _storeMemory(
-    Register baseRegister,
-    Uint32 offset,
-    Uint32 source, {
-    @required _Size size,
-    @required bool before,
-    @required bool add,
-    @required bool write,
-    @required bool forceUserMode,
-  }) {
-    Uint32 address;
-
-    void store() {
-      _debugHooks.onMemoryWrite(address, source);
-      switch (size) {
-        case _Size.byte:
-          _memory.storeByte(address, Uint8(source.bitRange(7, 0).value));
-          break;
-        case _Size.halfWord:
-          _memory.storeHalfWord(address, Uint16(source.bitRange(15, 0).value));
-          break;
-        case _Size.word:
-          _memory.storeWord(address, source);
-          break;
-        default:
-          throw StateError('Unexpected: $size');
-      }
-    }
-
-    final base = _readRegister(baseRegister, forceUserMode: forceUserMode);
-    if (before) {
-      address = (add ? (base + offset) : (base - offset)).toUint32();
-      store();
-    } else {
-      address = base;
-      store();
-      address = (add ? address + offset : address - offset).toUint32();
-    }
-    if (write) {
-      _writeRegister(baseRegister, address, forceUserMode: forceUserMode);
+    if (i.writeAddressIntoBase) {
+      _writeRegister(i.base, address);
     }
   }
 
   @override
   void visitSTR(STRArmInstruction i, [void _]) {
-    // [Rn +/- Offset] = Rd
-    _storeMemory(
-      i.base,
-      i.offset.pick(
-        (i) => Uint32(i.value.value),
-        evaluateShiftRegister,
-      ),
+    final offset = i.offset.pick(
+      (i) => Uint32(i.value.value),
+      evaluateShiftRegister,
+    );
+    final base = _readRegister(i.base);
+    final address = _createStack(i, base, offset.value).next();
+
+    _storeMemory2(
+      address,
       _readRegister(
         i.source,
         forceUserMode: i.forceNonPrivilegedAccess,
       ),
       size: i.transferByte ? _Size.byte : _Size.word,
-      before: i.addOffsetBeforeTransfer,
-      add: i.addOffsetToBase,
-      write: i.writeAddressIntoBase,
-      forceUserMode: i.forceNonPrivilegedAccess,
     );
+
+    if (i.writeAddressIntoBase) {
+      _writeRegister(i.base, address);
+    }
   }
 
   @override
   void visitLDRH(LDRHArmInstruction i, [void _]) {
-    final result = _loadMemory(
-      i.base,
-      i.offset.pick(
-        _readRegister,
-        (i) => Uint32(i.value.value),
-      ),
-      size: _Size.halfWord,
-      signed: false,
-      before: i.addOffsetBeforeTransfer,
-      add: i.addOffsetToBase,
-      write: i.writeAddressIntoBase,
-      forceUserMode: i.forceNonPrivilegedAccess,
+    final offset = i.offset.pick(
+      _readRegister,
+      (i) => Uint32(i.value.value),
     );
+    final base = _readRegister(i.base);
+    final address = _createStack(i, base, offset.value).next();
+
     _writeRegister(
       i.destination,
-      result,
+      _loadMemory2(
+        address,
+        size: _Size.halfWord,
+      ),
       forceUserMode: i.forceNonPrivilegedAccess,
     );
+
+    if (i.writeAddressIntoBase) {
+      _writeRegister(i.base, address);
+    }
   }
 
   @override
   void visitLDRSH(LDRSHArmInstruction i, [void _]) {
-    final result = _loadMemory(
-      i.base,
-      i.offset.pick(
-        _readRegister,
-        (i) => Uint32(i.value.value),
-      ),
-      size: _Size.halfWord,
-      signed: true,
-      before: i.addOffsetBeforeTransfer,
-      add: i.addOffsetToBase,
-      write: i.writeAddressIntoBase,
-      forceUserMode: i.forceNonPrivilegedAccess,
+    final offset = i.offset.pick(
+      _readRegister,
+      (i) => Uint32(i.value.value),
     );
+    final base = _readRegister(i.base);
+    final address = _createStack(i, base, offset.value).next();
+
     _writeRegister(
       i.destination,
-      result,
+      _loadMemory2(
+        address,
+        size: _Size.halfWord,
+        signed: true,
+      ),
       forceUserMode: i.forceNonPrivilegedAccess,
     );
+
+    if (i.writeAddressIntoBase) {
+      _writeRegister(i.base, address);
+    }
   }
 
   @override
   void visitLDRSB(LDRSBArmInstruction i, [void _]) {
-    final result = _loadMemory(
-      i.base,
-      i.offset.pick(
-        _readRegister,
-        (i) => Uint32(i.value.value),
-      ),
-      size: _Size.byte,
-      signed: true,
-      before: i.addOffsetBeforeTransfer,
-      add: i.addOffsetToBase,
-      write: i.writeAddressIntoBase,
-      forceUserMode: i.forceNonPrivilegedAccess,
+    final offset = i.offset.pick(
+      _readRegister,
+      (i) => Uint32(i.value.value),
     );
+    final base = _readRegister(i.base);
+    final address = _createStack(i, base, offset.value).next();
+
     _writeRegister(
       i.destination,
-      result,
+      _loadMemory2(
+        address,
+        size: _Size.byte,
+        signed: true,
+      ),
       forceUserMode: i.forceNonPrivilegedAccess,
     );
+
+    if (i.writeAddressIntoBase) {
+      _writeRegister(i.base, address);
+    }
   }
 
   @override
   void visitSTRH(STRHArmInstruction i, [void _]) {
-    _storeMemory(
-      i.base,
-      i.offset.pick(
-        _readRegister,
-        (i) => Uint32(i.value.value),
-      ),
+    final offset = i.offset.pick(
+      _readRegister,
+      (i) => Uint32(i.value.value),
+    );
+    final base = _readRegister(i.base);
+    final address = _createStack(i, base, offset.value).next();
+
+    _storeMemory2(
+      address,
       _readRegister(
         i.source,
         forceUserMode: i.forceNonPrivilegedAccess,
       ),
       size: _Size.halfWord,
-      before: i.addOffsetBeforeTransfer,
-      add: i.addOffsetToBase,
-      write: i.writeAddressIntoBase,
-      forceUserMode: i.forceNonPrivilegedAccess,
     );
+
+    if (i.writeAddressIntoBase) {
+      _writeRegister(i.base, address);
+    }
+  }
+
+  /// Helper function for LDM and STM ("Multiple" or "Block" data transfers).
+  ///
+  /// ## Address modes
+  ///
+  /// - `ia` = **Increment** address **after** each transfer.
+  /// - `ib` = **Increment** address **before** each transfer.
+  /// - `da` = **Decrement** address **after** each transfer.
+  /// - `db` = **Decrement** address **before** each transfer.
+  ///
+  /// > FYI: There are also stack aliases (`fd`, `ed`, `fa`, `ea`) that
+  /// > depending on whether [load] is set or not mean one of the above
+  /// > addressing modes.
+  ///
+  /// If [DataTransferArmInstruction.writeAddressIntoBase] is set, then the
+  /// _final_ address is written back into [DataTransferArmInstruction.base].
+  ///
+  /// > FYI: If the base register is in the register list, this is not valid.
+  ///
+  /// There are also some special restrictions for the register list itself:
+  ///
+  /// - Must _not_ contain the `SP` (r13), though some examples do...
+  /// - If [load], must not contain `PC` if it contains the `LR`.
+  /// - If not, must not contain `LR` if it contains the `PC`.
+  ///
+  /// If [DataTransferArmInstruction.forceNonPrivilegedAccess], it forces the
+  /// processor to transfer the saved program status register (`SPSR`) into the
+  /// current program status register (`CPSR`), which saves an instruction:
+  ///
+  /// - If [load] & register list contains `PC`, `CPSR` is restored from `SPSR`.
+  /// - Else, data is transferred into or out of the user mode registers instead
+  ///   of the current mode registers. This seems _not_ to include the base
+  ///   register istelf (for reading or writeback).
+  void _multipleDataTransfer(
+    BlockDataTransferArmInstruction i, {
+    @required bool load,
+  }) {
+    final base = _readRegister(i.base);
+    final stack = _createStack(i, base);
+    Uint32 address;
+    for (final register in i.registerList.registers) {
+      address = stack.next();
+      if (load) {
+        _writeRegister(
+          register,
+          _loadMemory2(address),
+          forceUserMode: i.forceNonPrivilegedAccess,
+        );
+      } else {
+        _storeMemory2(
+          address,
+          _readRegister(
+            register,
+            forceUserMode: i.forceNonPrivilegedAccess,
+          ),
+        );
+      }
+    }
+    if (i.writeAddressIntoBase) {
+      _writeRegister(i.base, address);
+    }
+  }
+
+  static RegisterStack _createStack(
+    DataTransferArmInstruction i,
+    Uint32 base, [
+    int offset = 4,
+  ]) {
+    return i.addOffsetToBase
+        ? i.addOffsetBeforeTransfer
+            ? RegisterStack.incrementBefore(base, offset)
+            : RegisterStack.incrementAfter(base, offset)
+        : i.addOffsetBeforeTransfer
+            ? RegisterStack.decrementBefore(base, offset)
+            : RegisterStack.decrementAfter(base, offset);
   }
 
   @override
   void visitLDM(LDMArmInstruction i, [void _]) {
-    // If write-back is not used, we want to restore the base register.
-    final base = _readRegister(
-      i.base,
-      forceUserMode: i.forceNonPrivilegedAccess,
-    );
-    // Loads multiple memory locations into multiple registers.
-    for (final register in i.registerList.registers) {
-      final result = _loadMemory(
-        // Base register containing the *initial* memory address.
-        i.base,
-        Uint32(4),
-        size: _Size.word,
-        signed: false,
-        // Addressing mode:
-        //   IA: Increment address after each transfer  (e.g. FD)
-        //   IB: Increment address before each transfer (e.g. ED)
-        //   DA: Decrement address after each transfer  (e.g. FA)
-        //   DB: Decrement address before each transfer (e.g. EA)
-        before: i.addOffsetBeforeTransfer,
-        add: i.addOffsetToBase,
-        // Always "write-back" - e.g. increment/decrement address.
-        write: true,
-        // Whether to write to user-bank registers regardless of current mode.
-        forceUserMode: i.forceNonPrivilegedAccess,
-      );
-      _writeRegister(
-        register,
-        result,
-        forceUserMode: i.forceNonPrivilegedAccess,
-      );
-    }
-    if (i.loadPsr) {
-      if (i.registerList.registers.last.isProgramCounter) {
-        // Mode change.
-        cpu.cpsr = cpu.spsr;
-      } else {
-        // User bank transfer.
-        // No write-back possible, so restore the base register.
-        assert(!i.writeAddressIntoBase, 'Should not be set');
-      }
-    }
-    // Restore base register if write-back disabled.
-    if (!i.writeAddressIntoBase) {
-      _writeRegister(
-        i.base,
-        base,
-        forceUserMode: i.forceNonPrivilegedAccess,
-      );
-    }
+    _multipleDataTransfer(i, load: true);
   }
 
   @override
   void visitSTM(STMArmInstruction i, [void _]) {
-    final offset = Uint32(4);
-    var registers = 0;
-    for (final source in i.registerList.registers) {
-      _storeMemory(
-        i.base,
-        offset,
-        _readRegister(source),
-        size: _Size.word,
-        before: i.addOffsetBeforeTransfer,
-        add: i.addOffsetToBase,
-        write: false,
-        forceUserMode: i.forceNonPrivilegedAccess,
-      );
-      registers++;
-    }
-    if (i.writeAddressIntoBase) {
-      final base = _readRegister(
-        i.base,
-        forceUserMode: i.forceNonPrivilegedAccess,
-      ).value;
-      int writeBack;
-      if (i.addOffsetToBase) {
-        writeBack = base + 4 * registers;
-      } else {
-        writeBack = base - 4 * registers;
-        writeBack = writeBack.toUnsigned(32);
-      }
-      _writeRegister(i.base, Uint32(writeBack));
-    }
+    _multipleDataTransfer(i, load: false);
   }
 
   @override
   void visitSWP(SWPArmInstruction i, [void _]) {
+    final address = _readRegister(i.base);
+
     // Rd = [Rm]
-    final result = _loadMemory(
-      i.base,
-      Uint32.zero,
-      size: i.transferByte ? _Size.byte : _Size.word,
-      signed: false,
-      before: true,
-      add: true,
-      write: false,
-      forceUserMode: false,
+    _writeRegister(
+      i.destination,
+      _loadMemory2(
+        address,
+        size: i.transferByte ? _Size.byte : _Size.word,
+      ),
     );
-    _writeRegister(i.destination, result);
 
     // [Rn] = Rm
-    _storeMemory(
-      i.base,
-      Uint32.zero,
+    _storeMemory2(
+      address,
       _readRegister(i.source),
       size: i.transferByte ? _Size.byte : _Size.word,
-      before: false,
-      add: true,
-      write: true,
-      forceUserMode: false,
     );
   }
 

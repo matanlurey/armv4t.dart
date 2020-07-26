@@ -198,9 +198,7 @@ abstract class HalfwordDataTransferArmInstruction
 @immutable
 @sealed
 abstract class BlockDataTransferArmInstruction
-    /**/ extends DataTransferArmInstruction
-    /**/ with
-        HasWriteBackOnly {
+    /**/ extends DataTransferArmInstruction {
   /// Register list.
   final RegisterList<RegisterAny> registerList;
 

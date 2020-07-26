@@ -82,11 +82,11 @@ void main() {
     final program = await _TestProgram.load('arm7');
     results = program.run();
 
-    //          508
+    //          508     1
     expect(read(0x1fc), 1);
-    //          512
+    //          512     1
     expect(read(0x200), 1);
-    //          516
+    //          516     512
     expect(read(0x204), 0x200);
   });
 
