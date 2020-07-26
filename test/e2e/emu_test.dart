@@ -133,7 +133,13 @@ class _TestProgram {
 
     bool reachedEndOfProgram() => cpu.programCounter.value >= _programSize;
 
+    var maxCycles = 100;
+
     while (true) {
+      if (maxCycles-- == 0) {
+        fail('Did not complete after 100 instructions.');
+      }
+
       final next = vm.peek();
 
       try {

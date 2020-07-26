@@ -1003,7 +1003,7 @@ class _ArmInterpreter
   }
 
   static RegisterStack _stack(
-    DataTransferArmInstruction i,
+    BlockDataTransferArmInstruction i,
     Uint32 base, {
     int offset = 4,
     int size = 1,
@@ -1022,7 +1022,7 @@ class _ArmInterpreter
     final baseAddress = _readRegister(i.base);
     final registers = i.registerList.registers.toList();
     final addresses = _stack(i, baseAddress, size: registers.length);
-    final writeBack = i.writeAddressIntoBaseOrForceNonPrivilegedAccess;
+    final writeBack = i.writeAddressIntoBase;
 
     // Precompute some different execution scenarios.
     final containsPc = registers.contains(RegisterAny.pc);
@@ -1050,7 +1050,7 @@ class _ArmInterpreter
     final baseAddress = _readRegister(i.base);
     final registers = i.registerList.registers.toList();
     final addresses = _stack(i, baseAddress, size: registers.length);
-    final writeBack = i.writeAddressIntoBaseOrForceNonPrivilegedAccess;
+    final writeBack = i.writeAddressIntoBase;
     if (i.loadPsrOrForceUserMode) {
       for (final register in registers) {
         _storeIntoMemory(

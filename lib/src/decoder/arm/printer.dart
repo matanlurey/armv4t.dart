@@ -464,7 +464,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
   ]) {
     // <LDM|STM>{cond}<FD|ED|FA|EA|IA|IB|DA|DB> Rn{!},<Rlist>{^}
     var mnuemonic = super.visitBlockDataTransfer(i);
-    final w = i.writeAddressIntoBase && i.addOffsetBeforeTransfer ? '!' : '';
+    final w = i.writeAddressIntoBase ? '!' : '';
     final c = i.loadPsrOrForceUserMode ? '^' : '';
     // Re-write as a stack operation if using r13.
     if (i.base.index.value == 13) {

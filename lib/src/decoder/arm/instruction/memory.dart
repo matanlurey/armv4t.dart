@@ -197,28 +197,35 @@ abstract class HalfwordDataTransferArmInstruction
 /// These instructions load or store any subset of general purpose registers.
 @immutable
 @sealed
-abstract class BlockDataTransferArmInstruction
-    /**/ extends DataTransferArmInstruction {
+abstract class BlockDataTransferArmInstruction extends ArmInstruction {
+  /// `P`: Whether ot add offset before transfer (`1`) or after transfer (`0`).
+  final bool addOffsetBeforeTransfer;
+
+  /// `U`: Whether to add offset to base (`1`) or subtract from base (`0`).
+  final bool addOffsetToBase;
+
+  /// `S`: Whether to load PSR or force user mode (`1`) or not (`0`).
+  final bool loadPsrOrForceUserMode;
+
+  /// `W`: Whether to write address into base (`1`) or not (`0`).
+  final bool writeAddressIntoBase;
+
+  /// Base register.
+  final RegisterAny base;
+
   /// Register list.
   final RegisterList<RegisterAny> registerList;
 
-  /// `S`: Whether to load PSR or force user mode (`1`) or not.
-  final bool loadPsrOrForceUserMode;
-
   BlockDataTransferArmInstruction._({
     @required Condition condition,
-    @required bool addOffsetBeforeTransfer,
-    @required bool addOffsetToBase,
-    @required bool writeAddressIntoBase,
+    @required this.addOffsetBeforeTransfer,
+    @required this.addOffsetToBase,
+    @required this.writeAddressIntoBase,
     @required this.loadPsrOrForceUserMode,
-    @required RegisterAny base,
+    @required this.base,
     @required this.registerList,
   }) : super._(
           condition: condition,
-          addOffsetBeforeTransfer: addOffsetBeforeTransfer,
-          addOffsetToBase: addOffsetToBase,
-          writeAddressIntoBaseOrForceNonPrivilegedAccess: writeAddressIntoBase,
-          base: base,
         );
 
   @override
