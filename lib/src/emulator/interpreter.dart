@@ -1023,22 +1023,23 @@ class _ArmInterpreter
     final registers = i.registerList.registers.toList();
     final addresses = _stack(i, baseAddress, size: registers.length);
     final writeBack = i.writeAddressIntoBaseOrForceNonPrivilegedAccess;
-    if (i.loadPsrOrForceUserMode || registers.contains(RegisterAny.pc)) {
-      for (final register in registers) {
-        _writeRegister(
-          register,
-          _loadFromMemory(addresses.next()),
-          forceUserMode: true,
-        );
-      }
-    } else {
-      for (final register in registers) {
-        _writeRegister(register, _loadFromMemory(addresses.next()));
-        if (register.isProgramCounter) {
-          cpu.cpsr = cpu.spsr;
-        }
+
+    // Precompute some different execution scenarios.
+    final containsPc = registers.contains(RegisterAny.pc);
+    final transferPsr = i.loadPsrOrForceUserMode && containsPc;
+    final userBankTransfer = i.loadPsrOrForceUserMode && !containsPc;
+
+    for (final register in registers) {
+      _writeRegister(
+        register,
+        _loadFromMemory(addresses.next()),
+        forceUserMode: userBankTransfer,
+      );
+      if (register.isProgramCounter && transferPsr) {
+        cpu.cpsr = cpu.spsr;
       }
     }
+
     if (writeBack) {
       _writeRegister(i.base, addresses.next());
     }
@@ -1064,6 +1065,8 @@ class _ArmInterpreter
       for (final register in registers) {
         Uint32 value;
         if (register.isProgramCounter) {
+          // Whenever R15 is stored to memory the stored value is the address
+          // of the STM instruction (e.g. the current program counter) plus 12.
           value = (cpu.programCounter + Uint32(12)).toUint32();
         } else if (register == i.base &&
             register == registers.first &&
