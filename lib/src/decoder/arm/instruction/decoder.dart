@@ -520,7 +520,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         writeAddressIntoBaseOrForceNonPrivilegedAccess: writeBack,
         transferByte: transferByte,
         base: base,
-        destination: sourceOrDestination,
+        source: sourceOrDestination,
         offset: offset,
       );
     }

@@ -11,10 +11,15 @@ processor CPU32_V4T
 
 code16
   main:
-    mov r0, #0xff
-    lsl r0, r0, #16
-    mov r2, sp
-    str r0, [r2]
-    mov r3, #2
-    ldr r1, [r2, r3]
+    mov r0, #0xff     ; r0    = 255
+    lsl r0, r0, #16   ; r0    = 255 << 16
+                      ; r0    = 0xff0000
+    mov r2, sp        ; r2    = 200
+    str r0, [r2]      ; @r2   = r0
+                      ; @200  = 0xff0000
+    mov r3, #2        ; r3    = 2
+    ldr r1, [r2, r3]  ; r1    = @r2  + r3
+                      ; r1    = @200 + 2
+                      ; r1    = @200 + 2
+                      ; r1    = @202
     push {r1}

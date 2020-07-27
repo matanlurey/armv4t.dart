@@ -663,7 +663,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
-        destination: format.base.toLoRegister(),
+        destination: format.destination.toLoRegister(),
         offset: Or2.left(Immediate(Uint12(format.offset.value))),
       );
     } else {
@@ -676,7 +676,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
-        destination: format.base.toLoRegister(),
+        source: format.destination.toLoRegister(),
         offset: Or2.left(Immediate(Uint12(format.offset.value))),
       );
     }
@@ -692,7 +692,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // ARM:   LDR{B} Rd, [Rb, Ro]
       return LDRArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
@@ -709,12 +709,12 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // ARM:   STR{B} Rd, [Rb, Ro]
       return STRArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
-        destination: format.destination.toLoRegister(),
+        source: format.destination.toLoRegister(),
         offset: Or2.right(ShiftedRegister(
           format.offset.toLoRegisterNonPC(),
           ShiftType.LSL,
@@ -976,7 +976,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: false,
         base: RegisterAny.sp,
-        destination: format.destination.toLoRegister(),
+        source: format.destination.toLoRegister(),
         offset: Or2.left(Immediate(Uint12(format.word.value))),
       );
     }
