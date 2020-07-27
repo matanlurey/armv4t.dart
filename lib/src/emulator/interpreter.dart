@@ -795,25 +795,14 @@ class _ArmInterpreter
 
     Uint32 value;
     if (!i.transferByte && address.value % 4 != 0) {
-      // A word load (LDR) will normally use a word aligned address.
+      // Mis-aligned LDR (rotated read).
       //
-      // However, an address offset from a word boundary will cause the data to
-      // be rotated into the register so that the addressed byte occupies bits 0
-      // to 7.
-      //
-      // That means that half-words accessed at offsets 0 and 2 from the word
-      // boundary will be correctly loaded into bits 0 through 15 of the
-      // register.
-      //
-      // Two shift operations are then required to clear or to sign extend the
-      // upper 16 bits.
-      var result = 0;
-      for (var i = 0; i < 4; i++) {
-        final byte = _memory.loadByte(Uint32(address.value + i));
-        result = result.replaceBitRange(8 * i + 7, 8 * i, byte.value);
-      }
-      value = Uint32(result);
-      _debugHooks.onMemoryRead(address, value);
+      // Read from forcibly aligned address (address & !3), then rotate the data
+      // as "ROR (addr AND 3) * 3".
+      final forceAlignedAddress = Uint32(address.value & ~3);
+      final shift = (address.value & 3) * 8;
+      value = _loadFromMemory(forceAlignedAddress);
+      value = value.rotateRightShift(shift);
     } else {
       value = _loadFromMemory(
         address,

@@ -22,4 +22,5 @@ code16
                       ; r1    = @200 + 2
                       ; r1    = @200 + 2
                       ; r1    = @202
+                      ; r1    = <MIS ALIGNED READ> 0xff0000
     push {r1}
