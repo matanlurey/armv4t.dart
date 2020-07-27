@@ -4,7 +4,7 @@
 ; ARM MODE (Entrypoint)
 processor CPU32_V1
   code32
-    mov sp, 200
+    mov sp, 0x200
     mov r0, main - 1
 processor CPU32_V4T
     BX r0
@@ -22,5 +22,5 @@ code16
                       ; r1    = @200 + 2
                       ; r1    = @200 + 2
                       ; r1    = @202
-                      ; r1    = <MIS ALIGNED READ> 0xff0000
+                      ; r1    = <MIS ALIGNED READ> 0xff
     push {r1}

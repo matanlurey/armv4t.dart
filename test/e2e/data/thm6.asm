@@ -3,7 +3,7 @@
 ; ARM MODE (Entrypoint)
 processor CPU32_V1
   code32
-    mov sp, 200
+    mov sp, 0x200
     mov r0, main - 1
 processor CPU32_V4T
     BX r0

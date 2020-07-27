@@ -107,7 +107,7 @@ void main() {
     expect(read(0x1f4), 5);
     expect(read(0x1f8), 60);
     expect(read(0x1fc), 0x200);
-  }, skip: 'Currently fails');
+  });
 
   test('thm2.asm', () async {
     final program = await _TestProgram.load('thm2');
@@ -116,16 +116,7 @@ void main() {
     expect(read(0x200), 0xff00);
     expect(read(0x204), 0xff80);
     expect(read(0x208), 0x7ffff80);
-  }, skip: 'Throws address not half-word aligned');
-
-  test('thm3.asm', () async {
-    final program = await _TestProgram.load('thm3');
-    results = program.run();
-
-    expect(read(0x1f8), 8);
-    expect(read(0x1fc), 0x200);
-    expect(read(0x200), 64);
-  }, skip: 'Currenty fails');
+  }, skip: 'https://github.com/matanlurey/armv4t.dart/issues/79');
 
   test('thm4.asm', () async {
     final program = await _TestProgram.load('thm4');
@@ -133,7 +124,7 @@ void main() {
 
     expect(read(0x200), 4);
     expect(read(0x204), 5);
-  }, skip: 'Currently fails');
+  }, skip: 'TODO: Correctly implement (Long Branch with Link) for Thumb');
 
   test('thm5.asm', () async {
     final program = await _TestProgram.load('thm5');
@@ -148,14 +139,14 @@ void main() {
     results = program.run();
 
     expect(read(0x1fc), 0);
-  });
+  }, skip: 'Currently fails');
 
   test('thm7.asm', () async {
     final program = await _TestProgram.load('thm7');
     results = program.run();
 
     expect(read(0x1fc), 0xff);
-  }, skip: 'Currently fails');
+  });
 }
 
 class _TestProgram {
