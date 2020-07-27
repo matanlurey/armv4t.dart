@@ -116,7 +116,7 @@ void main() {
     expect(read(0x200), 0xff00);
     expect(read(0x204), 0xff80);
     expect(read(0x208), 0x7ffff80);
-  }, skip: 'https://github.com/matanlurey/armv4t.dart/issues/79');
+  }, skip: 'Currently fails');
 
   test('thm4.asm', () async {
     final program = await _TestProgram.load('thm4');
