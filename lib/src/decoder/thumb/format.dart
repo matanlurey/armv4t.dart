@@ -226,8 +226,9 @@ class ThumbFormatDecoder extends Converter<Uint16, ThumbFormat> {
       // 1000_LOOO_OOBB_BDDD
       return LoadOrStoreHalfwordThumbFormat(
         loadBit: capture[0] == 1,
-        destination: Uint3(capture[1]),
-        word: Uint8(capture[2]),
+        offset: Uint5(capture[1]),
+        baseRegister: Uint3(capture[2]),
+        sourceOrDestinationRegister: Uint3(capture[3]),
       );
     } else if (identical(pattern, _loadOrStoreSignExtendedByteOrHalfword)) {
       // 0101_HS1O_OOBB_BDDD
@@ -519,8 +520,9 @@ class _ThumbFormatEncoder
     return (Uint16Builder()
           ..write('1000')
           ..writeBool(format.loadBit)
-          ..writeInt(format.destination)
-          ..writeInt(format.word))
+          ..writeInt(format.offset)
+          ..writeInt(format.baseRegister)
+          ..writeInt(format.sourceOrDestinationRegister))
         .build();
   }
 

@@ -2,13 +2,15 @@ part of '../format.dart';
 
 class LoadOrStoreHalfwordThumbFormat extends ThumbFormat {
   final bool loadBit;
-  final Uint3 destination;
-  final Uint8 word;
+  final Uint5 offset;
+  final Uint3 baseRegister;
+  final Uint3 sourceOrDestinationRegister;
 
   const LoadOrStoreHalfwordThumbFormat({
     @required this.loadBit,
-    @required this.destination,
-    @required this.word,
+    @required this.offset,
+    @required this.baseRegister,
+    @required this.sourceOrDestinationRegister,
   }) : super._();
 
   @override
@@ -20,8 +22,9 @@ class LoadOrStoreHalfwordThumbFormat extends ThumbFormat {
   Map<String, int> _values() {
     return {
       'l': loadBit ? 1 : 0,
-      'd': destination.value,
-      'w': word.value,
+      'o': offset.value,
+      'b': baseRegister.value,
+      'd': sourceOrDestinationRegister.value,
     };
   }
 }
