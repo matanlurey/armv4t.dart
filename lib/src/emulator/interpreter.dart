@@ -807,8 +807,6 @@ class _ArmInterpreter
       //
       // Two shift operations are then required to clear or to sign extend the
       // upper 16 bits.
-      //
-      // TODO: Conditionally allow accessing unaligned memory (i.e. throw).
       var result = 0;
       for (var i = 0; i < 4; i++) {
         final byte = _memory.loadByte(Uint32(address.value + i));
