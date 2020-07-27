@@ -565,9 +565,9 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         addOffsetBeforeTransfer: false,
         addOffsetToBase: true,
         writeAddressIntoBase: false,
-        base: format.destination.toLoRegister(),
-        destination: format.destination.toLoRegister(),
-        offset: Or2.right(Immediate(format.word)),
+        base: format.baseRegister.toLoRegister(),
+        destination: format.sourceOrDestinationRegister.toLoRegister(),
+        offset: Or2.right(Immediate(Uint8(format.offset.value))),
       );
     } else {
       // ARM:   STRH Rd, [Rb, #Imm]
@@ -577,9 +577,9 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         addOffsetBeforeTransfer: false,
         addOffsetToBase: true,
         writeAddressIntoBase: false,
-        base: format.destination.toLoRegister(),
-        source: format.destination.toLoRegister(),
-        offset: Or2.right(Immediate(format.word)),
+        base: format.baseRegister.toLoRegister(),
+        source: format.sourceOrDestinationRegister.toLoRegister(),
+        offset: Or2.right(Immediate(Uint8(format.offset.value))),
       );
     }
   }
@@ -591,19 +591,34 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
   ]) {
     if (format.sBit) {
       if (format.hBit) {
-        // ARM:   STRH Rd, [Rb, Ro]
-        // THUMB: STRH Rd, [Rb, Ro]
-        // 0 0
-        return STRHArmInstruction(
+        // ARM:   LDRSH Rd, [Rb, Ro]
+        // THUMB: LDRSH Rd, [Rb, Ro]
+        // 1 1
+        return LDRSHArmInstruction(
           condition: _always,
-          addOffsetBeforeTransfer: false,
+          addOffsetBeforeTransfer: true,
           addOffsetToBase: true,
           writeAddressIntoBase: false,
           base: format.baseRegister.toLoRegister(),
-          source: format.sourceOrdestinationRegister.toLoRegister(),
+          destination: format.sourceOrdestinationRegister.toLoRegister(),
           offset: Or2.left(format.offsetRegister.toLoRegisterNonPC()),
         );
       } else {
+        // ARM:   LDRSB Rd, [Rb, Ro]
+        // THUMB: LDRSB Rd, [Rb, Ro]
+        // 1 0
+        return LDRSBArmInstruction(
+          condition: _always,
+          addOffsetBeforeTransfer: true,
+          addOffsetToBase: true,
+          writeAddressIntoBase: false,
+          base: format.baseRegister.toLoRegister(),
+          destination: format.sourceOrdestinationRegister.toLoRegister(),
+          offset: Or2.left(format.offsetRegister.toLoRegisterNonPC()),
+        );
+      }
+    } else {
+      if (format.hBit) {
         // ARM:   LDRH Rd, [Rb, Ro]
         // THUMB: LDRH Rd, [Rb, Ro]
         // 0 1
@@ -616,32 +631,17 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
           destination: format.sourceOrdestinationRegister.toLoRegister(),
           offset: Or2.left(format.offsetRegister.toLoRegisterNonPC()),
         );
-      }
-    } else {
-      if (format.hBit) {
-        // ARM:   LDRSB Rd, [Rb, Ro]
-        // THUMB: LDRSB Rd, [Rb, Ro]
-        // 1 0
-        return LDRSBArmInstruction(
-          condition: _always,
-          addOffsetBeforeTransfer: false,
-          addOffsetToBase: true,
-          writeAddressIntoBase: false,
-          base: format.baseRegister.toLoRegister(),
-          destination: format.sourceOrdestinationRegister.toLoRegister(),
-          offset: Or2.left(format.offsetRegister.toLoRegisterNonPC()),
-        );
       } else {
-        // ARM:   LDRSH Rd, [Rb, Ro]
-        // THUMB: LDRSH Rd, [Rb, Ro]
-        // 1 1
-        return LDRSHArmInstruction(
+        // ARM:   STRH Rd, [Rb, Ro]
+        // THUMB: STRH Rd, [Rb, Ro]
+        // 0 0
+        return STRHArmInstruction(
           condition: _always,
           addOffsetBeforeTransfer: false,
           addOffsetToBase: true,
           writeAddressIntoBase: false,
           base: format.baseRegister.toLoRegister(),
-          destination: format.sourceOrdestinationRegister.toLoRegister(),
+          source: format.sourceOrdestinationRegister.toLoRegister(),
           offset: Or2.left(format.offsetRegister.toLoRegisterNonPC()),
         );
       }
@@ -658,7 +658,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // ARM:   LDR{B} Rd, [Rb, #Imm]
       return LDRArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
@@ -671,7 +671,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // ARM:   STR{B} Rd, [Rb, #Imm]
       return STRArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,

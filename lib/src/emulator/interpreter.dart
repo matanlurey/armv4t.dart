@@ -761,6 +761,44 @@ class _ArmInterpreter
     return value;
   }
 
+  /// Rotated read: Used for mis-aligned `LDR`, or the read part of `SWP`.
+  ///
+  /// Reads from a forcibly aligned address ([address] `& ~3`), and then rotates
+  /// the resulting data as `ROR(` [address] `& 3) * 8`. This effect is used
+  /// interally by `LDRB` and `LDRH` opcodes (which do then mask-out the unused
+  /// bits).
+  ///
+  /// The `SWP` opcode works like a combination of `LDR` and `STR`: that means
+  /// it does read-rotated, but it does write-unrotated.
+  Uint32 _loadWordFromMemoryAndForceAlignWithRotatedRead(Uint32 address) {
+    if (address.isWordAligned) {
+      return _loadFromMemory(address);
+    }
+    final ror = (address.value & 3) * 8;
+    return _loadFromMemory(address.forceWordAligned()).rotateRightShift(ror);
+  }
+
+  /// Rotated read: Used for mis-aligned `LDRH` in ARMv4.
+  ///
+  /// `LDRH Rd, [odd]` -> `LDRH Rd, [odd - 1] ROR 8`.
+  Uint32 _loadHalfWordFromMemoryAndForceAlignWithRotatedRead(Uint32 address) {
+    if (address.isHalfWordAligned) {
+      return _loadFromMemory(address, size: _Size.halfWord);
+    }
+    return _loadFromMemory(address.forceHalfWordAligned()).rotateRightShift(8);
+  }
+
+  /// Sign-expanded read: Used for mis-aligned `LDRSH` in ARMv4.
+  ///
+  /// `LDRSH Rd, [odd]` -> `LDRSB Rd, [odd]`.
+  Uint32 _loadSignedHalfWordFromMemorySignExpanded(Uint32 address) {
+    return _loadFromMemory(
+      address,
+      size: address.isHalfWordAligned ? _Size.halfWord : _Size.byte,
+      signed: true,
+    );
+  }
+
   void _storeIntoMemory(
     Uint32 address,
     Uint32 value, {
@@ -808,15 +846,8 @@ class _ArmInterpreter
     }
 
     Uint32 value;
-    if (!i.transferByte && address.value % 4 != 0) {
-      // Mis-aligned LDR (rotated read).
-      //
-      // Read from forcibly aligned address (address & !3), then rotate the data
-      // as "ROR (addr AND 3) * 3".
-      final forceAlignedAddress = Uint32(address.value & ~3);
-      final shift = (address.value & 3) * 8;
-      value = _loadFromMemory(forceAlignedAddress);
-      value = value.rotateRightShift(shift);
+    if (!i.transferByte) {
+      value = _loadWordFromMemoryAndForceAlignWithRotatedRead(address);
     } else {
       value = _loadFromMemory(
         address,
@@ -859,6 +890,9 @@ class _ArmInterpreter
       moveAddress();
     }
 
+    if (!i.transferByte) {
+      address = address.forceWordAligned();
+    }
     _storeIntoMemory(
       address,
       _readRegister(
@@ -899,10 +933,7 @@ class _ArmInterpreter
 
     _writeRegister(
       i.destination,
-      _loadFromMemory(
-        address,
-        size: _Size.halfWord,
-      ),
+      _loadHalfWordFromMemoryAndForceAlignWithRotatedRead(address),
       forceUserMode: i.forceNonPrivilegedAccess,
     );
 
@@ -937,11 +968,7 @@ class _ArmInterpreter
 
     _writeRegister(
       i.destination,
-      _loadFromMemory(
-        address,
-        size: _Size.halfWord,
-        signed: true,
-      ),
+      _loadSignedHalfWordFromMemorySignExpanded(address),
       forceUserMode: i.forceNonPrivilegedAccess,
     );
 
@@ -1013,8 +1040,11 @@ class _ArmInterpreter
       moveAddress();
     }
 
+    print(
+      '>>> _store($address) with force alignment: ${address.forceHalfWordAligned()}',
+    );
     _storeIntoMemory(
-      address,
+      address.forceHalfWordAligned(),
       _readRegister(
         i.source,
         forceUserMode: i.forceNonPrivilegedAccess,
@@ -1060,7 +1090,7 @@ class _ArmInterpreter
     for (final register in registers) {
       _writeRegister(
         register,
-        _loadFromMemory(addresses.next()),
+        _loadFromMemory(addresses.next().forceWordAligned()),
         forceUserMode: userBankTransfer,
       );
       if (register.isProgramCounter && transferPsr) {
@@ -1069,7 +1099,7 @@ class _ArmInterpreter
     }
 
     if (writeBack) {
-      _writeRegister(i.base, addresses.writeBack);
+      _writeRegister(i.base, addresses.writeBack.forceWordAligned());
     }
   }
 
@@ -1082,7 +1112,7 @@ class _ArmInterpreter
     if (i.loadPsrOrForceUserMode) {
       for (final register in registers) {
         _storeIntoMemory(
-          addresses.next(),
+          addresses.next().forceWordAligned(),
           _readRegister(
             register,
             forceUserMode: true,
@@ -1103,11 +1133,11 @@ class _ArmInterpreter
         } else {
           value = _readRegister(register);
         }
-        _storeIntoMemory(addresses.next(), value);
+        _storeIntoMemory(addresses.next().forceWordAligned(), value);
       }
     }
     if (writeBack) {
-      _writeRegister(i.base, addresses.writeBack);
+      _writeRegister(i.base, addresses.writeBack.forceWordAligned());
     }
   }
 
@@ -1116,17 +1146,17 @@ class _ArmInterpreter
     final address = _readRegister(i.base);
 
     // Rd = [Rm]
-    _writeRegister(
-      i.destination,
-      _loadFromMemory(
-        address,
-        size: i.transferByte ? _Size.byte : _Size.word,
-      ),
-    );
+    Uint32 value;
+    if (!i.transferByte) {
+      value = _loadWordFromMemoryAndForceAlignWithRotatedRead(address);
+    } else {
+      value = _loadFromMemory(address, size: _Size.byte);
+    }
+    _writeRegister(i.destination, value);
 
     // [Rn] = Rm
     _storeIntoMemory(
-      address,
+      i.transferByte ? address : address.forceWordAligned(),
       _readRegister(i.source),
       size: i.transferByte ? _Size.byte : _Size.word,
     );
@@ -1208,4 +1238,22 @@ enum _Size {
   byte,
   halfWord,
   word,
+}
+
+extension _ForcedAlignment on Uint32 {
+  /// Whether `this` represents a word-aligned address.
+  bool get isWordAligned => value % 4 == 0;
+
+  /// Returns an address represented as an [Uint32] word-aligned.
+  ///
+  /// E.g. `200` stays `200`, but `201`, `202`, `203`, become `200`.
+  Uint32 forceWordAligned() => Uint32(value & ~3);
+
+  /// Whether `this` represents a half-word-aligned address.
+  bool get isHalfWordAligned => value % 2 == 0;
+
+  /// Returns an address represented as an [Uint32] half-word aligned.
+  ///
+  /// E.g. `200` stays `200`, but `201` becomes `200`.
+  Uint32 forceHalfWordAligned() => Uint32(value & ~1);
 }
