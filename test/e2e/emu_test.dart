@@ -97,6 +97,79 @@ void main() {
     expect(read(0x200), 10);
     expect(read(0x204), 83);
   });
+
+  test('thm0.asm', () async {
+    final program = await _TestProgram.load('thm0');
+    results = program.run();
+
+    expect(read(0x1ec), 10);
+    expect(read(0x1f0), 15);
+    expect(read(0x1f4), 5);
+    expect(read(0x1f8), 60);
+    expect(read(0x1fc), 0x200);
+  }, skip: 'Currently fails');
+
+  test('thm1.asm', () async {
+    final program = await _TestProgram.load('thm1');
+    results = program.run();
+
+    expect(read(0x200), 0xdeadbeef);
+  }, skip: 'Throws creating Uint4');
+
+  test('thm2.asm', () async {
+    final program = await _TestProgram.load('thm2');
+    results = program.run();
+
+    expect(read(0x200), 0xff00);
+    expect(read(0x204), 0xff80);
+    expect(read(0x208), 0x7ffff80);
+  }, skip: 'Throws address not half-word aligned');
+
+  test('thm3.asm', () async {
+    final program = await _TestProgram.load('thm3');
+    results = program.run();
+
+    expect(read(0x1f8), 8);
+    expect(read(0x1fc), 0x200);
+    expect(read(0x200), 64);
+  }, skip: 'Currenty fails');
+
+  test('thm4.asm', () async {
+    final program = await _TestProgram.load('thm4');
+    results = program.run();
+
+    expect(read(0x200), 4);
+    expect(read(0x204), 5);
+  }, skip: 'Currently fails');
+
+  test('thm5.asm', () async {
+    final program = await _TestProgram.load('thm5');
+    results = program.run();
+
+    expect(read(0x200), 10);
+    expect(read(0x204), 83);
+  }, skip: 'Currently fails');
+
+  test('thm6.asm', () async {
+    final program = await _TestProgram.load('thm6');
+    results = program.run();
+
+    expect(read(0x1fc), 0);
+  });
+
+  test('thm7.asm', () async {
+    final program = await _TestProgram.load('thm7');
+    results = program.run();
+
+    expect(read(0x1fc), 0xff);
+  }, skip: 'Throws creating Uint4');
+
+  test('thm8.asm', () async {
+    final program = await _TestProgram.load('thm8');
+    results = program.run();
+
+    expect(read(0x1fc), 0x01234567);
+  }, skip: 'Throws creating Uint32');
 }
 
 class _TestProgram {
