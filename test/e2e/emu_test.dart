@@ -109,13 +109,6 @@ void main() {
     expect(read(0x1fc), 0x200);
   }, skip: 'Currently fails');
 
-  test('thm1.asm', () async {
-    final program = await _TestProgram.load('thm1');
-    results = program.run();
-
-    expect(read(0x200), 0xdeadbeef);
-  }, skip: 'Throws creating Uint4');
-
   test('thm2.asm', () async {
     final program = await _TestProgram.load('thm2');
     results = program.run();
@@ -162,14 +155,7 @@ void main() {
     results = program.run();
 
     expect(read(0x1fc), 0xff);
-  }, skip: 'Throws creating Uint4');
-
-  test('thm8.asm', () async {
-    final program = await _TestProgram.load('thm8');
-    results = program.run();
-
-    expect(read(0x1fc), 0x01234567);
-  }, skip: 'Throws creating Uint32');
+  }, skip: 'Currently fails');
 }
 
 class _TestProgram {

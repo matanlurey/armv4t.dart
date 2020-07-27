@@ -23,7 +23,7 @@ class MOVArmInstruction extends DataProcessingArmInstruction {
     @required RegisterAny destination,
     @required
         Or3<
-                ShiftedRegister<Immediate<Uint4>, RegisterAny>,
+                ShiftedRegister<Immediate<Uint5>, RegisterAny>,
                 ShiftedRegister<RegisterNotPC, RegisterAny>,
                 ShiftedImmediate<Uint8>>
             operand2,

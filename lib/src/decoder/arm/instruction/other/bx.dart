@@ -23,11 +23,6 @@ class BXArmInstruction extends ArmInstruction {
     return visitor.visitBX(this, context);
   }
 
-  /// Whether to switch to _THUMB_ mode when branching.
-  bool switchToThumbMode(Uint32 Function(Register) readOperand) {
-    return readOperand(operand).isSet(0);
-  }
-
   @override
   List<Object> _values() => [condition, operand];
 }

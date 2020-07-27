@@ -202,7 +202,7 @@ class _ArmInterpreter
 
   Uint32 _visitOperand2(
     Or3<
-            ShiftedRegister<Immediate<Uint4>, RegisterAny>,
+            ShiftedRegister<Immediate<Uint5>, RegisterAny>,
             ShiftedRegister<RegisterNotPC, RegisterAny>,
             ShiftedImmediate<Uint8>>
         operand2,
@@ -1129,9 +1129,10 @@ class _ArmInterpreter
   @override
   void visitBX(BXArmInstruction i, [void _]) {
     // PC = Rn, T = Rn.0
-    if (i.switchToThumbMode(_readRegister)) {
+    final to = _readRegister(i.operand).value;
+    if (to.isSet(0)) {
       cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: true));
-      final jump = _readRegister(i.operand).value - 1;
+      final jump = to - 1;
       cpu.programCounter = Uint32(jump);
     } else {
       cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: false));

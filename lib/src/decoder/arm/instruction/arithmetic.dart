@@ -34,7 +34,7 @@ abstract class DataProcessingArmInstruction
 
   /// Second operand.
   final Or3<
-      ShiftedRegister<Immediate<Uint4>, RegisterAny>,
+      ShiftedRegister<Immediate<Uint5>, RegisterAny>,
       /**/
       ShiftedRegister<RegisterNotPC, RegisterAny>,
       /**/
