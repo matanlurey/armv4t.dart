@@ -97,6 +97,56 @@ void main() {
     expect(read(0x200), 10);
     expect(read(0x204), 83);
   });
+
+  test('thm0.asm', () async {
+    final program = await _TestProgram.load('thm0');
+    results = program.run();
+
+    expect(read(0x1ec), 10);
+    expect(read(0x1f0), 15);
+    expect(read(0x1f4), 5);
+    expect(read(0x1f8), 60);
+    expect(read(0x1fc), 0x200);
+  });
+
+  test('thm2.asm', () async {
+    final program = await _TestProgram.load('thm2');
+    results = program.run();
+
+    expect(read(0x200), 0xff00);
+    expect(read(0x204), 0xff80);
+    expect(read(0x208), 0x7ffff80);
+  }, skip: 'https://github.com/matanlurey/armv4t.dart/issues/79');
+
+  test('thm4.asm', () async {
+    final program = await _TestProgram.load('thm4');
+    results = program.run();
+
+    expect(read(0x200), 4);
+    expect(read(0x204), 5);
+  }, skip: 'TODO: Correctly implement (Long Branch with Link) for Thumb');
+
+  test('thm5.asm', () async {
+    final program = await _TestProgram.load('thm5');
+    results = program.run();
+
+    expect(read(0x200), 10);
+    expect(read(0x204), 83);
+  }, skip: 'Currently fails');
+
+  test('thm6.asm', () async {
+    final program = await _TestProgram.load('thm6');
+    results = program.run();
+
+    expect(read(0x1fc), 0);
+  }, skip: 'Currently fails');
+
+  test('thm7.asm', () async {
+    final program = await _TestProgram.load('thm7');
+    results = program.run();
+
+    expect(read(0x1fc), 0xff);
+  });
 }
 
 class _TestProgram {

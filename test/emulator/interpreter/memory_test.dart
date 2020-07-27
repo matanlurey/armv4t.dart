@@ -169,7 +169,7 @@ void main() {
           writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
           transferByte: false,
           base: r0,
-          destination: r1,
+          source: r1,
           offset: Or2.left(Immediate(Uint12.zero)),
         );
         expect(decode(instruction), 'str r1, [r0]');
@@ -192,7 +192,7 @@ void main() {
           writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
           transferByte: true,
           base: r0,
-          destination: r1,
+          source: r1,
           offset: Or2.left(Immediate(Uint12.zero)),
         );
         expect(decode(instruction), 'strb r1, [r0]');
@@ -215,7 +215,7 @@ void main() {
           writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
           transferByte: false,
           base: r0,
-          destination: r1,
+          source: r1,
           offset: Or2.left(Immediate(Uint12(3))),
         );
         expect(decode(instruction), 'str r1, [r0, 3]');
@@ -238,7 +238,7 @@ void main() {
           writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
           transferByte: false,
           base: r0,
-          destination: r1,
+          source: r1,
           offset: Or2.left(Immediate(Uint12(4))),
         );
         expect(decode(instruction), 'str r1, [r0, -4]');
@@ -261,7 +261,7 @@ void main() {
           writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
           transferByte: false,
           base: r0,
-          destination: r1,
+          source: r1,
           offset: Or2.left(Immediate(Uint12(4))),
         );
         expect(decode(instruction), 'str r1, [r0], 4');

@@ -28,10 +28,11 @@ class ArmDebugger implements ArmDebugHooks {
   @override
   void onInstructionExecuting(
     ArmInstruction instruction,
+    Uint32 address,
   ) {
     _events.clear();
     final decoded = instruction.accept(const ArmInstructionPrinter());
-    _events.add('\n$decoded');
+    _events.add('\n@0x${address.value.toRadixString(16)}:\n$decoded');
   }
 
   @override
@@ -61,6 +62,7 @@ class ArmDebugger implements ArmDebugHooks {
   @override
   void onInstructionSkipped(
     ArmInstruction instruction,
+    Uint32 address,
     StatusRegister cpsr,
   ) {
     final decoded = instruction.accept(const ArmInstructionPrinter());
@@ -73,6 +75,7 @@ class ArmDebugger implements ArmDebugHooks {
     ];
     _events.clear();
     _events.add(
+      '\n@0x${address.value.toRadixString(16)}:'
       '\n$decoded ; skip, $condition :: ${flags.join(', ')}',
     );
   }

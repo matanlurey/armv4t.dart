@@ -52,10 +52,17 @@ class ArmDebugHooks {
   const ArmDebugHooks();
 
   /// Invoked when [ArmInstruction] will be executed.
-  void onInstructionExecuting(ArmInstruction instruction) {}
+  void onInstructionExecuting(
+    ArmInstruction instruction,
+    Uint32 address,
+  ) {}
 
   /// Invoked when [ArmInstruction.condition] skips execution based on [cpsr].
-  void onInstructionSkipped(ArmInstruction instruction, StatusRegister cpsr) {}
+  void onInstructionSkipped(
+    ArmInstruction instruction,
+    Uint32 address,
+    StatusRegister cpsr,
+  ) {}
 
   /// Invoked when [register] is read as a result of execution.
   void onRegisterRead(
@@ -144,11 +151,18 @@ class _ArmInterpreter
   @override
   bool run(ArmInstruction instruction) {
     if (evaluateCondition(instruction.condition)) {
-      _debugHooks.onInstructionExecuting(instruction);
+      _debugHooks.onInstructionExecuting(
+        instruction,
+        cpu.programCounter,
+      );
       instruction.accept(this);
       return true;
     } else {
-      _debugHooks.onInstructionSkipped(instruction, cpu.cpsr);
+      _debugHooks.onInstructionSkipped(
+        instruction,
+        cpu.programCounter,
+        cpu.cpsr,
+      );
       return false;
     }
   }
@@ -202,7 +216,7 @@ class _ArmInterpreter
 
   Uint32 _visitOperand2(
     Or3<
-            ShiftedRegister<Immediate<Uint4>, RegisterAny>,
+            ShiftedRegister<Immediate<Uint5>, RegisterAny>,
             ShiftedRegister<RegisterNotPC, RegisterAny>,
             ShiftedImmediate<Uint8>>
         operand2,
@@ -793,12 +807,26 @@ class _ArmInterpreter
       moveAddress();
     }
 
-    _writeRegister(
-      i.destination,
-      _loadFromMemory(
+    Uint32 value;
+    if (!i.transferByte && address.value % 4 != 0) {
+      // Mis-aligned LDR (rotated read).
+      //
+      // Read from forcibly aligned address (address & !3), then rotate the data
+      // as "ROR (addr AND 3) * 3".
+      final forceAlignedAddress = Uint32(address.value & ~3);
+      final shift = (address.value & 3) * 8;
+      value = _loadFromMemory(forceAlignedAddress);
+      value = value.rotateRightShift(shift);
+    } else {
+      value = _loadFromMemory(
         address,
         size: i.transferByte ? _Size.byte : _Size.word,
-      ),
+      );
+    }
+
+    _writeRegister(
+      i.destination,
+      value,
       forceUserMode: i.forceNonPrivilegedAccess,
     );
 
@@ -1109,8 +1137,15 @@ class _ArmInterpreter
     final isThumb = cpu.cpsr.thumbState;
     final numBytes = isThumb ? 2 : 4;
     final origin = cpu.programCounter.value;
-    final destination = origin + (offset * numBytes) + (2 * numBytes);
-    cpu.programCounter = Uint32(destination);
+    final destination = Uint32(
+      origin + (offset * numBytes) + (2 * numBytes),
+    );
+    cpu.programCounter = destination;
+    _debugHooks.onRegisterWrite(
+      RegisterAny.pc,
+      destination,
+      forcedUserMode: false,
+    );
     _executedBranch = true;
   }
 
@@ -1123,15 +1158,17 @@ class _ArmInterpreter
   void visitBL(BLArmInstruction i, [void _]) {
     final returnTo = cpu.programCounter.value + 4;
     cpu.linkRegister = Uint32(returnTo);
+    _writeRegister(RegisterAny.lr, Uint32(returnTo));
     _branch(i.offset.value);
   }
 
   @override
   void visitBX(BXArmInstruction i, [void _]) {
     // PC = Rn, T = Rn.0
-    if (i.switchToThumbMode(_readRegister)) {
+    final to = _readRegister(i.operand).value;
+    if (to.isSet(0)) {
       cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: true));
-      final jump = _readRegister(i.operand).value - 1;
+      final jump = to - 1;
       cpu.programCounter = Uint32(jump);
     } else {
       cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: false));

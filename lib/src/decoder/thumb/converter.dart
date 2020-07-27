@@ -36,15 +36,6 @@ extension on Uint3 {
   RegisterNotPC toHiRegisterNonPC() => RegisterNotPC(Uint4(value + 8));
 }
 
-extension on Uint5 {
-  /// TODO: Decide whether truncating as 4 bits is a legal operation.
-  ///
-  /// It is possible that the ARM instructions will need to be more size
-  /// flexible (e.g. not restrict to Uint4 in this particular case), or that a
-  /// 5-bit offset doesn't actually occur in practice.
-  Immediate<Uint4> get truncated => Immediate(Uint4(value));
-}
-
 class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     implements
         /**/ ThumbToArmDecoder,
@@ -134,7 +125,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
             ShiftedRegister(
               operand2,
               ShiftType.LSL,
-              Immediate(Uint4.zero),
+              Immediate(Uint5.zero),
             ),
           ),
         );
@@ -150,7 +141,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
             ShiftedRegister(
               operand2,
               ShiftType.LSL,
-              Immediate(Uint4.zero),
+              Immediate(Uint5.zero),
             ),
           ),
         );
@@ -163,11 +154,11 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     AluOperationThumbFormat format, [
     void _,
   ]) {
-    ShiftedRegister<Immediate<Uint4>, RegisterAny> left() {
+    ShiftedRegister<Immediate<Uint5>, RegisterAny> left() {
       return ShiftedRegister(
         format.source.toLoRegister(),
         ShiftType.LSL,
-        Immediate(Uint4.zero),
+        Immediate(Uint5.zero),
       );
     }
 
@@ -388,7 +379,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
                 ShiftedRegister(
                   format.source.toHiRegister(),
                   ShiftType.LSL,
-                  Immediate(Uint4.zero),
+                  Immediate(Uint5.zero),
                 ),
               ),
             );
@@ -404,7 +395,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
                 ShiftedRegister(
                   format.source.toLoRegister(),
                   ShiftType.LSL,
-                  Immediate(Uint4.zero),
+                  Immediate(Uint5.zero),
                 ),
               ),
             );
@@ -420,7 +411,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
                 ShiftedRegister(
                   format.source.toHiRegister(),
                   ShiftType.LSL,
-                  Immediate(Uint4.zero),
+                  Immediate(Uint5.zero),
                 ),
               ),
             );
@@ -438,7 +429,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
               operand2: Or3.left(ShiftedRegister(
                 format.source.toHiRegister(),
                 ShiftType.LSL,
-                Immediate(Uint4.zero),
+                Immediate(Uint5.zero),
               )),
             );
           // THUMB:  CMP Hd, Rs
@@ -451,7 +442,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
               operand2: Or3.left(ShiftedRegister(
                 format.source.toLoRegister(),
                 ShiftType.LSL,
-                Immediate(Uint4.zero),
+                Immediate(Uint5.zero),
               )),
             );
           // THUMB:  CMP Hd, Hs
@@ -464,7 +455,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
               operand2: Or3.left(ShiftedRegister(
                 format.source.toHiRegister(),
                 ShiftType.LSL,
-                Immediate(Uint4.zero),
+                Immediate(Uint5.zero),
               )),
             );
         }
@@ -483,7 +474,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
                 ShiftedRegister(
                   format.source.toHiRegister(),
                   ShiftType.LSL,
-                  Immediate(Uint4.zero),
+                  Immediate(Uint5.zero),
                 ),
               ),
             );
@@ -499,7 +490,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
                 ShiftedRegister(
                   format.source.toLoRegister(),
                   ShiftType.LSL,
-                  Immediate(Uint4.zero),
+                  Immediate(Uint5.zero),
                 ),
               ),
             );
@@ -515,7 +506,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
                 ShiftedRegister(
                   format.source.toHiRegister(),
                   ShiftType.LSL,
-                  Immediate(Uint4.zero),
+                  Immediate(Uint5.zero),
                 ),
               ),
             );
@@ -663,19 +654,6 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     void _,
   ]) {
     if (format.loadBit) {
-      // THUMB: STR{B} Rd, [Rb, #Imm]
-      // ARM:   STR{B} Rd, [Rb, #Imm]
-      return STRArmInstruction(
-        condition: _always,
-        addOffsetBeforeTransfer: false,
-        addOffsetToBase: true,
-        writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
-        transferByte: format.byteBit,
-        base: format.base.toLoRegister(),
-        destination: format.base.toLoRegister(),
-        offset: Or2.left(Immediate(Uint12(format.offset.value))),
-      );
-    } else {
       // THUMB: LDR{B} Rd, [Rb, #Imm]
       // ARM:   LDR{B} Rd, [Rb, #Imm]
       return LDRArmInstruction(
@@ -685,7 +663,20 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
-        destination: format.base.toLoRegister(),
+        destination: format.destination.toLoRegister(),
+        offset: Or2.left(Immediate(Uint12(format.offset.value))),
+      );
+    } else {
+      // THUMB: STR{B} Rd, [Rb, #Imm]
+      // ARM:   STR{B} Rd, [Rb, #Imm]
+      return STRArmInstruction(
+        condition: _always,
+        addOffsetBeforeTransfer: false,
+        addOffsetToBase: true,
+        writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
+        transferByte: format.byteBit,
+        base: format.base.toLoRegister(),
+        source: format.destination.toLoRegister(),
         offset: Or2.left(Immediate(Uint12(format.offset.value))),
       );
     }
@@ -701,12 +692,12 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // ARM:   LDR{B} Rd, [Rb, Ro]
       return LDRArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
-        destination: format.base.toLoRegister(),
+        destination: format.destination.toLoRegister(),
         offset: Or2.right(ShiftedRegister(
           format.offset.toLoRegisterNonPC(),
           ShiftType.LSL,
@@ -718,12 +709,12 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
       // ARM:   STR{B} Rd, [Rb, Ro]
       return STRArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
-        destination: format.base.toLoRegister(),
+        source: format.destination.toLoRegister(),
         offset: Or2.right(ShiftedRegister(
           format.offset.toLoRegisterNonPC(),
           ShiftType.LSL,
@@ -803,7 +794,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     void _,
   ]) {
     final shiftRegister = format.sourceRegister.toLoRegister();
-    final shiftImmediate = format.immediate.truncated;
+    final shiftImmediate = Immediate(format.immediate);
     final destination = format.destinationRegister.toLoRegister();
     switch (format.opCode.value) {
       // THUMB: LSL  Rd, Rs, #Offset5
@@ -985,7 +976,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: false,
         base: RegisterAny.sp,
-        destination: format.destination.toLoRegister(),
+        source: format.destination.toLoRegister(),
         offset: Or2.left(Immediate(Uint12(format.word.value))),
       );
     }

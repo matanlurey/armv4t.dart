@@ -1,0 +1,27 @@
+; Contains directives not compatible with fasm:
+; https://github.com/daniel5151/armv4t_emu/blob/master/tests/data/emutest_thm8.S
+;
+; So we don't (currently) run this one... the .bin file seems to be encoded
+; differently than we expect for fasm. 
+;
+; expected result: 0x1fc = 0x01234567
+; regression test for not forcing aligned PC load
+
+; ARM MODE (Entrypoint)
+processor CPU32_V1
+  code32
+    mov sp, 200
+    mov r0, main - 1
+processor CPU32_V4T
+    BX r0
+
+code16
+  main:
+    nop
+    ldr r1, [pc, #4]
+    b end
+    nop
+    .word 0x01234567
+    .word 0x89abcdef
+  end:
+    push {r1}

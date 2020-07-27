@@ -1,4 +1,5 @@
 import 'package:armv4t/decode.dart';
+import 'package:armv4t/src/common/binary.dart';
 import 'package:armv4t/src/emulator/interpreter.dart';
 import 'package:armv4t/src/emulator/memory.dart';
 import 'package:armv4t/src/emulator/processor.dart';
@@ -33,7 +34,7 @@ void main() {
         setConditionCodes: false,
         operand1: r0,
         operand2: Or3.left(
-          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint4(0))),
+          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
         destination: r2,
       );
@@ -53,7 +54,7 @@ void main() {
         setConditionCodes: true,
         operand1: r0,
         operand2: Or3.left(
-          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint4(0))),
+          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
         destination: r2,
       );
@@ -115,7 +116,7 @@ void main() {
         setConditionCodes: true,
         operand1: r0,
         operand2: Or3.left(
-          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint4(0))),
+          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
         destination: r2,
       );
@@ -140,7 +141,7 @@ void main() {
         setConditionCodes: true,
         operand1: r0,
         operand2: Or3.left(
-          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint4(0))),
+          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
         destination: r2,
       );
@@ -166,7 +167,7 @@ void main() {
         setConditionCodes: false,
         operand1: r0,
         operand2: Or3.left(
-          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint4(0))),
+          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
         destination: r2,
       );
@@ -191,7 +192,7 @@ void main() {
         setConditionCodes: true,
         operand1: r0,
         operand2: Or3.left(
-          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint4(0))),
+          ShiftedRegister(r1, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
         destination: r2,
       );
@@ -351,7 +352,7 @@ void main() {
         operand1: r1,
         destination: Register.filledWith0s,
         operand2: Or3.left(
-          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint4.zero)),
+          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
       );
 
@@ -372,7 +373,7 @@ void main() {
         operand1: r1,
         destination: Register.filledWith0s,
         operand2: Or3.left(
-          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint4.zero)),
+          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
       );
 
@@ -389,7 +390,7 @@ void main() {
         operand1: r1,
         destination: Register.filledWith0s,
         operand2: Or3.left(
-          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint4.zero)),
+          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
       );
 
@@ -410,7 +411,7 @@ void main() {
         operand1: r1,
         destination: Register.filledWith0s,
         operand2: Or3.left(
-          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint4.zero)),
+          ShiftedRegister(r2, ShiftType.LSL, Immediate(Uint5.zero)),
         ),
       );
 

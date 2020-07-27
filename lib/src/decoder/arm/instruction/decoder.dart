@@ -47,7 +47,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
     final destination = RegisterAny(format.destinationRegister);
 
     Or3<
-        ShiftedRegister<Immediate<Uint4>, RegisterAny>,
+        ShiftedRegister<Immediate<Uint5>, RegisterAny>,
         /**/
         ShiftedRegister<RegisterNotPC, RegisterAny>,
         /**/
@@ -93,7 +93,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         );
       } else {
         // R = 0
-        final shiftAmount = Uint4(format.operand2.bitRange(11, 7).value);
+        final shiftAmount = Uint5(format.operand2.bitRange(11, 7).value);
         operand2 = Or3.left(
           ShiftedRegister(
             shiftOperand,
@@ -520,7 +520,7 @@ class ArmInstructionDecoder implements ArmFormatVisitor<ArmInstruction, void> {
         writeAddressIntoBaseOrForceNonPrivilegedAccess: writeBack,
         transferByte: transferByte,
         base: base,
-        destination: sourceOrDestination,
+        source: sourceOrDestination,
         offset: offset,
       );
     }

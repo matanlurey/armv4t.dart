@@ -17,7 +17,7 @@ class STRArmInstruction extends SingleDataTransferArmInstruction {
     @required bool writeAddressIntoBaseOrForceNonPrivilegedAccess,
     @required bool transferByte,
     @required RegisterAny base,
-    @required RegisterAny destination,
+    @required RegisterAny source,
     @required
         Or2<Immediate<Uint12>, ShiftedRegister<Immediate<Uint4>, RegisterNotPC>>
             offset,
@@ -29,7 +29,7 @@ class STRArmInstruction extends SingleDataTransferArmInstruction {
               writeAddressIntoBaseOrForceNonPrivilegedAccess,
           transferByte: transferByte,
           base: base,
-          sourceOrDestination: destination,
+          sourceOrDestination: source,
           offset: offset,
         );
 

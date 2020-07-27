@@ -11,7 +11,7 @@ environment:
 
 dependencies:
   args: ^1.6.0
-  binary: ^1.7.0
+  binary: ^2.0.0
   collection: ^1.14.12
   meta: ^1.1.8
 
@@ -23,12 +23,6 @@ dev_dependencies:
   test: ^1.15.0
   test_coverage: ^0.4.1
 
-dependency_overrides:
-  binary:
-    git:
-      url: https://github.com/matanlurey/binary.dart
-      ref: 05345aa01622fdacb402673c06e6ceb637739e02
-
 executables:
-  debug: debug
+  debug:
   disassemble:
