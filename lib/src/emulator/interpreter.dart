@@ -748,9 +748,11 @@ class _ArmInterpreter
         break;
       case _Size.halfWord:
         var hword = _memory.loadHalfWord(address);
+        print('>>> Loaded $hword from $address');
         if (signed) {
           hword = hword.signExtend(15);
         }
+        print('>>> Sign extended to $hword');
         value = Uint32(hword.value);
         break;
       case _Size.word:
