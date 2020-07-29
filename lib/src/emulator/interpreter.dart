@@ -739,21 +739,19 @@ class _ArmInterpreter
   }) {
     Uint32 value;
     switch (size) {
+      // FIXME:
+      // Both signed byte and signed half-word are wonky and likely wrong.
       case _Size.byte:
-        var byte = _memory.loadByte(address);
+        value = Uint32(_memory.loadByte(address).value);
         if (signed) {
-          byte = byte.signExtend(7);
+          value = value.signExtend(7);
         }
-        value = Uint32(byte.value);
         break;
       case _Size.halfWord:
-        var hword = _memory.loadHalfWord(address);
-        print('>>> Loaded $hword from $address');
+        value = Uint32(_memory.loadHalfWord(address).value);
         if (signed) {
-          hword = hword.signExtend(15);
+          value = value.signExtend(15);
         }
-        print('>>> Sign extended to $hword');
-        value = Uint32(hword.value);
         break;
       case _Size.word:
         value = _memory.loadWord(address);
