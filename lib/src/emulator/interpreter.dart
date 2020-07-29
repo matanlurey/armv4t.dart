@@ -740,16 +740,18 @@ class _ArmInterpreter
     Uint32 value;
     switch (size) {
       case _Size.byte:
-        value = Uint32(_memory.loadByte(address).value);
+        var byte = _memory.loadByte(address);
         if (signed) {
-          value = value.signExtend(7);
+          byte = byte.signExtend(7);
         }
+        value = Uint32(byte.value);
         break;
       case _Size.halfWord:
-        value = Uint32(_memory.loadHalfWord(address).value);
+        var hword = _memory.loadHalfWord(address);
         if (signed) {
-          value = value.signExtend(15);
+          hword = hword.signExtend(15);
         }
+        value = Uint32(hword.value);
         break;
       case _Size.word:
         value = _memory.loadWord(address);
@@ -803,7 +805,6 @@ class _ArmInterpreter
     Uint32 address,
     Uint32 value, {
     _Size size = _Size.word,
-    bool signed = false,
   }) {
     _debugHooks.onMemoryWrite(address, value);
     switch (size) {
@@ -1040,9 +1041,6 @@ class _ArmInterpreter
       moveAddress();
     }
 
-    print(
-      '>>> _store($address) with force alignment: ${address.forceHalfWordAligned()}',
-    );
     _storeIntoMemory(
       address.forceHalfWordAligned(),
       _readRegister(

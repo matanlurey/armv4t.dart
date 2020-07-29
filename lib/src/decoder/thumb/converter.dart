@@ -557,29 +557,35 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     LoadOrStoreHalfwordThumbFormat format, [
     void _,
   ]) {
+    // Addresses are pre-indeed using a 6-bit immediate value.
+    //
+    // Note: [format.offset.value] is a full 6-bit address but must be half-word
+    // aligned (i.e. with bit 0 set to 0) since the assembler places #Imm >> 1
+    // in the Offset5 field.
+    final offset = Immediate(Uint8(format.offset.value << 1));
     if (format.loadBit) {
       // ARM:   LDRH Rd, [Rb, #Imm]
       // THUMB: LDRH Rd, [Rb, #Imm]
       return LDRHArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBase: false,
         base: format.baseRegister.toLoRegister(),
         destination: format.sourceOrDestinationRegister.toLoRegister(),
-        offset: Or2.right(Immediate(Uint8(format.offset.value))),
+        offset: Or2.right(offset),
       );
     } else {
       // ARM:   STRH Rd, [Rb, #Imm]
       // THUMB: STRH Rd, [Rb, #Imm]
       return STRHArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBase: false,
         base: format.baseRegister.toLoRegister(),
         source: format.sourceOrDestinationRegister.toLoRegister(),
-        offset: Or2.right(Immediate(Uint8(format.offset.value))),
+        offset: Or2.right(offset),
       );
     }
   }
@@ -624,7 +630,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         // 0 1
         return LDRHArmInstruction(
           condition: _always,
-          addOffsetBeforeTransfer: false,
+          addOffsetBeforeTransfer: true,
           addOffsetToBase: true,
           writeAddressIntoBase: false,
           base: format.baseRegister.toLoRegister(),
@@ -637,7 +643,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         // 0 0
         return STRHArmInstruction(
           condition: _always,
-          addOffsetBeforeTransfer: false,
+          addOffsetBeforeTransfer: true,
           addOffsetToBase: true,
           writeAddressIntoBase: false,
           base: format.baseRegister.toLoRegister(),
@@ -653,6 +659,14 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     LoadOrStoreWithImmediateOffsetThumbFormat format, [
     void _,
   ]) {
+    // For word access (B = 0), the value specified by [format.offset] is a full
+    // 7-bit address, but must be word-aligned (i.e. with bits 1:0 set to 0),
+    // since the assembler places #Imm >> 2 in the Offset5 field.
+    var value = format.offset.value;
+    if (!format.byteBit) {
+      value = value << 2;
+    }
+    final offset = Immediate(Uint12(value));
     if (format.loadBit) {
       // THUMB: LDR{B} Rd, [Rb, #Imm]
       // ARM:   LDR{B} Rd, [Rb, #Imm]
@@ -664,7 +678,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
         destination: format.destination.toLoRegister(),
-        offset: Or2.left(Immediate(Uint12(format.offset.value))),
+        offset: Or2.left(offset),
       );
     } else {
       // THUMB: STR{B} Rd, [Rb, #Imm]
@@ -677,7 +691,7 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
         transferByte: format.byteBit,
         base: format.base.toLoRegister(),
         source: format.destination.toLoRegister(),
-        offset: Or2.left(Immediate(Uint12(format.offset.value))),
+        offset: Or2.left(offset),
       );
     }
   }
@@ -953,31 +967,35 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     SPRelativeLoadOrStoreThumbFormat format, [
     void _,
   ]) {
+    // For word access (B = 0), the value specified by [format.offset] is a full
+    // 7-bit address, but must be word-aligned (i.e. with bits 1:0 set to 0),
+    // since the assembler places #Imm >> 2 in the Offset5 field.
+    final offset = Immediate(Uint12(format.word.value << 2));
     if (format.loadBit) {
       // THUMB: LDR Rd, [SP, #Imm]
       // ARM:   LDR Rd, [R13 #Imm]
       return LDRArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: false,
         base: RegisterAny.sp,
         destination: format.destination.toLoRegister(),
-        offset: Or2.left(Immediate(Uint12(format.word.value))),
+        offset: Or2.left(offset),
       );
     } else {
       // THUMB: STR Rd, [SP, #Imm]
       // ARM:   STR Rd, [R13 #Imm]
       return STRArmInstruction(
         condition: _always,
-        addOffsetBeforeTransfer: false,
+        addOffsetBeforeTransfer: true,
         addOffsetToBase: true,
         writeAddressIntoBaseOrForceNonPrivilegedAccess: false,
         transferByte: false,
         base: RegisterAny.sp,
         source: format.destination.toLoRegister(),
-        offset: Or2.left(Immediate(Uint12(format.word.value))),
+        offset: Or2.left(offset),
       );
     }
   }
