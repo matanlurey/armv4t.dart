@@ -739,8 +739,6 @@ class _ArmInterpreter
   }) {
     Uint32 value;
     switch (size) {
-      // FIXME:
-      // Both signed byte and signed half-word are wonky and likely wrong.
       case _Size.byte:
         value = Uint32(_memory.loadByte(address).value);
         if (signed) {
@@ -749,8 +747,10 @@ class _ArmInterpreter
         break;
       case _Size.halfWord:
         value = Uint32(_memory.loadHalfWord(address).value);
+        print('>>> loaded HW as ${value.toBinaryPadded()}');
         if (signed) {
           value = value.signExtend(15);
+          print('>>> sign extended to ${value.toBinaryPadded()}');
         }
         break;
       case _Size.word:
@@ -806,19 +806,23 @@ class _ArmInterpreter
     Uint32 value, {
     _Size size = _Size.word,
   }) {
-    _debugHooks.onMemoryWrite(address, value);
     switch (size) {
       case _Size.byte:
+        final byte = value.bitRange(7, 0).value;
+        _debugHooks.onMemoryWrite(address, Uint32(byte));
         return _memory.storeByte(
           address,
-          Uint8(value.bitRange(7, 0).value),
+          Uint8(byte),
         );
       case _Size.halfWord:
+        final hword = value.bitRange(15, 0).value;
+        _debugHooks.onMemoryWrite(address, Uint32(hword));
         return _memory.storeHalfWord(
           address,
-          Uint16(value.bitRange(15, 0).value),
+          Uint16(hword),
         );
       case _Size.word:
+        _debugHooks.onMemoryWrite(address, value);
         return _memory.storeWord(address, value);
       default:
         throw StateError('Unexpected: $size');
