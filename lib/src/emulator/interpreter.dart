@@ -747,10 +747,8 @@ class _ArmInterpreter
         break;
       case _Size.halfWord:
         value = Uint32(_memory.loadHalfWord(address).value);
-        print('>>> loaded HW as ${value.toBinaryPadded()}');
         if (signed) {
           value = value.signExtend(15);
-          print('>>> sign extended to ${value.toBinaryPadded()}');
         }
         break;
       case _Size.word:
