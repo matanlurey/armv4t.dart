@@ -17,13 +17,13 @@ code16
     strb r0, [r7, #1]   ; @(r7  + 1) = r0
                         ; @(200 + 1) = r0
                         ; @201       = 0xff
-    ldrsh r1, [r7, r6]  ; r1         = signed @(r7   + r6)
-                        ; r1         = signed @(0x200 + 0)
-                        ; r1         = signed @0x200
-                        ; r1         = signed 0xff
-                        ; r1         = 0xff00
-    lsr r1, r1, #1      ; r1         = r1 << 1
-                        ; r1         = 0xff00 << 1
+    ldrsh r1, [r7, r6]  ; r1         = sign extended @(r7   + r6)
+                        ; r1         = sign extended @(0x200 + 0)
+                        ; r1         = sign extended @0x200
+                        ; r1         = sign extended 0xff
+                        ; r1         = 0xffffff00
+    lsr r1, r1, #1      ; r1         = r1 >>> 1
+                        ; r1         = 0xffffff00 >>> 1
                         ; r1         = 0x1fe00
     strh r1, [r7, #4]   ; 
                         ; @0x204     = 0x7f80
