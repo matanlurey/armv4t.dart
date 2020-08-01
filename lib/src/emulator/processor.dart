@@ -124,8 +124,6 @@ abstract class Arm7Processor {
   set linkRegister(Uint32 value) => this[_LR] = value;
 
   /// `r15`: **Always** used as the _Program Counter_ (`PC`).
-  ///
-  /// TODO(https://github.com/matanlurey/armv4t.dart/issues/41): Pipe-lining?
   @nonVirtual
   Uint32 get programCounter => this[_PC];
   set programCounter(Uint32 value) => this[_PC] = value;

@@ -12,9 +12,27 @@ part of '../../instruction.dart';
 class BLArmInstruction extends ArmInstruction {
   final Int24 offset;
 
+  /// Whether this instruction originates from the `THUMB` `BL`.
+  ///
+  /// If `null` then this instruction should be treated as the `ARM` `BL`.
+  ///
+  /// If `true`, the following instructions should be executed:
+  /// ```txt
+  /// temp := next instruction address
+  /// PC   := LR   + OffsetLow << 1
+  /// LR   := temp | 1
+  /// ```
+  ///
+  /// If `false`, the following instruction should be executed:
+  /// ```txt
+  /// LR   := PC + OffsetHigh << 12
+  /// ```
+  final bool thumbLongBranch;
+
   BLArmInstruction({
     @required Condition condition,
     @required this.offset,
+    this.thumbLongBranch,
   }) : super._(condition: condition);
 
   @override
@@ -23,5 +41,5 @@ class BLArmInstruction extends ArmInstruction {
   }
 
   @override
-  List<Object> _values() => [condition, offset];
+  List<Object> _values() => [condition, offset, thumbLongBranch];
 }

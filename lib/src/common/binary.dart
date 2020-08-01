@@ -280,7 +280,7 @@ class Uint12 extends Integral<Uint12> {
   /// A pre-computed instance of `Uint12(0)`.
   static const zero = Uint12._(0);
 
-  /// Wraps a [value] that is otherwise a valid 24-bit unsigned integer.
+  /// Wraps a [value] that is otherwise a valid 12-bit unsigned integer.
   Uint12(int value)
       : super.checked(
           value: value,
@@ -346,6 +346,10 @@ class Uint24 extends Integral<Uint24> {
 
 extension Uint24X on Uint24 {
   Int24 toSigned() => Int24(value.toSigned(24));
+}
+
+extension Int24X on Int24 {
+  Uint24 toUnsigned() => Uint24(value.toUnsigned(24));
 }
 
 /// Encapsulates an signed 24-bit aggregation.

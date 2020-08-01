@@ -152,8 +152,8 @@ void main() {
       cpu[1] = Uint32(1);
       interpreter.run(instruction);
 
-      expect(cpu[2], Uint32(1));
-      expect(cpu.cpsr, defaultPSR);
+      expect(cpu[2], Uint32(0));
+      expect(cpu.cpsr, defaultPSR.update(isZero: true));
     });
   });
 
