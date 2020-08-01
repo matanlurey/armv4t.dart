@@ -1201,11 +1201,11 @@ class _ArmInterpreter
       _writeRegister(RegisterAny.lr, Uint32(link));
     } else {
       // The second instruction sets PC, and then sets the LR again.
+      final next = _readRegister(RegisterAny.pc).value;
       final link = _readRegister(RegisterAny.lr).value;
-      final from = _readRegister(RegisterAny.pc).value;
       final goto = link + (i.offset.value << 1);
       _writeRegister(RegisterAny.pc, Uint32(goto));
-      _writeRegister(RegisterAny.lr, Uint32(from + 3));
+      _writeRegister(RegisterAny.lr, Uint32(next + 3));
       _executedBranch = true;
     }
   }
