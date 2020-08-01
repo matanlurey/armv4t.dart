@@ -1205,7 +1205,7 @@ class _ArmInterpreter
       final from = _readRegister(RegisterAny.pc).value;
       final goto = link + (i.offset.value << 1);
       _writeRegister(RegisterAny.pc, Uint32(goto));
-      _writeRegister(RegisterAny.lr, Uint32(from + 2 | 1));
+      _writeRegister(RegisterAny.lr, Uint32(from + 3));
       _executedBranch = true;
     }
   }
