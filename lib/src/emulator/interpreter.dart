@@ -1205,7 +1205,8 @@ class _ArmInterpreter
       final from = _readRegister(RegisterAny.pc).value;
       final goto = link + (i.offset.value << 1);
       _writeRegister(RegisterAny.pc, Uint32(goto));
-      _writeRegister(RegisterAny.lr, Uint32(from + 2));
+      _writeRegister(RegisterAny.lr, Uint32(from + 2 | 1));
+      _executedBranch = true;
     }
   }
 
@@ -1214,10 +1215,13 @@ class _ArmInterpreter
     // PC = Rn, T = Rn.0
     final to = _readRegister(i.operand).value;
     if (to.isSet(0)) {
+      final wasThumbState = cpu.cpsr.thumbState;
       cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: true));
       final jump = to - 1;
       _writeRegister(RegisterAny.pc, Uint32(jump));
-      cpu.incrementProgramCounter();
+      if (!wasThumbState) {
+        cpu.incrementProgramCounter();
+      }
     } else {
       cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: false));
       _writeRegister(RegisterAny.pc, Uint32(to));
