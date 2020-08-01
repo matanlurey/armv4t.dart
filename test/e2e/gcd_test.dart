@@ -41,7 +41,7 @@ void main() {
     );
   }
 
-  int count = 0;
+  var count = 0;
 
   setUp(() {
     count = 0;

@@ -133,7 +133,7 @@ class ArmMnemonicPrinter implements ArmInstructionVisitor<String, void> {
     // T is present if the W-bit will be set in a post-indexed instruction,
     // forcing non-privileged mode for the transfer cycle. T is not allowed when
     // a pre-indexed addressing mode is specified or implied.
-    String t = '';
+    var t = '';
     if (!i.addOffsetBeforeTransfer) {
       if (i.writeAddressIntoBaseOrForceNonPrivilegedAccess) {
         t = 't';
@@ -573,7 +573,7 @@ class ArmInstructionPrinter extends SuperArmInstructionVisitor<String, void> {
     final d = visitRegister(i.sourceOrDestination);
     final u = i.addOffsetToBase ? '' : '-';
     // Similar to "visitSingleDataTransfer", but a bit simpler.
-    String address = '';
+    var address = '';
     if (i.base.isProgramCounter) {
       // Case 1.
       address = i.offset.pick(
