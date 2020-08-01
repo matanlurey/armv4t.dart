@@ -1220,7 +1220,7 @@ class _ArmInterpreter
       final jump = to - 1;
       _writeRegister(RegisterAny.pc, Uint32(jump));
       if (!wasThumbState) {
-        cpu.incrementProgramCounter();
+        _executedBranch = false;
       }
     } else {
       cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: false));

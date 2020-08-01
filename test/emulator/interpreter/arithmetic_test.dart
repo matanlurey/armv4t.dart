@@ -153,7 +153,7 @@ void main() {
       interpreter.run(instruction);
 
       expect(cpu[2], Uint32(0));
-      expect(cpu.cpsr, defaultPSR);
+      expect(cpu.cpsr, defaultPSR.update(isZero: true));
     });
   });
 
