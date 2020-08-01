@@ -1,3 +1,6 @@
+/// {@category common}
+library armv4t.decoder.common;
+
 import 'dart:typed_data';
 
 import 'package:armv4t/src/common/assert.dart';

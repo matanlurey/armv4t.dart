@@ -1,3 +1,6 @@
+/// {@category thumb}
+library armv4t.decoder.thumb.format;
+
 import 'dart:convert';
 
 import 'package:armv4t/decode.dart';
