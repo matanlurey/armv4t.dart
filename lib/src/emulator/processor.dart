@@ -60,10 +60,12 @@ abstract class Arm7Processor {
   static const _LR = 14;
   static const _PC = 15;
 
-  /// Returns a default (valid) register set for a reset processor state.
+  /// Returns a default (valid) register set for user-mode execution.
+  ///
+  /// TODO: Move this into `test/` and remove from the public API.
   @visibleForTesting
-  static Uint32List defaultRegisterSet() {
-    return _Arm7Processor._defaultRegisterSet();
+  static Uint32List testUserState() {
+    return _Arm7Processor._testUserState();
   }
 
   /// Creates a new [Arm7Processor], which uses the `ARMv4T` instruction set.
@@ -167,7 +169,7 @@ abstract class Arm7Processor {
 }
 
 class _Arm7Processor extends Arm7Processor {
-  static Uint32List _defaultRegisterSet() => Uint32List(_physicalRegisters)
+  static Uint32List _testUserState() => Uint32List(_physicalRegisters)
     ..[_statusRegistersUsr] =
         StatusRegister._defaultForMode(ArmOperatingMode.usr).toBits().value
     ..[_statusRegsitersFiq] =
@@ -233,8 +235,10 @@ class _Arm7Processor extends Arm7Processor {
 
   factory _Arm7Processor({Uint32List registers}) {
     if (registers == null) {
-      // Create a new empty register set.
-      registers = _defaultRegisterSet();
+      // Create a new cold-boot register set.
+      return _Arm7Processor(
+        registers: Uint32List(_physicalRegisters),
+      )..unsafeSetCpsr(StatusRegister.coldBoot);
     } else if (registers.length != _physicalRegisters) {
       throw ArgumentError.value(
         registers,
@@ -384,6 +388,14 @@ class _Arm7Processor extends Arm7Processor {
 @immutable
 @sealed
 abstract class StatusRegister {
+  /// Represents a default "cold-boot" state.
+  ///
+  /// - ARM State
+  /// - Supervisor Mode
+  /// - FIQ Set
+  /// - IRQ Set
+  static final coldBoot = StatusRegister(Uint32(0xd3));
+
   factory StatusRegister([Uint32 value]) {
     if (value == null) {
       return StatusRegister._defaultForMode(ArmOperatingMode.usr);

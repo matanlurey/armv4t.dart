@@ -15,7 +15,7 @@ void main() {
   ArmInterpreter interpreter;
 
   setUp(() {
-    cpu = Arm7Processor();
+    cpu = Arm7Processor(registers: Arm7Processor.testUserState());
     interpreter = ArmInterpreter(cpu, Memory.none());
   });
 
