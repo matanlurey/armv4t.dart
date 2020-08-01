@@ -263,8 +263,10 @@ class _ArmInterpreter
     int carryIn = 0,
   }) {
     var sum = op1 + op2;
-    if (carryIn != 0) {
+    if (carryIn > 0) {
       sum = sum.add64(carryIn.hiLo());
+    } else if (carryIn < 0) {
+      sum = sum.sub64(carryIn.hiLo());
     }
     return sum;
   }
@@ -336,7 +338,7 @@ class _ArmInterpreter
     final res = _addWithCarry(
       op1,
       op2,
-      carryIn: cpu.cpsr.isCarry ? 1 : 0,
+      carryIn: -1 + (cpu.cpsr.isCarry ? 1 : 0),
     );
     if (i.setConditionCodes && !i.destination.isProgramCounter) {
       _writeToAllFlags(
