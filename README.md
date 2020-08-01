@@ -27,6 +27,10 @@ An emulator for the [ARMv4T instruction set][], written in Dart.
 
 Emulator and related components necessary to load and execute ARMv4T programs.
 
+### `debug.dart`
+
+Components specific to aid debugging.
+
 ### `decode.dart`
 
 Contains classes and data structures for decoding (and in some cases, encoding)
