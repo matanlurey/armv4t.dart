@@ -131,7 +131,7 @@ void main() {
 
     expect(read(0x200), 4);
     expect(read(0x204), 5);
-  }, skip: 'TODO: Correctly implement (Long Branch with Link) for Thumb');
+  });
 
   test('thm5.asm', () async {
     final program = await _TestProgram.load('thm5');

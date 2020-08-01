@@ -743,10 +743,10 @@ class _ThumbToArmDecoder extends Converter<Uint16, ArmInstruction>
     LongBranchWithLinkThumbFormat format, [
     void _,
   ]) {
-    // TODO: Correctly implement BL.
     return BLArmInstruction(
       condition: _always,
       offset: Int24(format.offset.value.toSigned(11)),
+      thumbLongBranch: format.hBit,
     );
   }
 

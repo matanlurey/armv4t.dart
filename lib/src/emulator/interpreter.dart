@@ -1172,13 +1172,7 @@ class _ArmInterpreter
     final destination = Uint32(
       origin + (offset * numBytes) + (2 * numBytes),
     );
-    cpu.programCounter = destination;
-    _debugHooks.onRegisterWrite(
-      RegisterAny.pc,
-      destination,
-      forcedUserMode: false,
-    );
-    _executedBranch = true;
+    _writeRegister(RegisterAny.pc, destination);
   }
 
   @override
@@ -1188,10 +1182,31 @@ class _ArmInterpreter
 
   @override
   void visitBL(BLArmInstruction i, [void _]) {
-    final returnTo = cpu.programCounter.value + 4;
-    cpu.linkRegister = Uint32(returnTo);
-    _writeRegister(RegisterAny.lr, Uint32(returnTo));
-    _branch(i.offset.value);
+    final pc = _readRegister(RegisterAny.pc);
+
+    // ARM or THUMB Based "Branch with Link".
+    if (i.thumbLongBranch == null) {
+      final returnTo = pc.value + 4;
+      _writeRegister(RegisterAny.lr, Uint32(returnTo));
+      _branch(i.offset.value);
+      return;
+    }
+
+    // THUMB Based "Long Branch with Link".
+    // Unlike other THUMB mode instructions, this instruction ends up occupying
+    // 32-bits of memory (split into two distnmict 16-bit THUMB opcodes).
+    if (!i.thumbLongBranch) {
+      // The first instruction (H=0) sets the LR.
+      final link = (pc.value + 4 + (i.offset.value << 12)).signExtend(11, 23);
+      _writeRegister(RegisterAny.lr, Uint32(link));
+    } else {
+      // The second instruction sets PC, and then sets the LR again.
+      final link = _readRegister(RegisterAny.lr).value;
+      final from = _readRegister(RegisterAny.pc).value;
+      final goto = link + (i.offset.value << 1);
+      _writeRegister(RegisterAny.pc, Uint32(goto));
+      _writeRegister(RegisterAny.lr, Uint32(from + 2));
+    }
   }
 
   @override
@@ -1201,10 +1216,11 @@ class _ArmInterpreter
     if (to.isSet(0)) {
       cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: true));
       final jump = to - 1;
-      cpu.programCounter = Uint32(jump);
+      _writeRegister(RegisterAny.pc, Uint32(jump));
+      cpu.incrementProgramCounter();
     } else {
       cpu.unsafeSetCpsr(cpu.cpsr.update(thumbState: false));
-      cpu.programCounter = _readRegister(i.operand);
+      _writeRegister(RegisterAny.pc, Uint32(to));
     }
   }
 
@@ -1220,14 +1236,14 @@ class _ArmInterpreter
     // CPSR_F           = 1 (Reset and FIQ Only)
     // PC               = EXCEPTION_VECTOR
     final cpsr = cpu.cpsr;
+    _writeRegister(RegisterAny.lr, _readRegister(RegisterAny.pc));
     cpu
-      ..linkRegister = cpu.programCounter
       ..unsafeSetCpsr(cpu.cpsr.update(
         thumbState: false,
         mode: ArmOperatingMode.svc,
       ))
-      ..spsr = cpsr
-      ..programCounter = Uint32(_baseVector + _swiOffsets);
+      ..spsr = cpsr;
+    _writeRegister(RegisterAny.pc, Uint32(_baseVector + _swiOffsets));
   }
 
   @override

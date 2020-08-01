@@ -348,6 +348,10 @@ extension Uint24X on Uint24 {
   Int24 toSigned() => Int24(value.toSigned(24));
 }
 
+extension Int24X on Int24 {
+  Uint24 toUnsigned() => Uint24(value.toUnsigned(24));
+}
+
 /// Encapsulates an signed 24-bit aggregation.
 @sealed
 class Int24 extends Integral<Int24> {
