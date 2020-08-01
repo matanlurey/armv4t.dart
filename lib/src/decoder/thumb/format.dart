@@ -1,4 +1,7 @@
-/// {@category thumb}
+/// Decoding elements specific to `THUMB`.
+///
+/// {@category THUMB}
+/// {@subCategory Formats}
 library armv4t.decoder.thumb.format;
 
 import 'dart:convert';

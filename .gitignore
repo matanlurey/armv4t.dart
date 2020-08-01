@@ -1,6 +1,7 @@
 .dart_tool/
 .packages
 coverage/
+doc/api/
 
 # https://github.com/pulyaevskiy/test-coverage/issues/15
 coverage_badge.svg

@@ -1,5 +1,7 @@
-/// {@category arm}
-/// {@subCategory formats}
+/// Decoding formats specific to `ARM`.
+///
+/// {@category ARM}
+/// {@subCategory Formats}
 library armv4t.decoder.arm.format;
 
 import 'dart:convert';

@@ -1,4 +1,6 @@
-/// {@category arm}
+/// Decoding elements specific to `ARM`.
+///
+/// {@category ARM}
 library armv4t.decoder.arm.printer;
 
 import 'package:armv4t/src/decoder/arm/condition.dart';
