@@ -18,7 +18,7 @@ void main() {
   final r1 = RegisterAny(Uint4(1));
 
   setUp(() {
-    cpu = Arm7Processor();
+    cpu = Arm7Processor(registers: Arm7Processor.testUserState());
     memory = Memory.empty(20);
     interpreter = ArmInterpreter(cpu, memory);
   });

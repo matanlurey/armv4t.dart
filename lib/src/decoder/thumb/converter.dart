@@ -1,3 +1,8 @@
+/// Decoding elements specific to `THUMB`.
+///
+/// {@category THUMB}
+library armv4t.decoder.thumb.converter;
+
 import 'dart:convert';
 
 import 'package:armv4t/src/common/binary.dart';

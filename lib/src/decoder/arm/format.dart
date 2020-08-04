@@ -1,3 +1,9 @@
+/// Decoding formats specific to `ARM`.
+///
+/// {@category ARM}
+/// {@subCategory Formats}
+library armv4t.decoder.arm.format;
+
 import 'dart:convert';
 
 import 'package:armv4t/src/common/assert.dart';

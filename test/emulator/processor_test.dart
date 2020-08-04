@@ -8,7 +8,7 @@ void main() {
   group('Arm7Processor', () {
     Uint32List registers;
 
-    setUp(() => registers = Arm7Processor.defaultRegisterSet());
+    setUp(() => registers = Arm7Processor.testUserState());
 
     test('copyRegisters', () {
       expect(registers, Arm7Processor(registers: registers).copyRegisters());

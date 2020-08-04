@@ -1,3 +1,8 @@
+/// Decoding elements specific to `ARM`.
+///
+/// {@category ARM}
+library armv4t.decoder.arm;
+
 import 'package:meta/meta.dart';
 
 /// _ARM_ opcode suffixes that are used for conditionally executing code.

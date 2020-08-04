@@ -1,3 +1,9 @@
+/// Decoding instructions specific to `ARM`.
+///
+/// {@category ARM}
+/// {@subCategory Instructions}
+library armv4t.decoder.arm.instruction;
+
 import 'package:armv4t/decode.dart';
 import 'package:armv4t/src/common/assert.dart';
 import 'package:armv4t/src/common/binary.dart';

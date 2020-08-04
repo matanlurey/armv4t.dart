@@ -20,7 +20,7 @@ void main() {
   final r3 = RegisterNotPC(Uint4(3));
 
   setUp(() {
-    cpu = Arm7Processor();
+    cpu = Arm7Processor(registers: Arm7Processor.testUserState());
     interpreter = ArmInterpreter(cpu, Memory.none());
   });
 
